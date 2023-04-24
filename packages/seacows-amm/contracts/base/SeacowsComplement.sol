@@ -19,8 +19,8 @@ contract SeacowsComplement is ISeacowsComplement {
     constructor() {}
 
     function getComplementedBalance(address _token, address _collection) public view returns (uint256 balance0, uint256 balance1) {
-        balance0 = uint256(int256(IERC20(_collection).balanceOf(address(this))) - complement0);
-        balance1 = uint256(IERC721(_token).balanceOf(address(this)).mul(COMPLEMENT_PRECISION)) - complement1;
+        balance0 = uint256(int256(IERC20(_token).balanceOf(address(this))) - complement0);
+        balance1 = uint256(IERC721(_collection).balanceOf(address(this)).mul(COMPLEMENT_PRECISION)) - complement1;
     }
 
     // Expect _amount1Out = NFT quantity output * precision
@@ -33,11 +33,13 @@ contract SeacowsComplement is ISeacowsComplement {
             complement1 = _complementedAmount1Out - amount1Out;
 
             if (amount1Out >= _amount1Out) {
-                amount0Out = uint256(_amount0Out - (amount1Out - _amount1Out).mul(_spot));
-                complement0 -= int256(amount1Out);
+                uint _complement0 = (amount1Out - _amount1Out).mul(_spot);
+                amount0Out = uint256(_amount0Out - _complement0);
+                complement0 += int256(_complement0);
             } else {
-                amount0Out = uint256(_amount0Out + (_amount1Out - amount1Out).mul(_spot));
-                complement0 += int256(amount1Out);
+                uint _complement0 = (_amount1Out - amount1Out).mul(_spot);
+                amount0Out = uint256(_amount0Out + _complement0);
+                complement0 -= int256(_complement0);
             }
         } else {
             complement1 += _amount1Out;
@@ -45,7 +47,7 @@ contract SeacowsComplement is ISeacowsComplement {
 
             uint256 _complement0 = uint256(_amount1Out.mul(_spot));
             amount0Out = uint256(_amount0Out + _complement0);
-            complement0 += int256(_complement0);
+            complement0 -= int256(_complement0);
         }
 
     }
