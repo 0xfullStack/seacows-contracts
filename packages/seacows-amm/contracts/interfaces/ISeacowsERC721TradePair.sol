@@ -27,7 +27,7 @@ interface ISeacowsERC721TradePair is ISeacowsComplement {
     function initialize(address _collection, address _token, uint112 _fee) external;
     // function initialize(address collection_, address token_, uint112 fee_, uint256 slot_) external;
     function getReserves() external view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast);
-    function mint(address to) external returns (uint liquidity);
+    function mint(uint256 toTokenId) external returns (uint liquidity);
     function burn(address to, uint256[] memory ids) external returns (uint amount0, uint amount1);
     function swap(uint tokenAmountOut, uint[] memory idsOut, address to) external;
 }

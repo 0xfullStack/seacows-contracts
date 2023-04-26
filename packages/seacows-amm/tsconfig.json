@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "types/*": ["types/*"]
+      "types/*": ["types/*"],
+      "abis/*": ["abis/*"],
     },
     "target": "es2019",
     "module": "commonjs",
@@ -14,6 +15,6 @@
     "useUnknownInCatchVariables": false,
     "declaration": true
   },
-  "include": ["./types", "./scripts", "./test", "./tasks", "./deployed", "./helpers", "./abis/**/*.json","./index.ts"],
+  "include": ["./types", "./scripts", "./test", "./tasks", "./deployed", "./helpers", "./abis/**/*.json","./index.ts", ".eslintrc.js"],
   "files": ["./hardhat.config.ts"]
 }

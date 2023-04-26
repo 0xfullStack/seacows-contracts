@@ -14,8 +14,6 @@ contract SeacowsERC721TradePairFactory is ISeacowsERC721TradePairFactory {
     // token => collection => fee => pair
     mapping(address => mapping(address => mapping(uint112 => address))) private _pairs;
 
-    event PairCreated(address indexed token, address indexed collection, uint fee, address pair);
-
     constructor(address template_) {
         _template = template_;
     }
@@ -33,6 +31,5 @@ contract SeacowsERC721TradePairFactory is ISeacowsERC721TradePairFactory {
         _pair = Clones.clone(template());
         ISeacowsERC721TradePair(_pair).initialize(_token, _collection, _fee);
         _pairs[_token][_collection][_fee] = _pair;
-        emit PairCreated(_token, _collection, _fee, _pair);
     }
 }

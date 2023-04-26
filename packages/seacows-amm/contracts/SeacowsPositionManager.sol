@@ -22,6 +22,8 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     address public immutable WETH;
 
     mapping(address => uint256) private _pairSlots;
+    mapping(address => uint256) private _pairTokenIds;
+
     Counters.Counter private _slotGenerator;
 
     constructor(address template_, address _WETH) SeacowsERC3525("Seacows LP Token", "SLP", 18) SeacowsERC721TradePairFactory(template_) {
@@ -41,7 +43,11 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     function createPair(address _token, address _collection, uint112 _fee) public returns (address _pair) {
         _pair = _createPair(_token, _collection, _fee);
         uint256 _slot = _createSlot(_pair);
+        uint256 tokenId = _mint(_pair, _slot, 0);
         _pairSlots[_pair] = _slot;
+        _pairTokenIds[_pair] = tokenId;
+        
+        emit PairCreated(_token, _collection, _fee, _slot, _pair);
     }
 
     // **** ADD LIQUIDITY ****
@@ -77,7 +83,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint tokenDesired,
         uint[] memory idsDesired,
         uint tokenMin,
-        address to,
+        uint256 toTokenId,
         uint deadline
     ) external virtual ensure(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
         (tokenAmount, ids) = _addLiquidity(token, collection, fee, tokenDesired, idsDesired, tokenMin);
@@ -85,9 +91,9 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
         IERC20(token).transferFrom(msg.sender, pair, tokenAmount);
         for (uint i = 0; i < idsDesired.length; i++) {
-            IERC721(collection).safeTransferFrom(msg.sender, to, idsDesired[i]);
+            IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
         }
-        liquidity = ISeacowsERC721TradePair(pair).mint(to);
+        liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
     }
 
     function addLiquidityETH(
@@ -95,7 +101,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint112 fee,
         uint[] memory idsDesired,
         uint tokenMin,
-        address to,
+        uint256 toTokenId,
         uint deadline
     ) external virtual payable ensure(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
         (tokenAmount, ids) = _addLiquidity(
@@ -111,13 +117,13 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         assert(IWETH(WETH).transfer(pair, tokenAmount));
 
         for (uint i = 0; i < idsDesired.length; i++) {
-            IERC721(collection).safeTransferFrom(msg.sender, to, idsDesired[i]);
+            IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
         }
 
-        liquidity = ISeacowsERC721TradePair(pair).mint(to);
+        liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
         // refund dust eth, if any
         if (msg.value > tokenAmount) {
-            (bool success, ) = to.call{ value: msg.value - tokenAmount }("");
+            (bool success, ) = msg.sender.call{ value: msg.value - tokenAmount }("");
             require(success, "ETH transfer failed");
         }
     }
@@ -130,13 +136,14 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint liquidity,
         uint tokenMin,
         uint[] memory idsDesired,
+        uint256 fromTokenId,
         address to,
         uint deadline
     ) public virtual ensure(deadline) returns (uint tokenAmount, uint nftAmount) {
         address pair = getPair(token, collection, fee);
-        uint256 _slot = slotOfPair(pair);
+        uint256 _pairTokenId = tokenOfPair(pair);
 
-        transferFrom(tokenOfOwnerInSlot(msg.sender, _slot), pair, liquidity); // send liquidity to pair
+        transferFrom(fromTokenId, _pairTokenId, liquidity); // send liquidity to pair
         (tokenAmount, ) = ISeacowsERC721TradePair(pair).burn(to, idsDesired);
         require(tokenAmount >= tokenMin, "SeacowsPositionManager: INSUFFICIENT_TOKEN_AMOUNT");
         nftAmount = idsDesired.length;
@@ -148,6 +155,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint liquidity,
         uint tokenMin,
         uint[] memory idsDesired,
+        uint256 fromTokenId,
         address to,
         uint deadline
     ) public virtual ensure(deadline) returns (uint tokenAmount, uint nftAmount) {
@@ -158,6 +166,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
             liquidity,
             tokenMin,
             idsDesired,
+            fromTokenId,
             address(this),
             deadline
         );
@@ -172,22 +181,17 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         require(success, "TransferHelper::safeTransferETH: ETH transfer failed");
     }
     
-    function mintValue(address _to, uint256 _slot, uint256 _value) public onlyPair(_slot) {
-        uint256 tokenId = tokenOfOwnerInSlot(_to, _slot);
-        if (tokenId == 0) {
-            _mint(_to, _slot, _value);
-        } else {
-            _mintValue(tokenId, _value);
-        }
+    function mintValue(uint256 tokenId, uint256 _value) public onlyPair(slotOf(tokenId)) {
+        _mintValue(tokenId, _value);
     }
     
-    // function burn(address _from, uint256 _slot, uint256 _value) public onlyPair(_slot) {
-    //     // require(balanceOf())
-    //     _burnValue(tokenOfOwnerInSlot(_from, _slot), _value);
-    // }
+    function burn(uint256 tokenId) public {
+        require(ownerOf(tokenId) == msg.sender, "SeacowsPositionManager: UNAUTHORIZED");
+        require(balanceOf(tokenId) == 0, "SeacowsPositionManager: NOT_CLEARED");
+        _burn(tokenId);
+    }
     
-    function burnValue(address _from, uint256 _slot, uint256 burnValue_) public onlyPair(_slot) {
-        uint256 tokenId = tokenOfOwnerInSlot(_from, _slot);
+    function burnValue(uint256 tokenId, uint256 burnValue_) public onlyPair(slotOf(tokenId)) {
         _burnValue(tokenId, burnValue_);
     }
 
@@ -228,6 +232,10 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
     function slotOfPair(address _pair) public view returns (uint256) {
         return _pairSlots[_pair];
+    }
+
+    function tokenOfPair(address _pair) public view returns (uint256) {
+        return _pairTokenIds[_pair];
     }
     
     function _createSlot(address _pair) internal returns (uint256 newSlot) {
