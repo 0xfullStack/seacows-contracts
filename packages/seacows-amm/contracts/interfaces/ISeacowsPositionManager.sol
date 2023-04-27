@@ -10,7 +10,8 @@ interface ISeacowsPositionManager is ISeacowsERC3525 {
     // function totalValueSupplyOf(uint256 _slot) external view returns (uint256);
     // function tokenOfOwnerInSlot(address _owner, uint256 _slot) external view returns (uint256);
     function slotOfPair(address _pair) external view returns (uint256);
-    function tokenOfPair(address _pair) external view returns (uint256);
+    function tokenOf(address _pair) external view returns (uint256);
+    function lockTokenOf(address _pair) external view returns (uint256);
     
     function mintValue(uint256 tokenId, uint256 _value) external;
     function burnValue(uint256 tokenId, uint256 burnValue_) external;

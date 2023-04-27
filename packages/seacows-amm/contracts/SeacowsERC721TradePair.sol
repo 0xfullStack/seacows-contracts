@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -12,11 +13,12 @@ import { ISeacowsERC721TradePairFactory } from "./interfaces/ISeacowsERC721Trade
 import { ISeacowsPositionManager } from "./interfaces/ISeacowsPositionManager.sol";
 import "./lib/UQ112x112.sol";
 import "./base/SeacowsComplement.sol";
+import "./base/SeacowsComplement.sol";
 
 /// @title The base contract for an NFT/TOKEN AMM pair
 /// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
 /// @notice This implements the core swap logic from NFT to TOKEN
-contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement, ISeacowsERC721TradePair {
+contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement, IERC721Receiver, ISeacowsERC721TradePair {
     using SafeMath for uint;
     using SafeMath for uint112;
     using UQ112x112 for uint224;
@@ -82,7 +84,7 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
         uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
-           _mint(ISeacowsPositionManager(positionManager()).tokenOfPair(address(this)), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+           _mint(ISeacowsPositionManager(positionManager()).lockTokenOf(address(this)), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
             liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
         }
@@ -101,8 +103,8 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
         address _collection = collection;                                // gas savings
         (uint balance0, uint balance1) = getComplementedBalance(_token, _collection);
 
-        uint256 _pairTokenId = ISeacowsPositionManager(positionManager()).tokenOfPair(address(this));
-        uint liquidity = ISeacowsPositionManager(positionManager()).balanceOf(_pairTokenId).sub(MINIMUM_LIQUIDITY);
+        uint256 _pairTokenId = ISeacowsPositionManager(positionManager()).tokenOf(address(this));
+        uint liquidity = ISeacowsPositionManager(positionManager()).balanceOf(_pairTokenId);
 
         { // scope to avoid stack too deep errors
         uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
@@ -202,5 +204,9 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
 
     function _burn(uint256 fromTokenId, uint _liquidity) private {
         ISeacowsPositionManager(positionManager()).burnValue(fromTokenId, _liquidity);
+    }
+    
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) public override returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }
