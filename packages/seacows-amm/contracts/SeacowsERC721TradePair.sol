@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -13,12 +12,12 @@ import { ISeacowsERC721TradePairFactory } from "./interfaces/ISeacowsERC721Trade
 import { ISeacowsPositionManager } from "./interfaces/ISeacowsPositionManager.sol";
 import "./lib/UQ112x112.sol";
 import "./base/SeacowsComplement.sol";
-import "./base/SeacowsComplement.sol";
+import "./base/SeacowsPairMetadata.sol";
 
 /// @title The base contract for an NFT/TOKEN AMM pair
 /// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
 /// @notice This implements the core swap logic from NFT to TOKEN
-contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement, IERC721Receiver, ISeacowsERC721TradePair {
+contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement, SeacowsPairMetadata, ISeacowsERC721TradePair {
     using SafeMath for uint;
     using SafeMath for uint112;
     using UQ112x112 for uint224;
@@ -157,7 +156,7 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
         require(amount0In > 0 || amount1In > 0, "Seacows: INSUFFICIENT_INPUT_AMOUNT");
         { // scope for reserve{0,1}Adjusted, avoids stack too deep errors
         uint balance0Adjusted = balance0.mul(PERCENTAGE_PRECISION).sub(amount0In.mul(fee));
-        uint balance1Adjusted = balance1.mul(PERCENTAGE_PRECISION).sub(amount1In.mul(fee));
+        uint balance1Adjusted = balance1.mul(PERCENTAGE_PRECISION);
         require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(PERCENTAGE_PRECISION**2), "Seacows: K");
         }
 
@@ -204,9 +203,5 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
 
     function _burn(uint256 fromTokenId, uint _liquidity) private {
         ISeacowsPositionManager(positionManager()).burnValue(fromTokenId, _liquidity);
-    }
-    
-    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) public override returns (bytes4) {
-        return IERC721Receiver.onERC721Received.selector;
     }
 }
