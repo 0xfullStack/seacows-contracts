@@ -714,6 +714,11 @@ describe('SeacowsPositionManager', () => {
         );
     });
 
+    it('Should not burn liquidity when liquidity > 0 in the NFT', async () => {
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('3'));
+      await expect(manager.connect(alice).burn(2)).to.be.revertedWith('SeacowsPositionManager: NOT_CLEARED');
+    });
+
     it('Should burn liquidity when liquidity = 0 in the NFT', async () => {
       await manager
         .connect(alice)
@@ -728,8 +733,11 @@ describe('SeacowsPositionManager', () => {
           alice.address,
           MaxUint256,
         );
+      await expect(manager.connect(alice).burn(2))
+        .to.emit(manager, 'Transfer')
+        .withArgs(alice.address, ethers.constants.AddressZero, 2)
+        .to.emit(manager, 'TransferValue')
+        .withArgs(2, 0, 0);
     });
-
-    //   it('Should mint anonther Position NFT and add liquidity', async () => {});
   });
 });
