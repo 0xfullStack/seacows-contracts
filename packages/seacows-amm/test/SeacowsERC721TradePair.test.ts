@@ -81,23 +81,18 @@ describe('SeacowsERC721TradePair', () => {
        * @notes
        * At this point, 3 position NFTs are minted
        * Pair Position NFT ID = 1, 0 liquidity
-       * Pair Lock Position NFT ID = 2, 10000 liquidity
-       * Alice Position NFT ID = 3,
+       * Alice Position NFT ID = 2,
        */
       expect(await manager.ownerOf(1)).to.be.equal(pair.address);
-      expect(await manager.ownerOf(2)).to.be.equal(pair.address);
-      expect(await manager.ownerOf(3)).to.be.equal(alice.address);
+      expect(await manager.ownerOf(2)).to.be.equal(alice.address);
 
-      const lockedLiquidity = await manager['balanceOf(uint256)'](2);
-      const aliceLiquidity = await manager['balanceOf(uint256)'](3);
-      expect(lockedLiquidity).to.be.equal(10000);
-      expect(aliceLiquidity.add(lockedLiquidity)).to.be.equal(
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(
         sqrt(ethers.utils.parseEther('2').mul(BigNumber.from(1).mul(COMPLEMENT_PRECISION))),
       );
     });
 
     it('Should mint liqidity correctly even not using SeacowsPositionManager', async () => {
-      const aliceLiquidityBefore = await manager['balanceOf(uint256)'](3);
+      const aliceLiquidityBefore = await manager['balanceOf(uint256)'](2);
       /**
        * @notes transfer assets from Alice to Pair
        * ERC20: 2 Ethers
@@ -118,10 +113,10 @@ describe('SeacowsERC721TradePair', () => {
       const expectedLiquidityToMint = liquidity1.lte(liquidity2) ? liquidity1 : liquidity2;
 
       // Mint liquidity based on balance
-      await expect(pair.connect(alice).mint(3))
+      await expect(pair.connect(alice).mint(2))
         .to.be.emit(pair, 'Mint')
         .withArgs(alice.address, ethers.utils.parseEther('2'), ethers.utils.parseEther('3'));
-      expect(await manager['balanceOf(uint256)'](3)).to.be.equal(aliceLiquidityBefore.add(expectedLiquidityToMint));
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(aliceLiquidityBefore.add(expectedLiquidityToMint));
     });
 
     it('Should have the correct final state', async () => {
@@ -133,7 +128,7 @@ describe('SeacowsERC721TradePair', () => {
        */
       expect(await erc721.balanceOf(alice.address)).to.be.equal(1);
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6'));
-      expect(await manager.ownerOf(3)).to.be.equal(alice.address);
+      expect(await manager.ownerOf(2)).to.be.equal(alice.address);
 
       /**
        * @notes Summary of Pair at this stage
@@ -144,7 +139,6 @@ describe('SeacowsERC721TradePair', () => {
       expect(await erc721.balanceOf(pair.address)).to.be.equal(4);
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4'));
       expect(await manager.ownerOf(1)).to.be.equal(pair.address);
-      expect(await manager.ownerOf(2)).to.be.equal(pair.address);
     });
   });
 
@@ -178,9 +172,9 @@ describe('SeacowsERC721TradePair', () => {
     it('Should burn liqidity correctly even not using SeacowsPositionManager', async () => {
       // Owner of ERC721 ID = 1 is the Pair
       expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
-      const bobLiquidity = await manager['balanceOf(uint256)'](4);
+      const bobLiquidity = await manager['balanceOf(uint256)'](3);
       const pairTokenId = await manager.tokenOf(pair.address);
-      await manager.connect(bob)['transferFrom(uint256,uint256,uint256)'](4, pairTokenId, bobLiquidity);
+      await manager.connect(bob)['transferFrom(uint256,uint256,uint256)'](3, pairTokenId, bobLiquidity);
 
       // Bob burn the liquidity and want to get back ERC721 with ID = [1]
       await expect(pair.connect(bob).burn(bob.address, [1]))
@@ -201,7 +195,7 @@ describe('SeacowsERC721TradePair', () => {
        */
       expect(await erc721.balanceOf(alice.address)).to.be.equal(1);
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6'));
-      expect(await manager.ownerOf(3)).to.be.equal(alice.address);
+      expect(await manager.ownerOf(2)).to.be.equal(alice.address);
 
       /**
        * @notes Summary of Bob at this stage
@@ -213,7 +207,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
       expect(await erc721.ownerOf(6)).to.be.equal(bob.address);
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('10'));
-      expect(await manager.ownerOf(4)).to.be.equal(bob.address);
+      expect(await manager.ownerOf(3)).to.be.equal(bob.address);
 
       /**
        * @notes Summary of Pair at this stage
@@ -227,7 +221,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(await erc721.ownerOf(5)).to.be.equal(pair.address);
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4'));
       expect(await manager.ownerOf(1)).to.be.equal(pair.address);
-      expect(await manager.ownerOf(2)).to.be.equal(pair.address);
+      expect(await manager.ownerOf(2)).to.be.equal(alice.address);
     });
   });
 

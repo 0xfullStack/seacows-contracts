@@ -16,14 +16,13 @@ import { SeacowsLibrary } from "./lib/SeacowsLibrary.sol";
 /// @title The base contract for an NFT/TOKEN AMM pair
 /// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
 /// @notice This implements the core swap logic from NFT to TOKEN
-contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory,  ISeacowsPositionManager {
+contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory, ISeacowsPositionManager {
     using Counters for Counters.Counter;
 
     address public immutable WETH;
 
     mapping(address => uint256) private _pairSlots;
     mapping(address => uint256) private _pairTokenIds;
-    mapping(address => uint256) private _pairLockTokenIds;
 
     Counters.Counter private _slotGenerator;
 
@@ -50,10 +49,8 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         _pair = _createPair(_token, _collection, _fee);
         uint256 _slot = _createSlot(_pair);
         uint256 tokenId = _mint(_pair, _slot, 0);
-        uint256 lockTokenId = _mint(_pair, _slot, 0);
         _pairSlots[_pair] = _slot;
         _pairTokenIds[_pair] = tokenId;
-        _pairLockTokenIds[_pair] = lockTokenId;
         
         emit PairCreated(_token, _collection, _fee, _slot, _pair);
     }
@@ -298,10 +295,6 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
     function tokenOf(address _pair) public view returns (uint256) {
         return _pairTokenIds[_pair];
-    }
-
-    function lockTokenOf(address _pair) public view returns (uint256) {
-        return _pairLockTokenIds[_pair];
     }
     
     function _createSlot(address _pair) internal returns (uint256 newSlot) {

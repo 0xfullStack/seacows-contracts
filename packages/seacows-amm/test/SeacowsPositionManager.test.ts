@@ -9,7 +9,7 @@ import {
   type MockERC721,
   type MockERC20,
 } from 'types';
-import { ONE_PERCENT, POINT_FIVE_PERCENT, MINIMUM_LIQUIDITY } from './constants';
+import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
 import { sqrt } from './utils';
 
 describe('SeacowsPositionManager', () => {
@@ -51,7 +51,6 @@ describe('SeacowsPositionManager', () => {
 
       expect(await pair.positionManager()).to.be.equal(manager.address);
       expect(await pair.fee()).to.be.equal(ONE_PERCENT);
-      expect(await pair.MINIMUM_LIQUIDITY()).to.be.equal(MINIMUM_LIQUIDITY);
       expect(await pair.PERCENTAGE_PRECISION()).to.be.equal(10000);
       expect(await pair.ONE_PERCENT()).to.be.equal(ONE_PERCENT);
       expect(await pair.POINT_FIVE_PERCENT()).to.be.equal(POINT_FIVE_PERCENT);
@@ -66,7 +65,6 @@ describe('SeacowsPositionManager', () => {
       const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
 
       expect(await manager.tokenOf(pair.address)).to.be.equal(1);
-      expect(await manager.lockTokenOf(pair.address)).to.be.equal(2);
     });
 
     it('Should create same pair with different fee', async () => {
@@ -142,22 +140,19 @@ describe('SeacowsPositionManager', () => {
         .to.emit(manager, 'PairCreated')
         .withArgs(erc20.address, erc721.address, ONE_PERCENT, 1, pair.address)
         .to.emit(manager, 'Transfer')
-        .withArgs(ethers.constants.AddressZero, alice.address, 3)
+        .withArgs(ethers.constants.AddressZero, alice.address, 2)
         .to.emit(manager, 'TransferValue')
-        .withArgs(0, 3, ethers.utils.parseEther('3').sub(MINIMUM_LIQUIDITY));
+        .withArgs(0, 2, ethers.utils.parseEther('3'));
 
       // Verify Pair assets
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('3'));
       expect(await erc721.balanceOf(pair.address)).to.be.equal(3);
 
       // Verify Position NFT owned by Alice
-      expect(await manager.ownerOf(3)).to.be.equal(alice.address);
+      expect(await manager.ownerOf(2)).to.be.equal(alice.address);
       const [balance0, balance1] = await pair.getComplementedBalance(erc20.address, erc721.address);
       const liquidity = sqrt(balance0.mul(balance1));
-      expect(await manager['balanceOf(uint256)'](3)).to.be.equal(liquidity.sub(MINIMUM_LIQUIDITY));
-      expect(await manager['balanceOf(uint256)'](await manager.lockTokenOf(pair.address))).to.be.equal(
-        MINIMUM_LIQUIDITY,
-      );
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(liquidity);
 
       // Verify Alice balances
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
@@ -190,9 +185,9 @@ describe('SeacowsPositionManager', () => {
           ),
       )
         .to.emit(manager, 'Transfer')
-        .withArgs(ethers.constants.AddressZero, alice.address, 4)
+        .withArgs(ethers.constants.AddressZero, alice.address, 3)
         .to.emit(manager, 'TransferValue')
-        .withArgs(0, 4, liquidity);
+        .withArgs(0, 3, liquidity);
 
       // Verify Pair assets
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4'));
@@ -243,22 +238,19 @@ describe('SeacowsPositionManager', () => {
         .to.emit(manager, 'PairCreated')
         .withArgs(weth.address, erc721.address, ONE_PERCENT, 1, pair.address)
         .to.emit(manager, 'Transfer')
-        .withArgs(ethers.constants.AddressZero, alice.address, 3)
+        .withArgs(ethers.constants.AddressZero, alice.address, 2)
         .to.emit(manager, 'TransferValue')
-        .withArgs(0, 3, ethers.utils.parseEther('3').sub(MINIMUM_LIQUIDITY));
+        .withArgs(0, 2, ethers.utils.parseEther('3'));
 
       // Verify Pair assets
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('3'));
       expect(await erc721.balanceOf(pair.address)).to.be.equal(3);
 
       // Verify Position NFT owned by Alice
-      expect(await manager.ownerOf(3)).to.be.equal(alice.address);
+      expect(await manager.ownerOf(2)).to.be.equal(alice.address);
       const [balance0, balance1] = await pair.getComplementedBalance(weth.address, erc721.address);
       const liquidity = sqrt(balance0.mul(balance1));
-      expect(await manager['balanceOf(uint256)'](3)).to.be.equal(liquidity.sub(MINIMUM_LIQUIDITY));
-      expect(await manager['balanceOf(uint256)'](await manager.lockTokenOf(pair.address))).to.be.equal(
-        MINIMUM_LIQUIDITY,
-      );
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(liquidity);
 
       // Verify Alice balances
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
@@ -280,9 +272,9 @@ describe('SeacowsPositionManager', () => {
         }),
       )
         .to.emit(manager, 'Transfer')
-        .withArgs(ethers.constants.AddressZero, alice.address, 4)
+        .withArgs(ethers.constants.AddressZero, alice.address, 3)
         .to.emit(manager, 'TransferValue')
-        .withArgs(0, 4, liquidity);
+        .withArgs(0, 3, liquidity);
 
       // Verify Pair assets
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4'));
@@ -358,7 +350,7 @@ describe('SeacowsPositionManager', () => {
           ethers.utils.parseEther('1'),
           [4],
           ethers.utils.parseEther('1'),
-          3,
+          2,
           MaxUint256,
         );
       /**
@@ -374,7 +366,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(pairAddress)).to.be.equal(4);
 
       // Check liqudity balance of Alice Position NFT
-      expect(await manager['balanceOf(uint256)'](3)).to.be.equal(ethers.utils.parseEther('4').sub(MINIMUM_LIQUIDITY));
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('4'));
     });
 
     it('Should revert for invalid token ID', async () => {
@@ -443,7 +435,7 @@ describe('SeacowsPositionManager', () => {
 
       await manager
         .connect(alice)
-        .addLiquidityETH(erc721.address, ONE_PERCENT, [4], ethers.utils.parseEther('1'), 3, MaxUint256, {
+        .addLiquidityETH(erc721.address, ONE_PERCENT, [4], ethers.utils.parseEther('1'), 2, MaxUint256, {
           value: ethers.utils.parseEther('1'),
         });
       /**
@@ -459,7 +451,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(pairAddress)).to.be.equal(4);
 
       // Check liqudity balance of Alice Position NFT
-      expect(await manager['balanceOf(uint256)'](3)).to.be.equal(ethers.utils.parseEther('4').sub(MINIMUM_LIQUIDITY));
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('4'));
     });
 
     it('Should revert for invalid token ID', async () => {
@@ -542,7 +534,7 @@ describe('SeacowsPositionManager', () => {
           ethers.utils.parseEther('1'),
           ethers.utils.parseEther('1'),
           [2],
-          3,
+          2,
           alice.address,
           MaxUint256,
         );
@@ -561,7 +553,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
 
       // // Check liqudity balance of Alice Position NFT
-      expect(await manager['balanceOf(uint256)'](3)).to.be.equal(ethers.utils.parseEther('2').sub(MINIMUM_LIQUIDITY));
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
     });
 
     it('Should revert for invalid token ID', async () => {
@@ -639,7 +631,7 @@ describe('SeacowsPositionManager', () => {
           ethers.utils.parseEther('1'),
           ethers.utils.parseEther('1'),
           [2],
-          3,
+          2,
           alice.address,
           MaxUint256,
         );
@@ -657,7 +649,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
 
       // // Check liqudity balance of Alice Position NFT
-      expect(await manager['balanceOf(uint256)'](3)).to.be.equal(ethers.utils.parseEther('2').sub(MINIMUM_LIQUIDITY));
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
     });
 
     it('Should revert for invalid token ID', async () => {
@@ -729,10 +721,10 @@ describe('SeacowsPositionManager', () => {
           erc20.address,
           erc721.address,
           ONE_PERCENT,
-          ethers.utils.parseEther('3').sub(MINIMUM_LIQUIDITY),
+          ethers.utils.parseEther('3'),
           ethers.utils.parseEther('3'),
           [1, 2, 3],
-          3,
+          2,
           alice.address,
           MaxUint256,
         );

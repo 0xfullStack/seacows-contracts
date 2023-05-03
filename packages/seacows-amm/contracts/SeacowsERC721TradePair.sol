@@ -39,7 +39,6 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
     uint public price0CumulativeLast;
     uint public price1CumulativeLast;
 
-    uint public constant MINIMUM_LIQUIDITY = 0;
     uint public constant PERCENTAGE_PRECISION = 10**4;
     uint public constant ONE_PERCENT = 10**2;
     uint public constant POINT_FIVE_PERCENT = 5 * 10;
@@ -82,8 +81,7 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
 
         uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
         if (_totalSupply == 0) {
-            liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
-           _mint(ISeacowsPositionManager(positionManager()).lockTokenOf(address(this)), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+            liquidity = Math.sqrt(amount0.mul(amount1));
         } else {
             liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
         }
