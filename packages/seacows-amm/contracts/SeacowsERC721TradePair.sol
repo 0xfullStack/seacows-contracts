@@ -39,7 +39,7 @@ contract SeacowsERC721TradePair is ReentrancyGuardUpgradeable, SeacowsComplement
     uint public price0CumulativeLast;
     uint public price1CumulativeLast;
 
-    uint public constant MINIMUM_LIQUIDITY = 10**4;
+    uint public constant MINIMUM_LIQUIDITY = 0;
     uint public constant PERCENTAGE_PRECISION = 10**4;
     uint public constant ONE_PERCENT = 10**2;
     uint public constant POINT_FIVE_PERCENT = 5 * 10;

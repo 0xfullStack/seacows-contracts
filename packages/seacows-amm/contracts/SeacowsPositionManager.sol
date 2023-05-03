@@ -16,7 +16,7 @@ import { SeacowsLibrary } from "./lib/SeacowsLibrary.sol";
 /// @title The base contract for an NFT/TOKEN AMM pair
 /// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
 /// @notice This implements the core swap logic from NFT to TOKEN
-contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory, ISeacowsPositionManager {
+contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory,  ISeacowsPositionManager {
     using Counters for Counters.Counter;
 
     address public immutable WETH;
@@ -40,6 +40,11 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         require(deadline >= block.timestamp, "SeacowsPositionManager: EXPIRED");
         _;
     }
+
+    receive() external payable {
+        assert(msg.sender == WETH);
+    }
+
 
     function createPair(address _token, address _collection, uint112 _fee) public returns (address _pair) {
         _pair = _createPair(_token, _collection, _fee);
@@ -87,6 +92,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint256 toTokenId,
         uint deadline
     ) public checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
+        require(_exists(toTokenId), "SeacowsPositionManager: INVALID_TOKEN_ID");
         (tokenAmount, ids) = _addLiquidity(token, collection, fee, tokenDesired, idsDesired, tokenMin);
         address pair = getPair(token, collection, fee);
 
@@ -105,6 +111,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint256 toTokenId,
         uint deadline
     ) public payable checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
+        require(_exists(toTokenId), "SeacowsPositionManager: INVALID_TOKEN_ID");
         (tokenAmount, ids) = _addLiquidity(
             WETH,
             collection,
@@ -141,6 +148,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         address to,
         uint deadline
     ) public virtual checkDeadline(deadline) returns (uint tokenAmount, uint nftAmount) {
+        require(_exists(fromTokenId), "SeacowsPositionManager: INVALID_TOKEN_ID");
         address pair = getPair(token, collection, fee);
         uint256 _pairTokenId = tokenOf(pair);
 
@@ -160,6 +168,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         address to,
         uint deadline
     ) public virtual checkDeadline(deadline) returns (uint tokenAmount, uint nftAmount) {
+        require(_exists(fromTokenId), "SeacowsPositionManager: INVALID_TOKEN_ID");
         (tokenAmount, nftAmount) = removeLiquidity(
             WETH,
             collection,
