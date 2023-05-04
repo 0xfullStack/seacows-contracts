@@ -1,10 +1,11 @@
 {
-  "name": "hardhat-project",
+  "name": "@yolominds/seacows-amm",
   "version": "1.0.0",
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json && copyfiles -u 1 types/**/*.d.ts dist/types",
     "clean": "rimraf cache out",
     "compile": "hardhat compile",
+    "deploy:dev:goerli": "hardhat deploy:seacows --env dev --network goerli",
     "test": "hardhat test",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
@@ -61,5 +62,7 @@
     "typechain": "^8.1.1",
     "typescript": "*"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@yolominds/constants": "*"
+  }
 }

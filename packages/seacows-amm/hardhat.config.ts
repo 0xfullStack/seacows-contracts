@@ -1,6 +1,6 @@
 // import chai from 'chai';
 import * as dotenv from 'dotenv';
-// import { solidity } from 'ethereum-waffle';
+import { SupportedChain } from '@yolominds/constants';
 
 import { type HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
@@ -10,6 +10,7 @@ import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
+import './tasks';
 
 dotenv.config();
 // chai.use(solidity);
@@ -34,6 +35,7 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     goerli: {
+      chainId: SupportedChain.GÖRLI,
       url: process.env.GOERLI_ALCHEMY_KEY
         ? `https://eth-goerli.alchemyapi.io/v2/${process.env.GOERLI_ALCHEMY_KEY}`
         : '',
