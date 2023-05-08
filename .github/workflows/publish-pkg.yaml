@@ -41,9 +41,11 @@ jobs:
     - name: install modules
       run: yarn install
 
-    - name: build typescript
+    - name: compile contracts
       run: |
         yarn workspace @yolominds/seacows-amm compile
+    - name: build typescript
+      run: |
         yarn workspace @yolominds/seacows-amm build
         yarn workspace @yolominds/seacows-sdk build
 
