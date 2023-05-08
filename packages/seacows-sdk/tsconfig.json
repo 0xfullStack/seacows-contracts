@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "types/*": ["types/*"],
+      "abis/*": ["abis/*"],
+    },
+    "target": "es2019",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "noImplicitAny": false,
+    "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false,
+    "declaration": true
+  },
+  "include": ["./src"]
+}

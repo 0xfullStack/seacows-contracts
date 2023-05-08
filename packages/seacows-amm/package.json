@@ -1,6 +1,7 @@
 {
   "name": "@yolominds/seacows-amm",
   "version": "1.0.0",
+  "main": "index.ts",
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json && copyfiles -u 1 types/**/*.d.ts dist/types",
     "clean": "rimraf cache out",
@@ -16,7 +17,7 @@
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
-    "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@nomiclabs/hardhat-etherscan": "^3.0.3",
     "@openzeppelin/contracts": "^4.8.0",
     "@openzeppelin/contracts-upgradeable": "^4.8.3",
@@ -63,6 +64,9 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@yolominds/constants": "*"
-  }
+    "@yolominds/seacows-sdk": "*"
+  },
+  "files": [
+    "dist/*"
+  ]
 }

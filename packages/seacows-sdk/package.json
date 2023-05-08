@@ -1,0 +1,19 @@
+{
+  "name": "@yolominds/seacows-sdk",
+  "version": "1.0.0",
+  "main": "dist/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "publish": "npm publish"
+  },
+  "dependencies": {
+    "@yolominds/constants": "*",
+    "@yolominds/seacows-amm": "*"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "ts-node": "^10.7.0",
+    "typescript": "^5.0.4"
+  }
+}

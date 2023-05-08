@@ -1,0 +1,64 @@
+# Ref: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-to-github-packages
+name: Publish package to GitHub Packages
+on:
+  push:
+    branches:
+    - main
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    permissions: 
+      contents: write
+      packages: write 
+    steps:
+    - name: seacows-bot-install token
+      id: seacows-bot
+      uses: getsentry/action-github-app-token@v1
+      with:
+        app_id: ${{ secrets.SEACOWS_BOT_APP_ID }}
+        private_key: ${{ secrets.SEACOWS_BOT_PRIVATE_KEY }}
+
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ steps.seacows-bot.outputs.token }}
+        submodules: recursive
+  
+    # Setup .npmrc file to publish to GitHub Packages
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        registry-url: 'https://npm.pkg.github.com'
+        # Defaults to the user or organization that owns the workflow file
+        scope: '@yolominds'
+
+    - name: install modules
+      run: yarn install
+
+    - name: build typescript
+      run: |
+        yarn workspace @yolominds/seacows-amm compile
+        yarn workspace @yolominds/seacows-amm build
+        yarn workspace @yolominds/seacows-sdk build
+
+    - name: update version
+      run: |
+        git config --global user.email "bot@seacows.io"
+        git config --global user.name "Seacows Bot"
+        yarn release
+        yarn workspace @yolominds/seacows-sdk publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push updated version to main
+      uses: ad-m/github-push-action@master
+      with:
+        branch: main
+        tags: true
+        github_token: ${{ steps.seacows-bot.outputs.token }}

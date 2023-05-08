@@ -10,7 +10,14 @@ describe('SeacowsERC3525', () => {
 
   beforeEach(async () => {
     [, alice, bob] = await ethers.getSigners();
-    const MockSeacowsERC3525FC = await ethers.getContractFactory('MockSeacowsERC3525');
+    const nftFactoryLibraryFactory = await ethers.getContractFactory('NFTRenderer');
+    const rendererLib = await nftFactoryLibraryFactory.deploy();
+
+    const MockSeacowsERC3525FC = await ethers.getContractFactory('MockSeacowsERC3525', {
+      libraries: {
+        NFTRenderer: rendererLib.address,
+      },
+    });
 
     MockSeacowsERC3525 = await MockSeacowsERC3525FC.deploy();
   });

@@ -38,8 +38,15 @@ describe('SeacowsERC721TradePair', () => {
     erc721 = await MockERC721FC.deploy();
     erc20 = await MockERC20FC.deploy();
 
+    const nftFactoryLibraryFactory = await ethers.getContractFactory('NFTRenderer');
+    const rendererLib = await nftFactoryLibraryFactory.deploy();
+
     const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
-    const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+    const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+      libraries: {
+        NFTRenderer: rendererLib.address,
+      },
+    });
 
     template = await SeacowsERC721TradePairFC.deploy();
     manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);

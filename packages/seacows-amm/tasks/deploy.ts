@@ -1,5 +1,5 @@
 import { type ActionType } from 'hardhat/types';
-import { type Environment, type SupportedChain } from '@yolominds/constants';
+import { type Environment, type SupportedChain } from '@yolominds/seacows-sdk';
 import { addresses } from '../deployed';
 import { save } from './utils';
 

@@ -58,7 +58,8 @@ const config: HardhatUserConfig = {
     runOnCompile: true,
     clear: true,
     // flat: true,
-    except: [':@solvprotocol/erc-3525/IERC*'],
+    // except: [':@solvprotocol/erc-3525/IERC*'],
+    only: ['Seacows*'],
     rename: (sourceName: string, contractName: string) => {
       if (sourceName.match(/^@solvprotocol\/erc-3525/) != null) {
         return 'ERC3525/' + contractName;

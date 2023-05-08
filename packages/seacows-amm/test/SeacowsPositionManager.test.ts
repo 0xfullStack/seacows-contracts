@@ -20,8 +20,11 @@ describe('SeacowsPositionManager', () => {
 
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
+  let rendererLib;
   before(async () => {
     [owner, alice, bob] = await ethers.getSigners();
+    const nftFactoryLibraryFactory = await ethers.getContractFactory('NFTRenderer');
+    rendererLib = await nftFactoryLibraryFactory.deploy();
 
     const WETHFC = await ethers.getContractFactory('WETH');
     const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
@@ -36,7 +39,11 @@ describe('SeacowsPositionManager', () => {
     beforeEach(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
 
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
@@ -91,7 +98,11 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
@@ -199,7 +210,11 @@ describe('SeacowsPositionManager', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       /**
@@ -288,7 +303,11 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
@@ -392,7 +411,11 @@ describe('SeacowsPositionManager', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       /**
@@ -471,7 +494,11 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
@@ -579,7 +606,11 @@ describe('SeacowsPositionManager', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       /**
@@ -676,7 +707,11 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
