@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "publish": "npm publish",
-    "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' -t @yolominds/seacows-sdk\\@ --no-verify"
+    "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' -t @yolominds/seacows-sdk\\@ --no-verify && npm publish"
   },
   "dependencies": {
     "@yolominds/constants": "*",
