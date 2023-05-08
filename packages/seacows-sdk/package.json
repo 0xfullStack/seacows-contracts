@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "publish": "npm publish",
-    "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
+    "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' -t @yolominds/seacows-sdk\\@ --no-verify"
   },
   "dependencies": {
     "@yolominds/constants": "*",
