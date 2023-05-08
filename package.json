@@ -1,7 +1,7 @@
 {
   "name": "@yolominds/seacows-contracts",
-  "version": "1.0.0",
-  "private":"true",
+  "version": "1.1.0",
+  "private": "true",
   "license": "MIT",
   "scripts": {
     "build": "yarn workspaces run build",
