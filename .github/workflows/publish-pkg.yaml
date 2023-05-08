@@ -53,7 +53,7 @@ jobs:
       run: |
         git config --global user.email "bot@seacows.io"
         git config --global user.name "Seacows Bot"
-        yarn release
+        yarn workspace @yolominds/seacows-sdk release
         yarn workspace @yolominds/seacows-sdk publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

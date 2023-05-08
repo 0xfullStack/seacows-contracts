@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "publish": "npm publish"
+    "publish": "npm publish",
+    "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
   "dependencies": {
     "@yolominds/constants": "*",
