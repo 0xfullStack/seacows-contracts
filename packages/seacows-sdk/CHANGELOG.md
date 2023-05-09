@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.1.1 (2023-05-09)
+
+
+### Bug Fixes
+
+* remove amm dep ([f7e00a5](https://github.com/yolominds/seacows-contracts/commit/f7e00a587ad9a543e0c93f9ab4a6a4ff5ba482bb))
+
 ## 1.1.0 (2023-05-09)
 
 
