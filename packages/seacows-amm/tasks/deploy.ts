@@ -1,6 +1,6 @@
 import { type ActionType } from 'hardhat/types';
-import { type Environment, type SupportedChain } from '@yolominds/seacows-sdk';
-import { addresses } from '../deployed';
+import { type Environment, type SupportedChain, addresses } from '@yolominds/seacows-sdk';
+// import { addresses } from '../deployed';
 import { save } from './utils';
 
 export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers, network }) => {
@@ -8,8 +8,16 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
   const { weth } = addresses[env][chainId];
 
   try {
+    const NFTRendererFC = await ethers.getContractFactory('NFTRenderer');
+    const lib = await NFTRendererFC.deploy();
+    await lib.deployed();
+
     const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
-    const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager');
+    const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+      libraries: {
+        NFTRenderer: lib.address,
+      },
+    });
 
     const template = await SeacowsERC721TradePairFC.deploy();
     await template.deployed();
@@ -17,9 +25,7 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
 
     const manager = await SeacowsPositionManagerFC.deploy(template.address, weth);
     await manager.deployed();
-    await save(env, network.name, 'SeacowsERC721TradePair', manager.address);
-
-    console.log(`SeacowsPositionManager is deployed at: ${manager.address}`);
+    await save(env, network.name, 'SeacowsPositionManager', manager.address);
   } catch (error) {
     console.error('Error meesage:', error.message);
   }

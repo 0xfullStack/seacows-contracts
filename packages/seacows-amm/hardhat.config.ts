@@ -1,6 +1,6 @@
 // import chai from 'chai';
 import * as dotenv from 'dotenv';
-import { SupportedChain } from '@yolominds/constants';
+import { SupportedChain } from '@yolominds/seacows-sdk';
 
 import { type HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
@@ -10,8 +10,10 @@ import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
+import * as tdly from '@tenderly/hardhat-tenderly';
 import './tasks';
 
+tdly.setup();
 dotenv.config();
 // chai.use(solidity);
 
@@ -34,6 +36,13 @@ const config: HardhatUserConfig = {
     hardhat: {
       allowUnlimitedContractSize: true,
     },
+    mumbai: {
+      chainId: SupportedChain.MUMBAI,
+      url: process.env.MUMBAI_ALCHEMY_KEY
+        ? `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_ALCHEMY_KEY}`
+        : '',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     goerli: {
       chainId: SupportedChain.GÖRLI,
       url: process.env.GOERLI_ALCHEMY_KEY
@@ -55,6 +64,7 @@ const config: HardhatUserConfig = {
   },
   abiExporter: {
     path: 'abis',
+    // path: '../../seacows-sdk/src/abis/amm',
     runOnCompile: true,
     clear: true,
     // flat: true,
@@ -69,6 +79,11 @@ const config: HardhatUserConfig = {
     },
     spacing: 2,
     pretty: false,
+  },
+  tenderly: {
+    username: 'seacows-tech',
+    project: 'seacows',
+    privateVerification: false, // if true, contracts will be verified privately, if false, contracts will be verified publicly
   },
 };
 

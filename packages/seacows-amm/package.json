@@ -8,6 +8,7 @@
     "clean": "rimraf cache out",
     "compile": "hardhat compile",
     "deploy:dev:goerli": "hardhat deploy:seacows --env dev --network goerli",
+    "deploy:dev:mumbai": "hardhat deploy:seacows --env dev --network mumbai",
     "test": "hardhat test",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
@@ -23,6 +24,7 @@
     "@openzeppelin/contracts": "^4.8.0",
     "@openzeppelin/contracts-upgradeable": "^4.8.3",
     "@solvprotocol/erc-3525": "^1.3.0",
+    "@tenderly/hardhat-tenderly": "^1.7.2",
     "@typechain/ethers-v5": "^7.2.0",
     "@typechain/hardhat": "^6.1.2",
     "@types/big.js": "^6.1.3",

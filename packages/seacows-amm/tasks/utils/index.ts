@@ -1,9 +1,15 @@
 import path from 'path';
 import fs from 'fs';
-import { type Environment } from '@yolominds/constants';
+import { type Environment } from '@yolominds/seacows-sdk';
 
 const save = async (env: Environment, network: string, name: string, address: string): Promise<void> => {
-  const targetPath = path.join(__dirname, '../../deployed', env.toString(), network.toString(), name + '.json');
+  const targetPath = path.join(
+    __dirname,
+    '../../../seacows-sdk/src/deployed',
+    env.toString(),
+    network.toString(),
+    name + '.json',
+  );
   ensureDirectory(targetPath);
   fs.writeFileSync(targetPath, JSON.stringify({ address }, null, 2));
   console.log(`${name} of address ${address} deployment saved to ${targetPath}`);

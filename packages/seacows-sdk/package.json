@@ -1,19 +1,22 @@
 {
   "name": "@yolominds/seacows-sdk",
   "version": "1.0.1",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc && copyfiles -u 1 ./abis/**/* ./dist/abis",
+    "copy:amm": "copyfiles -u 3 ../seacows-amm/types/**/*.d.ts ../seacows-amm/types/**/*.ts ./types && copyfiles -u 3 ../seacows-amm/abis/**/* ./abis/seacows-amm",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' -t @yolominds/seacows-sdk\\@ --no-verify && npm publish"
   },
   "dependencies": {
-    "@yolominds/constants": "*",
     "@yolominds/seacows-amm": "*"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
     "ts-node": "^10.7.0",
     "typescript": "^5.0.4"
-  }
+  },
+  "files": [
+    "dist/**/*"
+  ]
 }
