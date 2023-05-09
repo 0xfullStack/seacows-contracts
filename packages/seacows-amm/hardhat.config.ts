@@ -60,7 +60,20 @@ const config: HardhatUserConfig = {
     currency: 'USD',
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      goerli: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : '',
+      mumbai: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
+    },
+    customChains: [
+      {
+        network: 'mumbai',
+        chainId: 80001,
+        urls: {
+          apiURL: 'https://api-testnet.polygonscan.com/api',
+          browserURL: 'https://mumbai.polygonscan.com',
+        },
+      },
+    ],
   },
   abiExporter: {
     path: 'abis',
