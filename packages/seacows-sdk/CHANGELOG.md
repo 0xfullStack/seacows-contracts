@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.2.0 (2023-05-09)
+
+
+### Features
+
+* relocate abis ([9b6dc36](https://github.com/yolominds/seacows-contracts/commit/9b6dc361317f4fb0cd79637102b478c41c6b9f41))
+
 ### 1.1.1 (2023-05-09)
 
 
