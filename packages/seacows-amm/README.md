@@ -30,3 +30,9 @@ For frontend integration, it should interact with SeacowsPositionManager directl
 | swapExactNFTsForTokens | It is used to sell NFT to the Pair                                                                                                  |
 | slotOfPair             | Get the slot number of the Pair                                                                                                     |
 | tokenOf                | Get the Position NFT of the Pair                                                                                                    |
+
+## User flow
+
+### Create Pair
+
+![Create Pair Userflow](./docs/create-pair-userflow.jpg)
