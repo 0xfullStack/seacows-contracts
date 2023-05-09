@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf dist && tsc && copyfiles -u 1 ./abis/**/* ./dist/abis",
+    "build": "rm -rf dist && tsc",
     "copy:amm": "copyfiles -u 3 ../seacows-amm/types/**/*.d.ts ../seacows-amm/types/**/*.ts ./types && copyfiles -u 3 ../seacows-amm/abis/**/* ./abis/seacows-amm",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' -t @yolominds/seacows-sdk\\@ --no-verify && npm publish"
   },
@@ -14,6 +14,7 @@
     "typescript": "^5.0.4"
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "abis/**/*"
   ]
 }
