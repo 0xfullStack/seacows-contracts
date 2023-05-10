@@ -5,7 +5,7 @@ import { type Environment } from '@yolominds/seacows-sdk';
 const save = async (env: Environment, network: string, name: string, address: string): Promise<void> => {
   const targetPath = path.join(
     __dirname,
-    '../../../seacows-sdk/src/deployed',
+    '../../../seacows-sdk/deployed',
     env.toString(),
     network.toString(),
     name + '.json',
