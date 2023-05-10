@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.3.0 (2023-05-10)
+
+
+### Features
+
+* update goerli deployed addresses ([82f6727](https://github.com/yolominds/seacows-contracts/commit/82f6727aa5e41c99bbde6ca90304ca02bef5c035))
+
 ## 1.2.0 (2023-05-09)
 
 
