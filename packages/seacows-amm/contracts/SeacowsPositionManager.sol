@@ -44,7 +44,12 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         assert(msg.sender == WETH);
     }
 
-
+    /**
+        @notice Creates a new Pair for a ERC20 Token and ERC721 Collection with specified fee tier
+        @param _token The ERC20 contract address
+        @param _collection The ERC721 contract address
+        @param _fee The fee tier. Please check TradePair for the fee tiers.
+     */
     function createPair(address _token, address _collection, uint112 _fee) public returns (address _pair) {
         _pair = _createPair(_token, _collection, _fee);
         uint256 _slot = _createSlot(_pair);
@@ -79,6 +84,18 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         }
     }
 
+
+    /**
+        @notice Add liquidity to the Pair based on the ERC20 address, ERC721 address and fee tier
+        @param token The ERC20 contract address
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param tokenDesired The amount of ERC20 token to add
+        @param idsDesired The ids of ERC721 NFT to add
+        @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
+        @param toTokenId The position NFT that is used to store the liquidity.
+        @param deadline The timestamp of deadline in seconds
+     */
     function addLiquidity(
         address token,
         address collection,
@@ -100,6 +117,16 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
     }
 
+    /**
+        @notice Add liquidity with ETH to the Pair based on the ERC721 address and fee tier
+        @notice There is a hidden tokenDesired which passed via payable
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param idsDesired The ids of ERC721 NFT to add
+        @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
+        @param toTokenId The Position NFT that is used to store the liquidity.
+        @param deadline The timestamp of deadline in seconds
+     */
     function addLiquidityETH(
         address collection,
         uint112 fee,
@@ -134,6 +161,18 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     }
 
     // **** REMOVE LIQUIDITY ****
+    /**
+        @notice Remove liquidity from the Pair based on the ERC20 address, ERC721 address and fee tier
+        @param token The ERC20 contract address
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param liquidity The amount of liquidity wanted to remove.
+        @param tokenMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
+        @param idsDesired The ids of ERC721 NFT to remove
+        @param fromTokenId The Position NFT that is used to burn the liquidity and redeem the assets.
+        @param to The address that will receive the withdrawn assets
+        @param deadline The timestamp of deadline in seconds
+     */
     function removeLiquidity(
         address token,
         address collection,
@@ -155,6 +194,17 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         nftAmount = idsDesired.length;
     }
 
+    /**
+        @notice Remove liquidity from the WETH Pair based on the ERC721 address and fee tier. Also convert WETH to ETH
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param liquidity The amount of liquidity wanted to remove.
+        @param tokenMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
+        @param idsDesired The ids of ERC721 NFT to remove
+        @param fromTokenId The position NFT that is used to burn the liquidity and redeem the assets.
+        @param to The address that will receive the withdrawn assets
+        @param deadline The timestamp of deadline in seconds
+     */
     function removeLiquidityETH(
         address collection,
         uint112 fee,
@@ -188,6 +238,16 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         require(success, "TransferHelper::safeTransferETH: ETH transfer failed");
     }
     
+    /**
+        @notice Mint a new Position NFTs. If Pair doesn't exist, it will create a new Pair.
+        @param token The ERC20 contract address
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param tokenDesired The amount of ERC20 token to add
+        @param idsDesired The ids of ERC721 NFT to add
+        @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
+        @param deadline The timestamp of deadline in seconds
+     */
     function mint(
         address token,
         address collection,
@@ -205,6 +265,15 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         (tokenAmount, ids, liquidity) = addLiquidity(token, collection, fee, tokenDesired, idsDesired, tokenMin, tokenId, deadline);
     }
     
+    /**
+        @notice Mint a new Position NFTs with ETH. If Pair doesn't exist, it will create a new Pair.
+        @dev The hidden tokenDesired is passed via payable
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param idsDesired The ids of ERC721 NFT to add
+        @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
+        @param deadline The timestamp of deadline in seconds
+     */
     function mintWithETH(
         address collection,
         uint112 fee,
@@ -244,6 +313,10 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         _mintValue(tokenId, _value);
     }
     
+    /**
+        @notice Burn a Position NFT. Only burnable when the liquidity is 0
+        @param tokenId The token ID to be burnt
+     */
     function burn(uint256 tokenId) public {
         require(ownerOf(tokenId) == msg.sender, "SeacowsPositionManager: UNAUTHORIZED");
         require(balanceOf(tokenId) == 0, "SeacowsPositionManager: NOT_CLEARED");
@@ -256,6 +329,14 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
 
     // **** SWAP ****
+    /**
+        @notice Swap from ERC20 to ERC721
+        @param _pair The pair to swap with
+        @param idsOut The NFT ids to swap out
+        @param amountInMax The max amount of ERC20 to input
+        @param to The address that receive the NFTs swapped out
+        @param deadline The timestamp of deadline in seconds
+     */
     function swapTokensForExactNFTs(
         address _pair,
         uint[] memory idsOut,
@@ -271,6 +352,14 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         pair.swap(0, idsOut, to);
     }
 
+    /**
+        @notice Swap from ERC721 to ERC20
+        @param _pair The pair to swap with
+        @param idsIn The NFT ids to swap in
+        @param amountOutMin The min amount of ERC20 to swap out
+        @param to The address that receive the ERC20 swapped out
+        @param deadline The timestamp of deadline in seconds
+     */
     function swapExactNFTsForTokens(
         address _pair,
         uint[] memory idsIn,
