@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.3.1 (2023-05-12)
+
+
+### Bug Fixes
+
+* wrong abis import ([4a6bc72](https://github.com/yolominds/seacows-contracts/commit/4a6bc72930eefe49002005b430c0a9f1e6bee1b9))
+
 ## 1.3.0 (2023-05-10)
 
 
