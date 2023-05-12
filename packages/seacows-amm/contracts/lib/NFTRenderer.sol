@@ -7,25 +7,32 @@ import 'base64-sol/base64.sol';
 
 library NFTRenderer {
     struct RenderParams {
+        address pool;
+        uint256 id;
+        string symbol;
+        uint256 swapFee;
+        uint256 poolShare;
         address owner;
-        int24 lowerTick;
-        int24 upperTick;
-        uint24 fee;
     }
 
-    function render(RenderParams memory params) public view returns (string memory) {
-        string memory symbol0 = 'TKN0';
-        string memory symbol1 = 'TKN1';
+    function render(RenderParams memory params) public pure returns (string memory) {
         string memory image = string.concat(
             '<svg width="800" height="1066" viewBox="0 0 800 1066" fill="none" xmlns="http://www.w3.org/2000/svg" >',
             '<style> .text-quantico { font-family: "Quantico"; font-weight: bold; } .text-lg { font-size: 48px; } .text-md { font-size: 32px; } .text-sm { font-size: 24px; } </style>',
             '<defs> <style type="text/css"> @import url("https://fonts.googleapis.com/css?family=Quantico:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic"); </style> </defs>',
-            renderTop(symbol0, symbol1, params.fee),
-            renderBottom(params.lowerTick, params.upperTick),
+            renderForeground(),
+            renderSnow(),
+            renderCurve(),
+            renderPoolAddress(params.pool),
+            renderId(params.id),
+            renderSymbol(params.symbol),
+            renderSwapFee(params.swapFee),
+            renderPoolShare(params.poolShare),
+            renderOwnerAddress(params.owner),
             renderBackground(),
             '</svg>'
         );
-        string memory description = renderDescription(symbol0, symbol1, params.fee, params.lowerTick, params.upperTick);
+        string memory description = renderDescription(params);
 
         string memory json = string.concat(
             '{"name":"Uniswap V3 Position",',
@@ -99,63 +106,77 @@ library NFTRenderer {
         );
     }
 
-    function renderTop(
-        string memory symbol0,
-        string memory symbol1,
-        uint24 fee
-    ) internal pure returns (string memory top) {
-        top = string.concat(
-            '<rect x="30" y="87" width="240" height="42"/>',
-            '<text x="39" y="120" class="tokens" fill="#fff">',
-            symbol0,
-            '/',
-            symbol1,
-            '</text>'
-            '<rect x="30" y="132" width="240" height="30"/>',
-            '<text x="39" y="120" dy="36" class="fee" fill="#fff">',
-            feeToText(fee),
+    function renderPoolAddress(address _pool) internal pure returns (string memory pool) {
+        pool = string.concat(
+            '<text x="41.36" y="57" fill="black" class="text-quantico text-sm">',
+            'POOL: ',
+            Strings.toHexString(_pool),
             '</text>'
         );
     }
 
-    function renderBottom(int24 lowerTick, int24 upperTick) internal pure returns (string memory bottom) {
-        bottom = string.concat(
-            '<rect x="30" y="342" width="240" height="24"/>',
-            '<text x="39" y="360" class="tick" fill="#fff">Lower tick: ',
-            tickToText(lowerTick),
-            '</text>',
-            '<rect x="30" y="372" width="240" height="24"/>',
-            '<text x="39" y="360" dy="30" class="tick" fill="#fff">Upper tick: ',
-            tickToText(upperTick),
+    function renderOwnerAddress(address _owner) internal pure returns (string memory owner) {
+        owner = string.concat(
+            '<text x="50.08" y="1020.01" fill="black" class="text-quantico text-sm">',
+            'Owner: ',
+            Strings.toHexString(_owner),
             '</text>'
         );
     }
 
-    function renderDescription(
-        string memory symbol0,
-        string memory symbol1,
-        uint24 fee,
-        int24 lowerTick,
-        int24 upperTick
-    ) internal pure returns (string memory description) {
-        description = string.concat(
-            symbol0,
-            '/',
-            symbol1,
-            ' ',
-            feeToText(fee),
-            ', Lower tick: ',
-            tickToText(lowerTick),
-            ', Upper text: ',
-            tickToText(upperTick)
+    function renderCurve() internal pure returns (string memory curve) {
+        curve = string.concat(
+            '<path d="M347 301V313.289C347 518.027 513.102 684 718 684" stroke="url(#paint5_linear_4414_291095)" stroke-width="79" stroke-linecap="round" />',
+            '<path d="M320.333 301C320.333 315.728 332.272 327.667 347 327.667C361.728 327.667 373.667 315.728 373.667 301C373.667 286.272 361.728 274.333 347 274.333C332.272 274.333 320.333 286.272 320.333 301ZM691.333 684C691.333 698.728 703.272 710.667 718 710.667C732.728 710.667 744.667 698.728 744.667 684C744.667 669.272 732.728 657.333 718 657.333C703.272 657.333 691.333 669.272 691.333 684ZM342 301V313H352V301H342ZM342 313C342 520.659 510.341 689 718 689V679C515.864 679 352 515.136 352 313H342Z" fill="url(#paint6_linear_4414_291095)" />'
         );
     }
 
-    function tickToText(int24 tick) internal pure returns (string memory tickString) {
-        tickString = string.concat(
-            tick < 0 ? '-' : '',
-            tick < 0 ? Strings.toString(uint256(uint24(-tick))) : Strings.toString(uint256(uint24(tick)))
+    function renderSnow() internal pure returns (string memory snow) {
+        snow = string.concat(
+            '<g filter="url(#filter0_b_4414_291095)"> <path d="M230.638 149.23L215.468 140.472L232.385 135.943L230.315 128.217L213.399 132.746L222.155 117.581L215.235 113.586L206.479 128.751L201.943 111.837L194.218 113.907L198.753 130.822L183.584 122.064L179.585 128.99L194.755 137.748L177.835 142.282L179.908 150.003L196.824 145.474L188.068 160.639L194.988 164.634L203.744 149.469L208.28 166.383L216.002 164.318L211.47 147.398L226.639 156.156L230.638 149.23Z" fill="url(#paint3_linear_4414_291095)" fill-opacity="0.6" /> </g>',
+            '<g filter="url(#filter1_b_4414_291095)"> <path d="M250.399 679.945L196.78 648.988L256.574 632.979L249.258 605.67L189.464 621.679L220.414 568.074L195.954 553.952L165.005 607.558L148.972 547.77L121.664 555.089L137.697 614.876L84.0781 583.919L69.9434 608.401L123.562 639.358L63.7574 655.387L71.0843 682.676L130.878 666.667L99.9287 720.273L124.388 734.394L155.338 680.789L171.37 740.576L198.667 733.277L182.645 673.47L236.264 704.427L250.399 679.945Z" fill="url(#paint4_linear_4414_291095)" fill-opacity="0.6" /> </g>'
         );
+    }
+
+    function renderId(uint256 _id) internal pure returns (string memory id) {
+        id = string.concat(
+            '<text x="681.378" y="158.72" fill="black" class="text-quantico text-md">',
+            '#',
+            Strings.toString(_id),
+            '</text>'
+        );
+    }
+
+    function renderSymbol(string memory _symbol) internal pure returns (string memory symbol) {
+        symbol = string.concat(
+            '<text x="516.632" y="200.4" fill="black" class="text-quantico text-lg">',
+            _symbol,
+            '</text>'
+        );
+    }
+
+    function renderPoolShare(uint256 _poolShare) internal pure returns (string memory poolShare) {
+        poolShare = string.concat(
+            '<text x="260.08" y="874" fill="black" class="text-quantico text-lg">',
+            'Pool Share: ',
+            Strings.toString(_poolShare),
+            '%',
+            '</text>'
+        );
+    }
+
+    function renderSwapFee(uint256 _swapFee) internal pure returns (string memory swapFee) {
+        swapFee = string.concat(
+            '<text x="346.08" y="803.96" fill="black" class="text-quantico text-lg">',
+            'Swap Fee: ',
+            Strings.toString(_swapFee),
+            '%',
+            '</text>'
+        );
+    }
+
+    function renderDescription(RenderParams memory params) internal pure returns (string memory description) {
+        description = string.concat(params.symbol, ' ', ' ', feeToText(params.swapFee));
     }
 
     function feeToText(uint256 fee) internal pure returns (string memory feeString) {
