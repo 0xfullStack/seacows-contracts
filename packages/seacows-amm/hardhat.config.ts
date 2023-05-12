@@ -56,12 +56,16 @@ const config: HardhatUserConfig = {
     target: 'ethers-v5',
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
+    // enabled: process.env.REPORT_GAS !== undefined,
+    enabled: true,
     currency: 'USD',
+    token: 'MATIC',
+    gasPriceApi: 'https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice',
   },
   etherscan: {
     apiKey: {
       goerli: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : '',
+      polygon: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
       mumbai: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
     },
     customChains: [
