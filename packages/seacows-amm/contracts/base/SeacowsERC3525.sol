@@ -2,48 +2,43 @@
 pragma solidity ^0.8.13;
 
 // import { ERC3525SlotEnumerable } from "@solvprotocol/erc-3525/ERC3525.sol";
-import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import { ERC3525 } from "@solvprotocol/erc-3525/ERC3525.sol";
-import { IERC3525 } from "@solvprotocol/erc-3525/IERC3525.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import { ISeacowsERC3525 } from "../interfaces/ISeacowsERC3525.sol";
-import { NFTRenderer } from "../lib/NFTRenderer.sol";
+import '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
+import {ERC3525} from '@solvprotocol/erc-3525/ERC3525.sol';
+import {IERC3525} from '@solvprotocol/erc-3525/IERC3525.sol';
+import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
+import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
+import {NFTRenderer} from '../lib/NFTRenderer.sol';
 
 /// @title The base contract for an NFT/TOKEN AMM pair
 /// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
 /// @notice This implements the core swap logic from NFT to TOKEN
 contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
-
     // address => slot => tokenId
     // mapping(address => mapping(uint256 => uint256)) private ownerSlotsToken;
 
     // slot => totalValueSupply
     mapping(uint256 => uint256) private totalValueSupplyInSlot;
-    
+
     constructor(string memory _name, string memory _symbol, uint8 _decimal) ERC3525(_name, _symbol, _decimal) {}
-  
+
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC3525, IERC165) returns (bool) {
-        return super.supportsInterface(interfaceId) || interfaceId == type(IERC721Receiver).interfaceId ;
+        return super.supportsInterface(interfaceId) || interfaceId == type(IERC721Receiver).interfaceId;
     }
 
     function totalValueSupplyOf(uint256 _slot) public view virtual returns (uint256) {
         return totalValueSupplyInSlot[_slot];
     }
 
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
         return
             NFTRenderer.render(
                 NFTRenderer.RenderParams({
-                    owner: address(this),
-                    lowerTick: -24,
-                    upperTick: -24,
-                    fee: 500
+                    pool: address(this), // TODO; get pool address
+                    id: tokenId,
+                    symbol: 'ETH/Azuki', // TODO; get symbol
+                    swapFee: 500, // TODO; get swap fee
+                    poolShare: 0.1e18, // TODO; get pool share
+                    owner: ownerOf(tokenId)
                 })
             );
     }

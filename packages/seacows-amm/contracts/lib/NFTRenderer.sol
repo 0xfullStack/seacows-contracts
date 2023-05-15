@@ -169,7 +169,7 @@ library NFTRenderer {
         swapFee = string.concat(
             '<text x="346.08" y="803.96" fill="black" class="text-quantico text-lg">',
             'Swap Fee: ',
-            Strings.toString(_swapFee),
+            feeToText(_swapFee),
             '%',
             '</text>'
         );
