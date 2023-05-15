@@ -23,12 +23,7 @@ library NFTRenderer {
             renderForeground(),
             renderSnow(),
             renderCurve(),
-            renderPoolAddress(params.pool),
-            renderId(params.id),
-            renderSymbol(params.symbol),
-            renderSwapFee(params.swapFee),
-            renderPoolShare(params.poolShare),
-            renderOwnerAddress(params.owner),
+            renderContent(params),
             renderBackground(),
             '</svg>'
         );
@@ -48,7 +43,11 @@ library NFTRenderer {
     }
 
     function renderForeground() internal pure returns (string memory foreground) {
-        foreground = string.concat(
+        foreground = string.concat(renderForeground1(), renderForeground2(), renderForeground3());
+    }
+
+    function renderForeground1() internal pure returns (string memory foreground1) {
+        foreground1 = string.concat(
             '<g clip-path="url(#clip0_4414_291095)">',
             '<rect width="800" height="1066" rx="16" fill="url(#paint0_linear_4414_291095)" /> <rect width="800" height="1066" rx="16" fill="url(#paint1_linear_4414_291095)" /> <rect width="800" height="1066" rx="16" fill="url(#paint2_linear_4414_291095)" />',
             '<path d="M306.5 1261C807.146 1261 1213 855.146 1213 354.5C1213 -146.146 807.146 -552 306.5 -552C-194.146 -552 -600 -146.146 -600 354.5C-600 855.146 -194.146 1261 306.5 1261Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
@@ -58,7 +57,12 @@ library NFTRenderer {
             '<path d="M306.498 1158.58C750.578 1158.58 1110.57 798.58 1110.57 354.5C1110.57 -89.5789 750.578 -449.576 306.498 -449.576C-137.581 -449.576 -497.578 -89.5789 -497.578 354.5C-497.578 798.58 -137.581 1158.58 306.498 1158.58Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.5 1132.98C736.445 1132.98 1084.98 784.445 1084.98 354.5C1084.98 -75.445 736.445 -423.984 306.5 -423.984C-123.445 -423.984 -471.984 -75.445 -471.984 354.5C-471.984 784.445 -123.445 1132.98 306.5 1132.98Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.502 1107.39C722.313 1107.39 1059.39 770.311 1059.39 354.5C1059.39 -61.3112 722.313 -398.393 306.502 -398.393C-109.309 -398.393 -446.391 -61.3112 -446.391 354.5C-446.391 770.311 -109.309 1107.39 306.502 1107.39Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.499 1081.77C708.161 1081.77 1033.77 756.163 1033.77 354.501C1033.77 -47.1604 708.161 -372.771 306.499 -372.771C-95.1623 -372.771 -420.773 -47.1604 -420.773 354.501C-420.773 756.163 -95.1623 1081.77 306.499 1081.77Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+            '<path d="M306.499 1081.77C708.161 1081.77 1033.77 756.163 1033.77 354.501C1033.77 -47.1604 708.161 -372.771 306.499 -372.771C-95.1623 -372.771 -420.773 -47.1604 -420.773 354.501C-420.773 756.163 -95.1623 1081.77 306.499 1081.77Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />'
+        );
+    }
+
+    function renderForeground2() internal pure returns (string memory foreground2) {
+        foreground2 = string.concat(
             '<path d="M306.501 1056.18C694.029 1056.18 1008.18 742.027 1008.18 354.499C1008.18 -33.0285 694.029 -347.182 306.501 -347.182C-81.0266 -347.182 -395.18 -33.0285 -395.18 354.499C-395.18 742.027 -81.0266 1056.18 306.501 1056.18Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.499 1030.56C679.877 1030.56 982.56 727.877 982.56 354.499C982.56 -18.8797 679.877 -321.562 306.499 -321.562C-66.8797 -321.562 -369.562 -18.8797 -369.562 354.499C-369.562 727.877 -66.8797 1030.56 306.499 1030.56Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.496 1004.97C665.74 1004.97 956.965 713.744 956.965 354.5C956.965 -4.74384 665.74 -295.969 306.496 -295.969C-52.7477 -295.969 -343.973 -4.74384 -343.973 354.5C-343.973 713.744 -52.7477 1004.97 306.496 1004.97Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
@@ -68,7 +72,12 @@ library NFTRenderer {
             '<path d="M306.503 902.544C609.18 902.544 854.548 657.176 854.548 354.499C854.548 51.8215 609.18 -193.547 306.503 -193.547C3.82541 -193.547 -241.543 51.8215 -241.543 354.499C-241.543 657.176 3.82541 902.544 306.503 902.544Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.5 876.954C595.044 876.954 828.954 643.044 828.954 354.5C828.954 65.9573 595.044 -167.953 306.5 -167.953C17.9573 -167.953 -215.953 65.9573 -215.953 354.5C-215.953 643.044 17.9573 876.954 306.5 876.954Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.502 851.334C580.896 851.334 803.336 628.894 803.336 354.5C803.336 80.1061 580.896 -142.334 306.502 -142.334C32.1081 -142.334 -190.332 80.1061 -190.332 354.5C-190.332 628.894 32.1081 851.334 306.502 851.334Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.5 825.742C566.759 825.742 777.742 614.759 777.742 354.5C777.742 94.24 566.759 -116.742 306.5 -116.742C46.24 -116.742 -164.742 94.24 -164.742 354.5C-164.742 614.759 46.24 825.742 306.5 825.742Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+            '<path d="M306.5 825.742C566.759 825.742 777.742 614.759 777.742 354.5C777.742 94.24 566.759 -116.742 306.5 -116.742C46.24 -116.742 -164.742 94.24 -164.742 354.5C-164.742 614.759 46.24 825.742 306.5 825.742Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />'
+        );
+    }
+
+    function renderForeground3() internal pure returns (string memory foreground3) {
+        foreground3 = string.concat(
             '<path d="M306.497 800.151C552.623 800.151 752.147 600.627 752.147 354.501C752.147 108.376 552.623 -91.1484 306.497 -91.1484C60.3718 -91.1484 -139.152 108.376 -139.152 354.501C-139.152 600.627 60.3718 800.151 306.497 800.151Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.499 774.531C538.475 774.531 726.529 586.477 726.529 354.501C726.529 122.525 538.475 -65.5293 306.499 -65.5293C74.5226 -65.5293 -113.531 122.525 -113.531 354.501C-113.531 586.477 74.5226 774.531 306.499 774.531Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.501 748.939C524.343 748.939 700.939 572.343 700.939 354.501C700.939 136.658 524.343 -39.9375 306.501 -39.9375C88.6585 -39.9375 -87.9375 136.658 -87.9375 354.501C-87.9375 572.343 88.6585 748.939 306.501 748.939Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
@@ -103,6 +112,17 @@ library NFTRenderer {
             '<linearGradient id="paint7_linear_4414_291095" x1="-4.47205e-06" y1="224.5" x2="800" y2="829" gradientUnits="userSpaceOnUse" >',
             '<stop stop-color="#FFFFFE" stop-opacity="0.42" /> <stop offset="0.25" stop-color="white" stop-opacity="0.77" /> <stop offset="0.5" stop-color="white" stop-opacity="0" /> <stop offset="0.75" stop-color="white" stop-opacity="0.42" /> <stop offset="1" stop-color="white" stop-opacity="0.7" /> </linearGradient>',
             '<clipPath id="clip0_4414_291095"> <rect width="800" height="1066" rx="16" fill="white" /> </clipPath> </defs>'
+        );
+    }
+
+    function renderContent(RenderParams memory params) internal pure returns (string memory content) {
+        content = string.concat(
+            renderPoolAddress(params.pool),
+            renderId(params.id),
+            renderSymbol(params.symbol),
+            renderSwapFee(params.swapFee),
+            renderPoolShare(params.poolShare),
+            renderOwnerAddress(params.owner)
         );
     }
 
