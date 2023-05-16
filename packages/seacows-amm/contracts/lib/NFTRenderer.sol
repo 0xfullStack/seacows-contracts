@@ -6,6 +6,8 @@ import './BitMath.sol';
 import 'base64-sol/base64.sol';
 
 library NFTRenderer {
+    uint256 public constant PERCENTAGE_PRECISION = 10 ** 4;
+
     struct RenderParams {
         address pool;
         uint256 id;
@@ -179,7 +181,9 @@ library NFTRenderer {
         poolShare = string.concat(
             '<text x="260.08" y="874" fill="black" class="text-quantico text-lg">',
             'Pool Share: ',
-            Strings.toString(_poolShare),
+            Strings.toString(_poolShare / PERCENTAGE_PRECISION),
+            '.',
+            Strings.toString(_poolShare % PERCENTAGE_PRECISION),
             '%',
             '</text>'
         );
@@ -189,21 +193,41 @@ library NFTRenderer {
         swapFee = string.concat(
             '<text x="346.08" y="803.96" fill="black" class="text-quantico text-lg">',
             'Swap Fee: ',
-            feeToText(_swapFee),
+            convertToFloatString(_swapFee),
             '%',
             '</text>'
         );
     }
 
     function renderDescription(RenderParams memory params) internal pure returns (string memory description) {
-        description = string.concat(params.symbol, ' ', ' ', feeToText(params.swapFee));
+        description = string.concat(params.symbol, ' ', ' ', convertToFloatString(params.swapFee));
     }
 
-    function feeToText(uint256 fee) internal pure returns (string memory feeString) {
-        if (fee == 500) {
-            feeString = '0.05%';
-        } else if (fee == 3000) {
-            feeString = '0.3%';
+    function convertToFloatString(uint256 value) internal pure returns (string memory) {
+        uint256 precision = 10 ** 4;
+        uint256 quotient = value / precision;
+        uint256 remainderRaw = value % precision;
+
+        string memory integerPart = Strings.toString(quotient);
+        string memory fractionalPartRaw = Strings.toString(remainderRaw);
+        string memory fractionalPart;
+
+        if (remainderRaw != 0) {
+            // remove trailing zeros
+            uint256 remainder = remainderRaw;
+            while (remainder != 0 && remainder % 10 == 0) {
+                remainder = remainder / 10;
+            }
+            fractionalPart = Strings.toString(remainder);
+            // Pad fractional part with zeros if needed
+            uint256 fractionalPartLength = bytes(fractionalPartRaw).length;
+            for (uint256 i = fractionalPartLength; i < 4; i++) {
+                fractionalPart = string.concat('0', fractionalPart);
+            }
+
+            fractionalPart = string.concat('.', fractionalPart);
         }
+
+        return string.concat(integerPart, fractionalPart);
     }
 }

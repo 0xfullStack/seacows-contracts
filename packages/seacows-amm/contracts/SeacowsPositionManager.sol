@@ -22,6 +22,8 @@ import {NFTRenderer} from './lib/NFTRenderer.sol';
 contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory, ISeacowsPositionManager {
     using Counters for Counters.Counter;
 
+    uint256 public constant PERCENTAGE_PRECISION = 10 ** 4;
+
     address public immutable WETH;
 
     mapping(address => uint256) private _pairSlots;
@@ -403,7 +405,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         string memory tokenSymbol = ERC20(pair.token()).symbol();
         string memory collectionSymbol = ERC721(pair.collection()).symbol();
         uint256 fee = pair.fee();
-        uint256 poolShare = (balanceOf(tokenId) * 1e18) / totalSupply();
+        uint256 poolShare = (balanceOf(tokenId) * PERCENTAGE_PRECISION) / totalSupply();
 
         return
             NFTRenderer.render(
