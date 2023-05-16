@@ -7,7 +7,6 @@ import {ERC3525} from '@solvprotocol/erc-3525/ERC3525.sol';
 import {IERC3525} from '@solvprotocol/erc-3525/IERC3525.sol';
 import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
-import {NFTRenderer} from '../lib/NFTRenderer.sol';
 
 /// @title The base contract for an NFT/TOKEN AMM pair
 /// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
@@ -27,20 +26,6 @@ contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
 
     function totalValueSupplyOf(uint256 _slot) public view virtual returns (uint256) {
         return totalValueSupplyInSlot[_slot];
-    }
-
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        return
-            NFTRenderer.render(
-                NFTRenderer.RenderParams({
-                    pool: address(this), // TODO; get pool address
-                    id: tokenId,
-                    symbol: 'ETH/Azuki', // TODO; get symbol
-                    swapFee: 500, // TODO; get swap fee
-                    poolShare: 0.1e18, // TODO; get pool share
-                    owner: ownerOf(tokenId)
-                })
-            );
     }
 
     function _afterValueTransfer(
