@@ -403,7 +403,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         string memory tokenSymbol = ERC20(pair.token()).symbol();
         string memory collectionSymbol = ERC721(pair.collection()).symbol();
         uint256 fee = pair.fee();
-        uint256 poolShare = balanceOf(tokenId) / totalSupply();
+        uint256 poolShare = (balanceOf(tokenId) * 1e18) / totalSupply();
 
         return
             NFTRenderer.render(
