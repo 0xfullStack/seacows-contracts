@@ -10,4 +10,5 @@ dist
 cache
 artifacts
 abis
+!tasks/abis/
 
