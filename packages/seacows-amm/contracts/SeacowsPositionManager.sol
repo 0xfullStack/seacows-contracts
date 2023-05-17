@@ -380,12 +380,12 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         (uint tokenReserve, uint nftReserve, ) = pair.getReserves();
         amountOut = SeacowsLibrary.getAmountOut(
             idsIn.length * pair.COMPLEMENT_PRECISION(),
-            nftReserve,
             tokenReserve,
+            nftReserve,
             pair.fee(),
             pair.PERCENTAGE_PRECISION()
         );
-        require(amountOut >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
+        require(amountOut >= amountOutMin, 'SeacowsPositionManager: INSUFFICIENT_OUTPUT_AMOUNT');
         for (uint i = 0; i < idsIn.length; i++) {
             IERC721(pair.collection()).safeTransferFrom(msg.sender, _pair, idsIn[i]);
         }

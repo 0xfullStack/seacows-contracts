@@ -14,21 +14,20 @@ library SeacowsLibrary {
     }
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
-    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint feeNumerator, uint feeDenominator) internal pure returns (uint amountOut) {
-        require(amountIn > 0, "SeacowsLibrary: INSUFFICIENT_INPUT_AMOUNT");
-        require(reserveIn > 0 && reserveOut > 0, "SeacowsLibrary: INSUFFICIENT_LIQUIDITY");
-        uint amountInWithFee = amountIn.mul(feeNumerator);
-        uint numerator = amountInWithFee.mul(reserveOut);
-        uint denominator = reserveIn.mul(feeDenominator).add(amountInWithFee);
-        amountOut = numerator / denominator;
+    function getAmountOut(uint nftIn, uint tokenReserve, uint nftReserve, uint feeNumerator, uint feeDenominator) internal pure returns (uint tokenOut) {
+        require(nftIn > 0, "SeacowsLibrary: INSUFFICIENT_INPUT_AMOUNT");
+        require(tokenReserve > 0 && nftReserve > 0, "SeacowsLibrary: INSUFFICIENT_LIQUIDITY");
+        uint numerator = nftIn.mul(tokenReserve).mul(feeDenominator.sub(feeNumerator));
+        uint denominator = (nftReserve.add(nftIn)).mul(feeDenominator);
+        tokenOut = (numerator / denominator).sub(1);
     }
 
     // given an output amount of an asset and pair reserves, returns a required input amount of the other asset
-    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint feeNumerator, uint feeDenominator) internal pure returns (uint amountIn) {
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint feeNumerator, uint feeDenominator) internal pure returns (uint tokenIn) {
         require(amountOut > 0, "SeacowsLibrary: INSUFFICIENT_OUTPUT_AMOUNT");
         require(reserveIn > 0 && reserveOut > 0, "SeacowsLibrary: INSUFFICIENT_LIQUIDITY");
         uint numerator = reserveIn.mul(amountOut).mul(feeDenominator);
-        uint denominator = reserveOut.sub(amountOut).mul(feeNumerator);
-        amountIn = (numerator / denominator).add(1);
+        uint denominator = reserveOut.sub(amountOut).mul(feeDenominator.sub(feeNumerator));
+        tokenIn = (numerator / denominator).add(1);
     }
 }

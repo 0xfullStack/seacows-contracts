@@ -16,7 +16,8 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver {
     return super.supportsInterface(interfaceId) || interfaceId == type(IERC721Receiver).interfaceId || interfaceId == type(IERC3525Receiver).interfaceId;
   }
 
-  function onERC3525Received(address _operator, uint256 _fromTokenId, uint256 _toTokenId, uint256 _value, bytes calldata _data) external returns (bytes4) {
+
+  function onERC3525Received(address _operator, uint256 _fromTokenId, uint256 _toTokenId, uint256 _value, bytes calldata _data) external pure returns (bytes4) {
     return IERC3525Receiver.onERC3525Received.selector;
   }
 }

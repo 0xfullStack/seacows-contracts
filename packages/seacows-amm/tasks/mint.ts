@@ -31,7 +31,7 @@ export const mint: ActionType<{ env: Environment }> = async ({ env }, { ethers, 
     '0xc973F7456d5518F47cD9fC203857f19904c1b0b6',
     100,
     ethers.utils.parseEther('10'),
-    [3],
+    [4],
     ethers.utils.parseEther('10'),
     MaxUint256,
   );

@@ -57,7 +57,7 @@ const config: HardhatUserConfig = {
   },
   gasReporter: {
     // enabled: process.env.REPORT_GAS !== undefined,
-    enabled: true,
+    enabled: false,
     currency: 'USD',
     token: 'MATIC',
     gasPriceApi: 'https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice',

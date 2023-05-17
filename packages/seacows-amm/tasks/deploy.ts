@@ -11,6 +11,7 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     const NFTRendererFC = await ethers.getContractFactory('NFTRenderer');
     const lib = await NFTRendererFC.deploy();
     await lib.deployed();
+    await save(env, network.name, 'NFTRenderer', lib.address);
 
     const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
     const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {

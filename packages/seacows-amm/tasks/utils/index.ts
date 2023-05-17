@@ -1,6 +1,15 @@
 import path from 'path';
 import fs from 'fs';
 import { type Environment } from '@yolominds/seacows-sdk';
+import { type BigNumber } from 'ethers';
+
+const getTokenIn = (nftsOut: BigNumber, tokenReserve: BigNumber, nftReserve: BigNumber): BigNumber => {
+  return tokenReserve.mul(nftsOut).div(nftReserve.sub(nftsOut));
+};
+
+const getTokenOut = (nftsIn: BigNumber, tokenReserve: BigNumber, nftReserve: BigNumber): BigNumber => {
+  return tokenReserve.mul(nftsIn).div(nftReserve.add(nftsIn));
+};
 
 const save = async (env: Environment, network: string, name: string, address: string): Promise<void> => {
   const targetPath = path.join(
@@ -29,4 +38,4 @@ const ensureDirectory = (filePath: string): boolean => {
 //   return path.join(__dirname, '../../../../deployed', network, name + '.json');
 // }
 
-export { save };
+export { save, getTokenIn, getTokenOut };
