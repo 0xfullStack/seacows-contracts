@@ -28,7 +28,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
     mapping(address => uint256) private _pairSlots;
     mapping(address => uint256) private _pairTokenIds;
-    mapping(uint256 => address) private _tokenIdPairs;
+    mapping(uint256 => address) private _slotPairs;
 
     Counters.Counter private _slotGenerator;
 
@@ -65,7 +65,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint256 tokenId = _mint(_pair, _slot, 0);
         _pairSlots[_pair] = _slot;
         _pairTokenIds[_pair] = tokenId;
-        _tokenIdPairs[tokenId] = _pair;
+        _slotPairs[_slot] = _pair;
 
         emit PairCreated(_token, _collection, _fee, _slot, _pair);
     }
@@ -401,7 +401,10 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_tokenIdPairs[tokenId]);
+        require(_exists(tokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
+
+        uint256 slotId = slotOf(tokenId);
+        ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_slotPairs[slotId]);
         string memory tokenSymbol = ERC20(pair.token()).symbol();
         string memory collectionSymbol = ERC721(pair.collection()).symbol();
         uint256 fee = pair.fee();
@@ -410,7 +413,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         return
             NFTRenderer.render(
                 NFTRenderer.RenderParams({
-                    pool: _tokenIdPairs[tokenId],
+                    pool: _slotPairs[slotId],
                     id: tokenId,
                     symbol: string.concat(tokenSymbol, '/', collectionSymbol),
                     swapFee: fee,
