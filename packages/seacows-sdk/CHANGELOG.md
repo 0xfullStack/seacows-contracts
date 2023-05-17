@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.4.0 (2023-05-17)
+
+
+### Features
+
+* update pool share ([#2](https://github.com/yolominds/seacows-contracts/issues/2)) ([6a84a79](https://github.com/yolominds/seacows-contracts/commit/6a84a79ed817c4cd2b25e741a7743824fb1fe904))
+
 ### 1.3.3 (2023-05-17)
 
 ### 1.3.2 (2023-05-17)
