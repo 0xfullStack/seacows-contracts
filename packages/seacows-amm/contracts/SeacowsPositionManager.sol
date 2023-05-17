@@ -413,7 +413,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         return
             NFTRenderer.render(
                 NFTRenderer.RenderParams({
-                    pool: _slotPairs[slotId],
+                    pool: address(pair),
                     id: tokenId,
                     symbol: string.concat(tokenSymbol, '/', collectionSymbol),
                     swapFee: fee,
