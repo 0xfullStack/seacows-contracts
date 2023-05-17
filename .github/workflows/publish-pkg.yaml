@@ -46,7 +46,6 @@ jobs:
         yarn workspace @yolominds/seacows-amm compile
     - name: build typescript
       run: |
-        yarn workspace @yolominds/seacows-amm build
         yarn workspace @yolominds/seacows-sdk build
 
     - name: update version and publish package

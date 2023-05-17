@@ -4,7 +4,6 @@
   "private": "true",
   "license": "MIT",
   "scripts": {
-    "build": "yarn workspaces run build",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
   "workspaces": [
