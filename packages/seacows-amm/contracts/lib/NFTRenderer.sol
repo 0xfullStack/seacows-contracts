@@ -181,9 +181,7 @@ library NFTRenderer {
         poolShare = string.concat(
             '<text x="260.08" y="874" fill="black" class="text-quantico text-lg">',
             'Pool Share: ',
-            Strings.toString(_poolShare / PERCENTAGE_PRECISION),
-            '.',
-            Strings.toString(_poolShare % PERCENTAGE_PRECISION),
+            convertToFloatString(_poolShare),
             '%',
             '</text>'
         );
