@@ -9,13 +9,13 @@ const getTokenInMax = (
   feeDenominator: BigNumber,
   slippageNumerator: number,
   slippageDenominator,
-): { tokenInMax: BigNumber; TokenInMaxWithSlippage: BigNumber } => {
+): { tokenInMax: BigNumber; tokenInMaxWithSlippage: BigNumber } => {
   const nftsOut = BigNumber.from(idsOut.length).mul(complement);
   const tokenIn = tokenReserve.mul(nftsOut).div(nftReserve.sub(nftsOut));
   const tokenInWithFee = tokenIn.mul(feeDenominator).div(feeDenominator.sub(feeNumerator));
   return {
     tokenInMax: tokenInWithFee,
-    TokenInMaxWithSlippage: tokenInWithFee.mul(slippageDenominator.add(slippageNumerator)).div(slippageDenominator),
+    tokenInMaxWithSlippage: tokenInWithFee.mul(slippageDenominator.add(slippageNumerator)).div(slippageDenominator),
   };
 };
 
