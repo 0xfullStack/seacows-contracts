@@ -8,14 +8,16 @@ const getTokenInMax = (
   feeNumerator: BigNumber,
   feeDenominator: BigNumber,
   slippageNumerator: number,
-  slippageDenominator,
+  slippageDenominator: number,
 ): { tokenInMax: BigNumber; tokenInMaxWithSlippage: BigNumber } => {
   const nftsOut = BigNumber.from(idsOut.length).mul(complement);
   const tokenIn = tokenReserve.mul(nftsOut).div(nftReserve.sub(nftsOut));
   const tokenInWithFee = tokenIn.mul(feeDenominator).div(feeDenominator.sub(feeNumerator));
   return {
     tokenInMax: tokenInWithFee,
-    tokenInMaxWithSlippage: tokenInWithFee.mul(slippageDenominator.add(slippageNumerator)).div(slippageDenominator),
+    tokenInMaxWithSlippage: tokenInWithFee
+      .mul(BigNumber.from(slippageDenominator + slippageNumerator))
+      .div(BigNumber.from(slippageDenominator)),
   };
 };
 
@@ -27,14 +29,16 @@ const getTokenOutMin = (
   feeNumerator: BigNumber,
   feeDenominator: BigNumber,
   slippageNumerator: number,
-  slippageDenominator,
+  slippageDenominator: number,
 ): { tokenOutMin: BigNumber; tokenOutMinWithSlippage: BigNumber } => {
   const nftsIn = BigNumber.from(idsIn.length).mul(complement);
   const tokenOut = tokenReserve.mul(nftsIn).div(nftReserve.add(nftsIn));
   const tokenOutWithFee = tokenOut.mul(feeDenominator.sub(feeNumerator)).div(feeDenominator);
   return {
     tokenOutMin: tokenOutWithFee,
-    tokenOutMinWithSlippage: tokenOutWithFee.mul(slippageDenominator.sub(slippageNumerator)).div(slippageDenominator),
+    tokenOutMinWithSlippage: tokenOutWithFee
+      .mul(BigNumber.from(slippageDenominator - slippageNumerator))
+      .div(BigNumber.from(slippageDenominator)),
   };
 };
 
