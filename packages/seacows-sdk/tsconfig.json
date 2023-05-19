@@ -1,15 +1,16 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-      "outDir": "./dist",
-      "allowJs": true,
-      "target": "es5",
-      "allowUnreachableCode": false,
-      "noImplicitAny": false,
-      "typeRoots": [ "./typings" ],
-      "resolveJsonModule": true,
-      "useUnknownInCatchVariables": false,
-      "declaration": true
+    "outDir": "dist",
+    "allowJs": true,
+    "target": "es5",
+    "allowUnreachableCode": false,
+    "noImplicitAny": false,
+    "typeRoots": [ "./typings" ],
+    "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false,
+    "declaration": true,
+    "strictNullChecks": true
   },
   "include": [
       "./**/*"
