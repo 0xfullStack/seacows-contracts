@@ -81,16 +81,19 @@ const config: HardhatUserConfig = {
   },
   abiExporter: {
     path: 'abis',
+    // path: '../../seacows-sdk/src/abis/amm',
     runOnCompile: true,
     clear: true,
-    only: ['Seacows*'],
-    rename: (sourceName: string, contractName: string) => {
-      if (sourceName.match(/^@solvprotocol\/erc-3525/) != null) {
-        return 'ERC3525/' + contractName;
-      } else {
-        return contractName;
-      }
-    },
+    flat: true,
+    // except: [':@solvprotocol/erc-3525/IERC*'],
+    only: [':Seacows*'],
+    // rename: (sourceName: string, contractName: string) => {
+    //   if (sourceName.match(/^@solvprotocol\/erc-3525/) != null) {
+    //     return 'ERC3525/' + contractName;
+    //   } else {
+    //     return contractName;
+    //   }
+    // },
     spacing: 2,
     pretty: false,
   },

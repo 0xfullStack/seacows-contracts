@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "copy:amm": "copyfiles -u 3 ../seacows-amm/types/**/*.d.ts ../seacows-amm/types/**/*.ts ./types && copyfiles -u 3 ../seacows-amm/abis/**/* ./abis/seacows-amm",
+    "copy:amm": "copyfiles -u 3 ../seacows-amm/types/**/*.d.ts ../seacows-amm/types/**/*.ts ./types/amm && copyfiles -u 3 ../seacows-amm/abis/**/* ./abis/amm",
+    "copy:periphery": "copyfiles -u 3 ../seacows-periphery/types/**/*.d.ts ../seacows-periphery/types/**/*.ts ./types/periphery && copyfiles -u 3 ../seacows-periphery/abis/**/* ./abis/periphery",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' -t @yolominds/seacows-sdk\\@ --no-verify && npm publish"
   },
   "devDependencies": {

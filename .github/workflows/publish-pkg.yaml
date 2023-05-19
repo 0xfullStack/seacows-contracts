@@ -44,8 +44,11 @@ jobs:
     - name: compile contracts
       run: |
         yarn workspace @yolominds/seacows-amm compile
+        yarn workspace @yolominds/seacows-periphery compile
     - name: build typescript
       run: |
+        yarn workspace @yolominds/seacows-sdk copy:amm
+        yarn workspace @yolominds/seacows-sdk copy:periphery
         yarn workspace @yolominds/seacows-sdk build
 
     - name: update version and publish package

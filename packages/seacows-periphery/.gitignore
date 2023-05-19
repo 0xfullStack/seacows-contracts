@@ -1,0 +1,14 @@
+node_modules
+.env
+coverage
+coverage.json
+types
+typechain-types
+dist
+
+# Hardhat files
+cache
+artifacts
+abis
+!tasks/abis/
+
