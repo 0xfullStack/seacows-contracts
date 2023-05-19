@@ -1,7 +1,7 @@
 import { type ActionType } from 'hardhat/types';
 import { type Environment, type SupportedChain, addresses } from '@yolominds/seacows-sdk';
 import { type ERC721, type ERC20, type SeacowsPositionManager } from '../types';
-import MANAGER_ABI from '@yolominds/seacows-sdk/abis/seacows-amm/SeacowsPositionManager.json';
+import MANAGER_ABI from '@yolominds/seacows-sdk/abis/amm/SeacowsPositionManager.json';
 import ERC20_ABI from '@yolominds/seacows-sdk/abis/common/ERC20.json';
 import ERC721_ABI from '@yolominds/seacows-sdk/abis/common/ERC721.json';
 import { MaxUint256 } from '@ethersproject/constants';

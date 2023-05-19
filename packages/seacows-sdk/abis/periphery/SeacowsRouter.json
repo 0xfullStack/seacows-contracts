@@ -1,0 +1,158 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_pairs",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[][]",
+        "name": "idsIns",
+        "type": "uint256[][]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amountOutMins",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
+    ],
+    "name": "batchSwapExactNFTsForTokens",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_pairs",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[][]",
+        "name": "idsOuts",
+        "type": "uint256[][]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amountInMaxs",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
+    ],
+    "name": "batchSwapTokensForExactNFTs",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pair",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "idsIn",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountOutMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
+    ],
+    "name": "swapExactNFTsForTokens",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pair",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "idsOut",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountInMax",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
+    ],
+    "name": "swapTokensForExactNFTs",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

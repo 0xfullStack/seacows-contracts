@@ -1,0 +1,111 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "COMPLEMENT_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "amount0Out",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "amount1Out",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "complements",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "_complement0",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_complement1",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_collection",
+        "type": "address"
+      }
+    ],
+    "name": "getComplementedBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "balance0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "balance1",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount0Out",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount1Out",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateComplement",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

@@ -2,13 +2,12 @@ node_modules
 .env
 coverage
 coverage.json
-types
-typechain-types
+# types
 dist
 
 # Hardhat files
 cache
 artifacts
-abis
-!abis/common
+# abis
+# !abis/common
 
