@@ -77,7 +77,7 @@ contract SeacowsERC721TradePair is
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function mint(uint256 toTokenId) public returns (uint liquidity) {
+    function mint(uint256 toTokenId) public nonReentrant returns (uint liquidity) {
         (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
         (uint balance0, uint balance1) = getComplementedBalance(token, collection);
         uint112 amount0 = uint112(balance0.sub(_reserve0));
@@ -97,7 +97,7 @@ contract SeacowsERC721TradePair is
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function burn(address to, uint256[] memory ids) public returns (uint amount0, uint amount1) {
+    function burn(address to, uint256[] memory ids) public nonReentrant returns (uint amount0, uint amount1) {
         (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
         address _token = token; // gas savings
         address _collection = collection; // gas savings
