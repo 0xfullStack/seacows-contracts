@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.6.0 (2023-05-24)
+
+
+### Features
+
+* add nonReentrant in tradepair mint/burn function ([#3](https://github.com/yolominds/seacows-contracts/issues/3)) ([eb85799](https://github.com/yolominds/seacows-contracts/commit/eb85799e5c5f85ad84518c4993513f2634506c7e))
+
 ### 1.5.3 (2023-05-19)
 
 ### 1.5.2 (2023-05-19)
