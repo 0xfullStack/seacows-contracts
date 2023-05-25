@@ -3,11 +3,19 @@ import { type Provider } from '@ethersproject/abstract-provider';
 import PAIR_ABI from '../abis/amm/ISeacowsERC721TradePair.json';
 import { type SeacowsERC721TradePair } from '../types/amm';
 
+/**
+  @notice Calculate the Max. Token input amount when user buy NFT(s) from pool
+  @param pair The Pair contract address or the Pair contract interface
+  @param idsOut The NFT ids the user wants to buy
+  @param slippageNumerator The Slippage Tolerance Numerator. E.g. 3% slipage, use 3. Default: 0
+  @param slippageDenominator The Slippage Tolerance Denominator E.g. 3% slipage, use 100. Default: 100
+  @param signerOrProvider [Optional] The ethers signer or ether provider
+*/
 const getSwapTokenInMax = async (
   pair: string | SeacowsERC721TradePair,
   idsOut: number[],
-  slippageNumerator: number,
-  slippageDenominator: number,
+  slippageNumerator: number = 0,
+  slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
 ): Promise<{ tokenInMax: BigNumber; tokenInMaxWithSlippage: BigNumber }> => {
   const pairContract =
@@ -29,11 +37,19 @@ const getSwapTokenInMax = async (
   };
 };
 
+/**
+  @notice Calculate the Min. Token output amount when user sell NFT(s) to pool
+  @param pair The Pair contract address or the Pair contract interface
+  @param idsIn The NFT ids the user wants to sell
+  @param slippageNumerator The Slippage Tolerance Numerator. E.g. 3% slipage, use 3. Default: 0
+  @param slippageDenominator The Slippage Tolerance Denominator E.g. 3% slipage, use 100. Default: 100
+  @param signerOrProvider [Optional] The ethers signer or ether provider
+*/
 const getSwapTokenOutMin = async (
   pair: string | SeacowsERC721TradePair,
   idsIn: number[],
-  slippageNumerator: number,
-  slippageDenominator: number,
+  slippageNumerator: number = 0,
+  slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
 ): Promise<{ tokenOutMin: BigNumber; tokenOutMinWithSlippage: BigNumber }> => {
   const pairContract =
@@ -55,23 +71,54 @@ const getSwapTokenOutMin = async (
   };
 };
 
+/**
+  @notice Calculate the Max. Token input amount when user add liquidity to pool
+  @param pair The Pair contract address or the Pair contract interface
+  @param idsIn The NFT ids the user wants to sell
+  @param slippageNumerator The Slippage Tolerance Numerator. E.g. 3% slipage, use 3. Default: 0
+  @param slippageDenominator The Slippage Tolerance Denominator E.g. 3% slipage, use 100. Default: 100
+  @param signerOrProvider [Optional] The ethers signer or ether provider
+*/
 const getDepositTokenInMax = async (
   pair: string | SeacowsERC721TradePair,
   idsIn: number[],
+  slippageNumerator: number = 0,
+  slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
-): Promise<BigNumber> => {
+): Promise<{ tokenInMax: BigNumber; tokenInMaxWithSlippage: BigNumber }> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
   const complement = await pairContract.COMPLEMENT_PRECISION();
   const [tokenReserve, nftReserve] = await pairContract.getReserves();
-  return tokenReserve.mul(idsIn.length).mul(complement).div(nftReserve);
+  const tokenInMax = tokenReserve.mul(idsIn.length).mul(complement).div(nftReserve);
+  return {
+    tokenInMax,
+    tokenInMaxWithSlippage: tokenInMax
+      .mul(BigNumber.from(slippageDenominator + slippageNumerator))
+      .div(BigNumber.from(slippageDenominator)),
+  };
 };
 
+/**
+  @notice Calculate the Max. Token input amount when user add liquidity to pool
+  @param pair The Pair contract address or the Pair contract interface
+  @param idsIn The NFT ids the user wants to sell
+  @param slippageNumerator The Slippage Tolerance Numerator. E.g. 3% slipage, use 3. Default: 0
+  @param slippageDenominator The Slippage Tolerance Denominator E.g. 3% slipage, use 100. Default: 100
+  @param signerOrProvider [Optional] The ethers signer or ether provider
+*/
 const getWithdrawAssetsOutMin = async (
   pair: string | SeacowsERC721TradePair,
   liquidity: BigNumber,
+  slippageNumerator: number = 0,
+  slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
-): Promise<{ tokenOutMin: BigNumber; nftOutMin: BigNumber }> => {
+): Promise<{
+  tokenOutMin: BigNumber;
+  nftOutMin: BigNumber;
+  tokenOutMinWithSlippage: BigNumber;
+  nftOutMinWithSlippage: BigNumber;
+}> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
   const [tokenBalance, nftBalance] = await pairContract.getComplementedBalance();
@@ -84,6 +131,12 @@ const getWithdrawAssetsOutMin = async (
   return {
     tokenOutMin,
     nftOutMin,
+    tokenOutMinWithSlippage: tokenOutMin
+      .mul(BigNumber.from(slippageDenominator - slippageNumerator))
+      .div(BigNumber.from(slippageDenominator)),
+    nftOutMinWithSlippage: nftOutMin
+      .mul(BigNumber.from(slippageDenominator - slippageNumerator))
+      .div(BigNumber.from(slippageDenominator)),
   };
 };
 
