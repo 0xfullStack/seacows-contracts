@@ -13,13 +13,18 @@ contract MockSeacowsComplement is SeacowsComplement {
 
     constructor() SeacowsComplement() {}
 
+
+    function getComplementedBalance(address _token, address _collection) public view returns (uint256 balance0, uint256 balance1) {
+        return _getComplementedBalance(_token, _collection);
+    }
+
     function updateComplement(uint256 _amount0Out, uint256 _amount1Out) public {
         (amount0Out, amount1Out) = _updateComplement(_amount0Out, _amount1Out);
     }
 
     function complements() public view  returns (int256 _complement0, uint256 _complement1) {
-        _complement0 = complement0;
-        _complement1 = complement1;
+        _complement0 = tokenComplement();
+        _complement1 = nftComplement();
     }
 
 }

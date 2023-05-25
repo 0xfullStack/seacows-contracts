@@ -7,6 +7,7 @@ import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/proxy/Clones.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
+import "@openzeppelin/contracts/utils/Strings.sol";
 import {SeacowsERC3525} from './base/SeacowsERC3525.sol';
 import {SeacowsERC721TradePairFactory} from './base/SeacowsERC721TradePairFactory.sol';
 
@@ -86,11 +87,9 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         if (tokenReserve == 0 && nftReserve == 0) {
             (tokenAmount, ids) = (tokenDesired, idsDesired);
         } else {
-            uint tokenOptimal = SeacowsLibrary.quote(idsDesired.length * (10 ** 18), nftReserve, tokenReserve);
-            if (tokenOptimal <= tokenDesired) {
-                require(tokenOptimal >= tokenMin, 'SeacowsPositionManager: INSUFFICIENT_B_AMOUNT');
-                (tokenAmount, ids) = (tokenOptimal, idsDesired);
-            }
+            uint tokenOptimal = SeacowsLibrary.quote(idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION(), nftReserve, tokenReserve);
+            require(tokenOptimal <= tokenDesired && tokenOptimal >= tokenMin, string.concat('SeacowsPositionManager: INSUFFICIENT_B_AMOUNT', Strings.toString(tokenOptimal),  Strings.toString(tokenDesired)));
+            (tokenAmount, ids) = (tokenOptimal, idsDesired);
         }
     }
 

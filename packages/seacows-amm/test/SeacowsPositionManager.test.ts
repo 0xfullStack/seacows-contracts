@@ -1,6 +1,13 @@
 import { MaxUint256, Zero } from '@ethersproject/constants';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import {
+  getSwapTokenInMax,
+  getSwapTokenOutMin,
+  getDepositTokenInMax,
+  getWithdrawAssetsOutMin,
+} from '@yolominds/seacows-sdk';
 import { expect } from 'chai';
+import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   type SeacowsERC721TradePair,
@@ -161,7 +168,7 @@ describe('SeacowsPositionManager', () => {
 
       // Verify Position NFT owned by Alice
       expect(await manager.ownerOf(2)).to.be.equal(alice.address);
-      const [balance0, balance1] = await pair.getComplementedBalance(erc20.address, erc721.address);
+      const [balance0, balance1] = await pair.getComplementedBalance();
       const liquidity = sqrt(balance0.mul(balance1));
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(liquidity);
 
@@ -263,7 +270,7 @@ describe('SeacowsPositionManager', () => {
 
       // Verify Position NFT owned by Alice
       expect(await manager.ownerOf(2)).to.be.equal(alice.address);
-      const [balance0, balance1] = await pair.getComplementedBalance(weth.address, erc721.address);
+      const [balance0, balance1] = await pair.getComplementedBalance();
       const liquidity = sqrt(balance0.mul(balance1));
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(liquidity);
 
@@ -794,7 +801,7 @@ describe('SeacowsPositionManager', () => {
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
-       * ERC721: [1, 2, 3, 4, 5]
+       * ERC721: [0, 1, 2, 3, 4]
        */
       for (let i = 0; i < 5; i++) {
         await erc721.mint(alice.address);
@@ -807,8 +814,7 @@ describe('SeacowsPositionManager', () => {
        * Input ERC721: [1, 2, 3]
        *
        * Position NFT ID of Pair: 1
-       * Position NFT ID of Pair Lock Position: 2
-       * Position NFT ID of Alice: 3
+       * Position NFT ID of Alice: 2
        */
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
       await erc721.connect(alice).setApprovalForAll(manager.address, true);
@@ -835,10 +841,7 @@ describe('SeacowsPositionManager', () => {
       const prevPairBalance = await erc20.balanceOf(pair.address);
 
       // Caculate how much need to be paid
-      const precision = await pair.PERCENTAGE_PRECISION();
-      const [tokenReserve, nftReserve] = await pair.getReserves();
-      const tokenIn = getTokenIn(ethers.utils.parseEther('1'), tokenReserve, nftReserve);
-      const tokenInWithFee = tokenIn.mul(precision).div(precision.sub(ONE_PERCENT)).add(1);
+      const { tokenInMaxWithSlippage: tokenInWithFee } = await getSwapTokenInMax(pair.address, [1], 0, 100, alice);
 
       // Approve token cost
       await erc20.connect(alice).approve(manager.address, tokenInWithFee);
@@ -849,16 +852,32 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.ownerOf(1)).to.be.equal(alice.address);
     });
 
+    it('Should add liquidity correctly after swap', async () => {
+      expect(await erc721.ownerOf(0)).to.be.equal(alice.address);
+      expect(await erc721.ownerOf(4)).to.be.equal(alice.address);
+
+      const tokenIn = await getDepositTokenInMax(pair.address, [0, 4], alice);
+      // Approve token cost
+      await erc20.connect(alice).approve(manager.address, tokenIn);
+      await erc721.connect(alice).setApprovalForAll(manager.address, true);
+      await manager
+        .connect(alice)
+        .addLiquidity(erc20.address, erc721.address, ONE_PERCENT, tokenIn, [0, 4], 0, 2, MaxUint256);
+
+      expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
+      expect(await erc721.ownerOf(4)).to.be.equal(pair.address);
+      // expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.add(tokenOutWithFee));
+      // expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.sub(tokenOutWithFee));
+      // expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
+    });
+
     it('Should swap 1 NFT for some ETH', async () => {
       // Alice balances before
       const prevAliceBalance = await erc20.balanceOf(alice.address);
       const prevPairBalance = await erc20.balanceOf(pair.address);
 
       // Caculate how much need to be paid
-      const precision = await pair.PERCENTAGE_PRECISION();
-      const [tokenReserve, nftReserve] = await pair.getReserves();
-      const tokenOut = getTokenOut(ethers.utils.parseEther('1'), tokenReserve, nftReserve);
-      const tokenOutWithFee = tokenOut.mul(precision.sub(ONE_PERCENT)).div(precision);
+      const { tokenOutMinWithSlippage: tokenOutWithFee } = await getSwapTokenOutMin(pair.address, [1], 0, 100, alice);
 
       // Approve token cost
       await manager.connect(alice).swapExactNFTsForTokens(pair.address, [1], 0, alice.address, MaxUint256);

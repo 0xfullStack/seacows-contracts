@@ -11,43 +11,51 @@ contract SeacowsComplement is ISeacowsComplement {
     using SafeMath for uint;
     using SafeMath for uint256;
 
-    int256 internal complement0;
-    uint256 internal complement1;
+    int256 private _tokenComplement;
+    uint256 private _nftComplement;
 
     uint public override constant COMPLEMENT_PRECISION = 10**18;
 
     constructor() {}
 
-    function getComplementedBalance(address _token, address _collection) public view returns (uint256 balance0, uint256 balance1) {
-        balance0 = uint256(int256(IERC20(_token).balanceOf(address(this))) - complement0);
-        balance1 = uint256(IERC721(_collection).balanceOf(address(this)).mul(COMPLEMENT_PRECISION)) - complement1;
+    function tokenComplement() public view returns (int256) {
+        return _tokenComplement;
     }
 
-    // Expect _amount1Out = NFT quantity output * precision
-    function _updateComplement(uint256 _amount0Out, uint256 _amount1Out) internal returns (uint256 amount0Out, uint256 amount1Out) {
-        uint256 _spot = _amount0Out.div(_amount1Out);
-        uint256 _complementedAmount1Out = complement1 + _amount1Out;
+    function nftComplement() public view returns (uint256) {
+        return _nftComplement;
+    }
 
-        if (_complementedAmount1Out >= COMPLEMENT_PRECISION ) {
-            amount1Out = uint256((_complementedAmount1Out).div(COMPLEMENT_PRECISION).mul(COMPLEMENT_PRECISION));
-            complement1 = _complementedAmount1Out - amount1Out;
+    function _getComplementedBalance(address _token, address _collection) internal view returns (uint256 balance0, uint256 balance1) {
+        balance0 = uint256(int256(IERC20(_token).balanceOf(address(this))) - _tokenComplement);
+        balance1 = uint256(IERC721(_collection).balanceOf(address(this)).mul(COMPLEMENT_PRECISION)) - _nftComplement;
+    }
 
-            if (amount1Out >= _amount1Out) {
-                uint _complement0 = (amount1Out - _amount1Out).mul(_spot);
-                amount0Out = uint256(_amount0Out - _complement0);
-                complement0 += int256(_complement0);
+    // Expect _nftAmountOut = NFT quantity output * precision
+    function _updateComplement(uint256 _tokenAmountOut, uint256 _nftAmountOut) internal returns (uint256 tokenAmountOut, uint256 nftAmountOut) {
+        uint256 _spot = _tokenAmountOut.div(_nftAmountOut);
+        uint256 _complementedNftAmountOut = _nftComplement + _nftAmountOut;
+
+        if (_complementedNftAmountOut >= COMPLEMENT_PRECISION ) {
+            nftAmountOut = uint256((_complementedNftAmountOut).div(COMPLEMENT_PRECISION).mul(COMPLEMENT_PRECISION));
+            _nftComplement = _complementedNftAmountOut - nftAmountOut;
+
+            if (nftAmountOut >= _nftAmountOut) {
+                uint __tokenComplement = (nftAmountOut - _nftAmountOut).mul(_spot);
+                tokenAmountOut = uint256(_tokenAmountOut - __tokenComplement);
+                _tokenComplement += int256(__tokenComplement);
             } else {
-                uint _complement0 = (_amount1Out - amount1Out).mul(_spot);
-                amount0Out = uint256(_amount0Out + _complement0);
-                complement0 -= int256(_complement0);
+                uint __tokenComplement = (_nftAmountOut - nftAmountOut).mul(_spot);
+                tokenAmountOut = uint256(_tokenAmountOut + __tokenComplement);
+                _tokenComplement -= int256(__tokenComplement);
             }
         } else {
-            complement1 += _amount1Out;
-            amount1Out = 0;
+            _nftComplement += _nftAmountOut;
+            nftAmountOut = 0;
 
-            uint256 _complement0 = uint256(_amount1Out.mul(_spot));
-            amount0Out = uint256(_amount0Out + _complement0);
-            complement0 -= int256(_complement0);
+            uint256 __tokenComplement = uint256(_nftAmountOut.mul(_spot));
+            tokenAmountOut = uint256(_tokenAmountOut + __tokenComplement);
+            _tokenComplement -= int256(__tokenComplement);
         }
 
     }
