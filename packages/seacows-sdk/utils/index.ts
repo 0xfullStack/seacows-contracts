@@ -3,6 +3,48 @@ import { type Provider } from '@ethersproject/abstract-provider';
 import PAIR_ABI from '../abis/amm/ISeacowsERC721TradePair.json';
 import { type SeacowsERC721TradePair } from '../types/amm';
 
+const getTokenInMax = (
+  idsOut: number[],
+  complement: BigNumber,
+  tokenReserve: BigNumber,
+  nftReserve: BigNumber,
+  feeNumerator: BigNumber,
+  feeDenominator: BigNumber,
+  slippageNumerator: number,
+  slippageDenominator: number,
+): { tokenInMax: BigNumber; tokenInMaxWithSlippage: BigNumber } => {
+  const nftsOut = BigNumber.from(idsOut.length).mul(complement);
+  const tokenIn = tokenReserve.mul(nftsOut).div(nftReserve.sub(nftsOut));
+  const tokenInWithFee = tokenIn.mul(feeDenominator).div(feeDenominator.sub(feeNumerator)).add(1);
+  return {
+    tokenInMax: tokenInWithFee,
+    tokenInMaxWithSlippage: tokenInWithFee
+      .mul(BigNumber.from(slippageDenominator + slippageNumerator))
+      .div(BigNumber.from(slippageDenominator)),
+  };
+};
+
+const getTokenOutMin = (
+  idsIn: number[],
+  complement: BigNumber,
+  tokenReserve: BigNumber,
+  nftReserve: BigNumber,
+  feeNumerator: BigNumber,
+  feeDenominator: BigNumber,
+  slippageNumerator: number,
+  slippageDenominator: number,
+): { tokenOutMin: BigNumber; tokenOutMinWithSlippage: BigNumber } => {
+  const nftsIn = BigNumber.from(idsIn.length).mul(complement);
+  const tokenOut = tokenReserve.mul(nftsIn).div(nftReserve.add(nftsIn));
+  const tokenOutWithFee = tokenOut.mul(feeDenominator.sub(feeNumerator)).div(feeDenominator);
+  return {
+    tokenOutMin: tokenOutWithFee,
+    tokenOutMinWithSlippage: tokenOutWithFee
+      .mul(BigNumber.from(slippageDenominator - slippageNumerator))
+      .div(BigNumber.from(slippageDenominator)),
+  };
+};
+
 /**
   @notice Calculate the Max. Token input amount when user buy NFT(s) from pool
   @param pair The Pair contract address or the Pair contract interface
@@ -25,16 +67,16 @@ const getSwapTokenInMax = async (
   const [tokenReserve, nftReserve] = await pairContract.getReserves();
   const feeNumerator = await pairContract.fee();
   const feeDenominator = await pairContract.PERCENTAGE_PRECISION();
-
-  const nftsOut = BigNumber.from(idsOut.length).mul(complement);
-  const tokenIn = tokenReserve.mul(nftsOut).div(nftReserve.sub(nftsOut));
-  const tokenInWithFee = tokenIn.mul(feeDenominator).div(feeDenominator.sub(feeNumerator)).add(1);
-  return {
-    tokenInMax: tokenInWithFee,
-    tokenInMaxWithSlippage: tokenInWithFee
-      .mul(BigNumber.from(slippageDenominator + slippageNumerator))
-      .div(BigNumber.from(slippageDenominator)),
-  };
+  return getTokenInMax(
+    idsOut,
+    complement,
+    tokenReserve,
+    nftReserve,
+    feeNumerator,
+    feeDenominator,
+    slippageNumerator,
+    slippageDenominator,
+  );
 };
 
 /**
@@ -60,15 +102,16 @@ const getSwapTokenOutMin = async (
   const feeNumerator = await pairContract.fee();
   const feeDenominator = await pairContract.PERCENTAGE_PRECISION();
 
-  const nftsIn = BigNumber.from(idsIn.length).mul(complement);
-  const tokenOut = tokenReserve.mul(nftsIn).div(nftReserve.add(nftsIn));
-  const tokenOutWithFee = tokenOut.mul(feeDenominator.sub(feeNumerator)).div(feeDenominator);
-  return {
-    tokenOutMin: tokenOutWithFee,
-    tokenOutMinWithSlippage: tokenOutWithFee
-      .mul(BigNumber.from(slippageDenominator - slippageNumerator))
-      .div(BigNumber.from(slippageDenominator)),
-  };
+  return getTokenOutMin(
+    idsIn,
+    complement,
+    tokenReserve,
+    nftReserve,
+    feeNumerator,
+    feeDenominator,
+    slippageNumerator,
+    slippageDenominator,
+  );
 };
 
 /**
@@ -88,6 +131,7 @@ const getDepositTokenInMax = async (
 ): Promise<{ tokenInMax: BigNumber; tokenInMaxWithSlippage: BigNumber }> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
+
   const complement = await pairContract.COMPLEMENT_PRECISION();
   const [tokenReserve, nftReserve] = await pairContract.getReserves();
   const tokenInMax = tokenReserve.mul(idsIn.length).mul(complement).div(nftReserve);
@@ -121,6 +165,7 @@ const getWithdrawAssetsOutMin = async (
 }> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
+
   const [tokenBalance, nftBalance] = await pairContract.getComplementedBalance();
   const totalSupply = await pairContract.totalSupply();
 
@@ -140,4 +185,11 @@ const getWithdrawAssetsOutMin = async (
   };
 };
 
-export { getSwapTokenInMax, getSwapTokenOutMin, getDepositTokenInMax, getWithdrawAssetsOutMin };
+export {
+  getTokenInMax,
+  getTokenOutMin,
+  getSwapTokenInMax,
+  getSwapTokenOutMin,
+  getDepositTokenInMax,
+  getWithdrawAssetsOutMin,
+};

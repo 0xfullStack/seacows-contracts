@@ -17,7 +17,7 @@ import {
   type MockERC20,
 } from 'types';
 import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
-import { calculateTokenChange, getTokenIn, getTokenOut, sqrt } from './utils';
+import { sqrt } from './utils';
 
 describe('SeacowsPositionManager', () => {
   let owner: SignerWithAddress;
@@ -856,7 +856,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.ownerOf(0)).to.be.equal(alice.address);
       expect(await erc721.ownerOf(4)).to.be.equal(alice.address);
 
-      const tokenIn = await getDepositTokenInMax(pair.address, [0, 4], alice);
+      const { tokenInMaxWithSlippage: tokenIn } = await getDepositTokenInMax(pair, [0, 4]);
       // Approve token cost
       await erc20.connect(alice).approve(manager.address, tokenIn);
       await erc721.connect(alice).setApprovalForAll(manager.address, true);
@@ -891,7 +891,7 @@ describe('SeacowsPositionManager', () => {
 
       await manager.connect(alice).setApprovalForAll(manager.address, true);
       const aliceLiquidity = await manager['balanceOf(uint256)'](2);
-      const { tokenOutMin } = await getWithdrawAssetsOutMin(pair, aliceLiquidity.div(2), alice);
+      const { tokenOutMin } = await getWithdrawAssetsOutMin(pair, aliceLiquidity.div(2));
       await manager
         .connect(alice)
         .removeLiquidity(
