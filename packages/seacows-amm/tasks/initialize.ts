@@ -1,7 +1,6 @@
 import { type ActionType } from 'hardhat/types';
-import { Environment, SupportedChain, addresses } from '@yolominds/seacows-sdk';
+import { Environment, SupportedChain, addresses, getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
 // import { addresses } from '../deployed';
-import { getTokenIn, save } from './utils';
 import ERC20_FAUCET_ABI from './abis/ERC20Faucet.json';
 import ERC721_FAUCET_ABI from './abis/ERC721Faucet.json';
 import { type BigNumber } from 'ethers';
@@ -24,6 +23,7 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
 
   const ERC20Contract = new ethers.Contract(erc20, ERC20_FAUCET_ABI, owner);
   const ERC721Contract = new ethers.Contract(erc721, ERC721_FAUCET_ABI, owner);
+  const ManagerContract = await ethers.getContractAt('SeacowsPositionManager', manager);
 
   try {
     // Prepare assets
@@ -36,7 +36,7 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
     // console.log(`Minting ${ERC721Symbol}...`);
     // const total = ((await ERC721Contract.totalSupply()) as BigNumber).toNumber();
     // console.log(`Total ${total} ${ERC721Symbol} in the collection`);
-    const ids: number[] = [36, 37, 38, 39, 40, 41, 42, 43];
+    const ids: number[] = [49, 50, 51, 52, 53, 54, 55, 56];
 
     // for (let i = total; i < total + 8; i++) {
     //   console.log(`Mint ${ERC721Symbol} with ID ${i}`);
@@ -50,7 +50,6 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
     // await (await ERC20Contract.approve(manager, ethers.utils.parseEther('100'))).wait();
     // await (await ERC721Contract.setApprovalForAll(manager, true)).wait();
 
-    const ManagerContract = await ethers.getContractAt('SeacowsPositionManager', manager);
     // console.log(`Minting ${ERC20Symbol}-${ERC721Symbol} Pair with 1% fee...`);
     // await (
     //   await ManagerContract.mint(
@@ -82,27 +81,26 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
     const pair = await ManagerContract.getPair(erc20, erc721, 100);
     console.log('Pair address: ', pair);
     const pairContract = await ethers.getContractAt('SeacowsERC721TradePair', pair);
-    let [tokenReserve, nftReserve] = await pairContract.getReserves();
-    const COMPLEMENT_PRECISION = await pairContract.COMPLEMENT_PRECISION();
-    const PERCENTAGE_PRECISION = await pairContract.PERCENTAGE_PRECISION();
-    const ONE_PERCENT = await pairContract.ONE_PERCENT();
 
-    const amountIn = getTokenIn(COMPLEMENT_PRECISION, tokenReserve, nftReserve);
-    const amountInWithFee = amountIn.mul(PERCENTAGE_PRECISION).div(PERCENTAGE_PRECISION.sub(ONE_PERCENT)).add(1);
+    const { tokenInMax: amountIn } = await getSwapTokenInMax(pair, ids.slice(0, 1), 0, 100, owner);
     console.log('Approving Manager to spend ERC20');
-    await (await ERC20Contract.connect(owner).approve(ManagerContract.address, amountInWithFee)).wait();
+    await (await ERC20Contract.connect(owner).approve(ManagerContract.address, amountIn)).wait();
     await ManagerContract.connect(owner).swapTokensForExactNFTs(
       pair,
       ids.slice(0, 1),
-      amountInWithFee,
+      amountIn,
       owner.address,
       MaxUint256,
     );
 
-    [tokenReserve, nftReserve] = await pairContract.getReserves();
-    // const amountOut = getTokenIn(COMPLEMENT_PRECISION, tokenReserve, nftReserve);
-    // const amountOutWithFee = amountOut.mul(PERCENTAGE_PRECISION.sub(ONE_PERCENT)).div(PERCENTAGE_PRECISION);
-    await ManagerContract.connect(owner).swapExactNFTsForTokens(pair, ids.slice(0, 1), 0, owner.address, MaxUint256);
+    const { tokenOutMin: amountOut } = await getSwapTokenOutMin(pair, ids.slice(0, 1), 0, 100, owner);
+    await ManagerContract.connect(owner).swapExactNFTsForTokens(
+      pair,
+      ids.slice(0, 1),
+      amountOut,
+      owner.address,
+      MaxUint256,
+    );
     // ManagerContract.connect(owner).swapExactNFTsForTokens(pair, [])
   } catch (error) {
     console.error('Error meesage:', error.message);
