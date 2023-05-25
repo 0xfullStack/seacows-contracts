@@ -21,7 +21,9 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface SeacowsComplementInterface extends ethers.utils.Interface {
   functions: {
     "COMPLEMENT_PRECISION()": FunctionFragment;
-    "getComplementedBalance(address,address)": FunctionFragment;
+    "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
+    "nftComplement()": FunctionFragment;
+    "tokenComplement()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -29,8 +31,16 @@ interface SeacowsComplementInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getComplementedBalance",
-    values: [string, string]
+    functionFragment: "getComplemenetedAssetsOut",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nftComplement",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenComplement",
+    values?: undefined
   ): string;
 
   decodeFunctionResult(
@@ -38,7 +48,15 @@ interface SeacowsComplementInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getComplementedBalance",
+    functionFragment: "getComplemenetedAssetsOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "nftComplement",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenComplement",
     data: BytesLike
   ): Result;
 
@@ -91,35 +109,62 @@ export class SeacowsComplement extends BaseContract {
   functions: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getComplementedBalance(
-      _token: string,
-      _collection: string,
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { balance0: BigNumber; balance1: BigNumber }
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        tokenComplementAdjusted: BigNumber;
+        nftComplementAdjusted: BigNumber;
+      }
     >;
+
+    nftComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getComplementedBalance(
-    _token: string,
-    _collection: string,
+  getComplemenetedAssetsOut(
+    _tokenAmountOut: BigNumberish,
+    _nftAmountOut: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber] & { balance0: BigNumber; balance1: BigNumber }
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      tokenAmountOut: BigNumber;
+      nftAmountOut: BigNumber;
+      tokenComplementAdjusted: BigNumber;
+      nftComplementAdjusted: BigNumber;
+    }
   >;
+
+  nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+  tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getComplementedBalance(
-      _token: string,
-      _collection: string,
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { balance0: BigNumber; balance1: BigNumber }
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        tokenComplementAdjusted: BigNumber;
+        nftComplementAdjusted: BigNumber;
+      }
     >;
+
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {};
@@ -127,11 +172,15 @@ export class SeacowsComplement extends BaseContract {
   estimateGas: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getComplementedBalance(
-      _token: string,
-      _collection: string,
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -139,10 +188,14 @@ export class SeacowsComplement extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getComplementedBalance(
-      _token: string,
-      _collection: string,
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    nftComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

@@ -10,7 +10,8 @@
     "resolveJsonModule": true,
     "useUnknownInCatchVariables": false,
     "declaration": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "esModuleInterop": true
   },
   "include": [
       "./**/*"

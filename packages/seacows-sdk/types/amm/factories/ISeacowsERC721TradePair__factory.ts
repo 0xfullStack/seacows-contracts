@@ -210,6 +210,45 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenAmountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_nftAmountOut",
+        type: "uint256",
+      },
+    ],
+    name: "getComplemenetedAssetsOut",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "tokenAmountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "nftAmountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "int256",
+        name: "tokenComplementAdjusted",
+        type: "int256",
+      },
+      {
+        internalType: "uint256",
+        name: "nftComplementAdjusted",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "getReserves",
     outputs: [
@@ -275,6 +314,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "nftComplement",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -305,6 +357,19 @@ const _abi = [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "tokenComplement",
+    outputs: [
+      {
+        internalType: "int256",
+        name: "",
+        type: "int256",
       },
     ],
     stateMutability: "view",

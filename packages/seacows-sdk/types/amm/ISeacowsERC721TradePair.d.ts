@@ -26,11 +26,14 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "burn(address,uint256[])": FunctionFragment;
     "collection()": FunctionFragment;
     "fee()": FunctionFragment;
+    "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
     "getReserves()": FunctionFragment;
     "initialize(address,address,uint112)": FunctionFragment;
     "mint(uint256)": FunctionFragment;
+    "nftComplement()": FunctionFragment;
     "swap(uint256,uint256[],address)": FunctionFragment;
     "token()": FunctionFragment;
+    "tokenComplement()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -51,6 +54,10 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "fee", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "getComplemenetedAssetsOut",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getReserves",
     values?: undefined
   ): string;
@@ -60,10 +67,18 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
   encodeFunctionData(
+    functionFragment: "nftComplement",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "swap",
     values: [BigNumberish, BigNumberish[], string]
   ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "tokenComplement",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "COMPLEMENT_PRECISION",
@@ -77,13 +92,25 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fee", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getComplemenetedAssetsOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getReserves",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "nftComplement",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenComplement",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Burn(address,uint256,uint256,address)": EventFragment;
@@ -188,6 +215,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     fee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        tokenComplementAdjusted: BigNumber;
+        nftComplementAdjusted: BigNumber;
+      }
+    >;
+
     getReserves(
       overrides?: CallOverrides
     ): Promise<
@@ -210,6 +250,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    nftComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
@@ -218,6 +260,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
     ): Promise<ContractTransaction>;
 
     token(overrides?: CallOverrides): Promise<[string]>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -233,6 +277,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
   collection(overrides?: CallOverrides): Promise<string>;
 
   fee(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getComplemenetedAssetsOut(
+    _tokenAmountOut: BigNumberish,
+    _nftAmountOut: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      tokenAmountOut: BigNumber;
+      nftAmountOut: BigNumber;
+      tokenComplementAdjusted: BigNumber;
+      nftComplementAdjusted: BigNumber;
+    }
+  >;
 
   getReserves(
     overrides?: CallOverrides
@@ -256,6 +313,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
   swap(
     tokenAmountOut: BigNumberish,
     idsOut: BigNumberish[],
@@ -264,6 +323,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
   ): Promise<ContractTransaction>;
 
   token(overrides?: CallOverrides): Promise<string>;
+
+  tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -281,6 +342,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
     collection(overrides?: CallOverrides): Promise<string>;
 
     fee(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        tokenComplementAdjusted: BigNumber;
+        nftComplementAdjusted: BigNumber;
+      }
+    >;
 
     getReserves(
       overrides?: CallOverrides
@@ -304,6 +378,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
@@ -312,6 +388,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
     ): Promise<void>;
 
     token(overrides?: CallOverrides): Promise<string>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -423,6 +501,12 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     fee(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getReserves(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
@@ -437,6 +521,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
@@ -445,6 +531,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
     ): Promise<BigNumber>;
 
     token(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -466,6 +554,12 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     fee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getReserves(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     initialize(
@@ -480,6 +574,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    nftComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
@@ -488,5 +584,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

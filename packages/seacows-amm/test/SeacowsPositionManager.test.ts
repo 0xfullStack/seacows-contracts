@@ -866,9 +866,6 @@ describe('SeacowsPositionManager', () => {
 
       expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
       expect(await erc721.ownerOf(4)).to.be.equal(pair.address);
-      // expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.add(tokenOutWithFee));
-      // expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.sub(tokenOutWithFee));
-      // expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
     });
 
     it('Should swap 1 NFT for some ETH', async () => {
@@ -885,6 +882,34 @@ describe('SeacowsPositionManager', () => {
       expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.add(tokenOutWithFee));
       expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.sub(tokenOutWithFee));
       expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
+    });
+
+    it('Should withdraw correctly after swap', async () => {
+      // Alice balances before
+      const prevAliceBalance = await erc20.balanceOf(alice.address);
+      const prevPairBalance = await erc20.balanceOf(pair.address);
+
+      await manager.connect(alice).setApprovalForAll(manager.address, true);
+      const aliceLiquidity = await manager['balanceOf(uint256)'](2);
+      const { tokenOutMin } = await getWithdrawAssetsOutMin(pair, aliceLiquidity.div(2), alice);
+      await manager
+        .connect(alice)
+        .removeLiquidity(
+          erc20.address,
+          erc721.address,
+          ONE_PERCENT,
+          aliceLiquidity.div(2),
+          tokenOutMin,
+          [0, 4],
+          2,
+          alice.address,
+          MaxUint256,
+        );
+
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.add(tokenOutMin));
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.sub(tokenOutMin));
+      expect(await erc721.ownerOf(0)).to.be.equal(alice.address);
+      expect(await erc721.ownerOf(4)).to.be.equal(alice.address);
     });
   });
 });

@@ -25,7 +25,10 @@ interface MockSeacowsComplementInterface extends ethers.utils.Interface {
     "amount0Out()": FunctionFragment;
     "amount1Out()": FunctionFragment;
     "complements()": FunctionFragment;
+    "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
     "getComplementedBalance(address,address)": FunctionFragment;
+    "nftComplement()": FunctionFragment;
+    "tokenComplement()": FunctionFragment;
     "updateComplement(uint256,uint256)": FunctionFragment;
   };
 
@@ -46,8 +49,20 @@ interface MockSeacowsComplementInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getComplemenetedAssetsOut",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getComplementedBalance",
     values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nftComplement",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenComplement",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "updateComplement",
@@ -65,7 +80,19 @@ interface MockSeacowsComplementInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getComplemenetedAssetsOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getComplementedBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "nftComplement",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenComplement",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -135,6 +162,19 @@ export class MockSeacowsComplement extends BaseContract {
       }
     >;
 
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        tokenComplementAdjusted: BigNumber;
+        nftComplementAdjusted: BigNumber;
+      }
+    >;
+
     getComplementedBalance(
       _token: string,
       _collection: string,
@@ -142,6 +182,10 @@ export class MockSeacowsComplement extends BaseContract {
     ): Promise<
       [BigNumber, BigNumber] & { balance0: BigNumber; balance1: BigNumber }
     >;
+
+    nftComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     updateComplement(
       _amount0Out: BigNumberish,
@@ -165,6 +209,19 @@ export class MockSeacowsComplement extends BaseContract {
     }
   >;
 
+  getComplemenetedAssetsOut(
+    _tokenAmountOut: BigNumberish,
+    _nftAmountOut: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      tokenAmountOut: BigNumber;
+      nftAmountOut: BigNumber;
+      tokenComplementAdjusted: BigNumber;
+      nftComplementAdjusted: BigNumber;
+    }
+  >;
+
   getComplementedBalance(
     _token: string,
     _collection: string,
@@ -172,6 +229,10 @@ export class MockSeacowsComplement extends BaseContract {
   ): Promise<
     [BigNumber, BigNumber] & { balance0: BigNumber; balance1: BigNumber }
   >;
+
+  nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+  tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
   updateComplement(
     _amount0Out: BigNumberish,
@@ -195,6 +256,19 @@ export class MockSeacowsComplement extends BaseContract {
       }
     >;
 
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        tokenComplementAdjusted: BigNumber;
+        nftComplementAdjusted: BigNumber;
+      }
+    >;
+
     getComplementedBalance(
       _token: string,
       _collection: string,
@@ -202,6 +276,10 @@ export class MockSeacowsComplement extends BaseContract {
     ): Promise<
       [BigNumber, BigNumber] & { balance0: BigNumber; balance1: BigNumber }
     >;
+
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
     updateComplement(
       _amount0Out: BigNumberish,
@@ -221,11 +299,21 @@ export class MockSeacowsComplement extends BaseContract {
 
     complements(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getComplementedBalance(
       _token: string,
       _collection: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
     updateComplement(
       _amount0Out: BigNumberish,
@@ -245,11 +333,21 @@ export class MockSeacowsComplement extends BaseContract {
 
     complements(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getComplementedBalance(
       _token: string,
       _collection: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    nftComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     updateComplement(
       _amount0Out: BigNumberish,

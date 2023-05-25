@@ -240,26 +240,54 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_collection",
-        "type": "address"
-      }
-    ],
-    "name": "getComplementedBalance",
-    "outputs": [
-      {
         "internalType": "uint256",
-        "name": "balance0",
+        "name": "_tokenAmountOut",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "balance1",
+        "name": "_nftAmountOut",
+        "type": "uint256"
+      }
+    ],
+    "name": "getComplemenetedAssetsOut",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenAmountOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftAmountOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "tokenComplementAdjusted",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftComplementAdjusted",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getComplementedBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenBalance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftBalance",
         "type": "uint256"
       }
     ],
@@ -329,6 +357,19 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nftComplement",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -531,6 +572,19 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenComplement",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
       }
     ],
     "stateMutability": "view",
