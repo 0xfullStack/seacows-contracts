@@ -28,54 +28,54 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
   try {
     // Prepare assets
     const ERC20Symbol = (await ERC20Contract.symbol()) as string;
-    // console.log(`Minting ${ERC20Symbol}...`);
-    // await ERC20Contract.mint(owner.address, ethers.utils.parseEther('100'));
-    // console.log(`100${ERC20Symbol} Minted`);
+    console.log(`Minting ${ERC20Symbol}...`);
+    await ERC20Contract.mint(owner.address, ethers.utils.parseEther('100'));
+    console.log(`100${ERC20Symbol} Minted`);
 
     const ERC721Symbol = (await ERC721Contract.symbol()) as string;
-    // console.log(`Minting ${ERC721Symbol}...`);
-    // const total = ((await ERC721Contract.totalSupply()) as BigNumber).toNumber();
-    // console.log(`Total ${total} ${ERC721Symbol} in the collection`);
-    const ids: number[] = [49, 50, 51, 52, 53, 54, 55, 56];
+    console.log(`Minting ${ERC721Symbol}...`);
+    const total = ((await ERC721Contract.totalSupply()) as BigNumber).toNumber();
+    console.log(`Total ${total} ${ERC721Symbol} in the collection`);
+    const ids: number[] = [];
 
-    // for (let i = total; i < total + 8; i++) {
-    //   console.log(`Mint ${ERC721Symbol} with ID ${i}`);
-    //   const txn = await ERC721Contract.mint(owner.address);
-    //   await txn.wait();
-    //   ids.push(i);
-    //   console.log(`${ERC721Symbol} Minted: `, ids);
-    // }
+    for (let i = total; i < total + 8; i++) {
+      console.log(`Mint ${ERC721Symbol} with ID ${i}`);
+      const txn = await ERC721Contract.mint(owner.address);
+      await txn.wait();
+      ids.push(i);
+      console.log(`${ERC721Symbol} Minted: `, ids);
+    }
 
-    // // Create new Pair and mint Position NFTs via Manager
-    // await (await ERC20Contract.approve(manager, ethers.utils.parseEther('100'))).wait();
-    // await (await ERC721Contract.setApprovalForAll(manager, true)).wait();
+    // Create new Pair and mint Position NFTs via Manager
+    await (await ERC20Contract.approve(manager, ethers.utils.parseEther('100'))).wait();
+    await (await ERC721Contract.setApprovalForAll(manager, true)).wait();
 
-    // console.log(`Minting ${ERC20Symbol}-${ERC721Symbol} Pair with 1% fee...`);
-    // await (
-    //   await ManagerContract.mint(
-    //     erc20,
-    //     erc721,
-    //     100,
-    //     ethers.utils.parseEther('40'),
-    //     ids.slice(0, 4),
-    //     ethers.utils.parseEther('40'),
-    //     MaxUint256,
-    //   )
-    // ).wait();
-    // console.log(`Done!`);
-    // console.log(`Minting ${ERC20Symbol}-${ERC721Symbol} Pair with 0.5% fee...`);
-    // await (
-    //   await ManagerContract.mint(
-    //     erc20,
-    //     erc721,
-    //     50,
-    //     ethers.utils.parseEther('40'),
-    //     ids.slice(4),
-    //     ethers.utils.parseEther('40'),
-    //     MaxUint256,
-    //   )
-    // ).wait();
-    // console.log(`Done!`);
+    console.log(`Minting ${ERC20Symbol}-${ERC721Symbol} Pair with 1% fee...`);
+    await (
+      await ManagerContract.mint(
+        erc20,
+        erc721,
+        100,
+        ethers.utils.parseEther('40'),
+        ids.slice(0, 4),
+        ethers.utils.parseEther('40'),
+        MaxUint256,
+      )
+    ).wait();
+    console.log(`Done!`);
+    console.log(`Minting ${ERC20Symbol}-${ERC721Symbol} Pair with 0.5% fee...`);
+    await (
+      await ManagerContract.mint(
+        erc20,
+        erc721,
+        50,
+        ethers.utils.parseEther('40'),
+        ids.slice(4),
+        ethers.utils.parseEther('40'),
+        MaxUint256,
+      )
+    ).wait();
+    console.log(`Done!`);
 
     // Swap something
     const pair = await ManagerContract.getPair(erc20, erc721, 100);
