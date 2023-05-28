@@ -146,7 +146,7 @@ const getDepositTokenInMax = async (
 /**
   @notice Calculate the Max. Token input amount when user add liquidity to pool
   @param pair The Pair contract address or the Pair contract interface
-  @param idsIn The NFT ids the user wants to sell
+  @param liquidity The amount of liquidity to be burnt
   @param slippageNumerator The Slippage Tolerance Numerator. E.g. 3% slipage, use 3. Default: 0
   @param slippageDenominator The Slippage Tolerance Denominator E.g. 3% slipage, use 100. Default: 100
   @param signerOrProvider [Optional] The ethers signer or ether provider
