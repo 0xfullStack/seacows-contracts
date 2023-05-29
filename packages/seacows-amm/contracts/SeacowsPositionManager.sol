@@ -88,7 +88,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
             (tokenAmount, ids) = (tokenDesired, idsDesired);
         } else {
             uint tokenOptimal = SeacowsLibrary.quote(idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION(), nftReserve, tokenReserve);
-            require(tokenOptimal <= tokenDesired && tokenOptimal >= tokenMin, string.concat('SeacowsPositionManager: INSUFFICIENT_B_AMOUNT', Strings.toString(tokenOptimal),  Strings.toString(tokenDesired)));
+            require(tokenOptimal <= tokenDesired && tokenOptimal >= tokenMin, 'SeacowsPositionManager: INSUFFICIENT_B_AMOUNT');
             (tokenAmount, ids) = (tokenOptimal, idsDesired);
         }
     }
