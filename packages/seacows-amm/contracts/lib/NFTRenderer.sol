@@ -45,12 +45,17 @@ library NFTRenderer {
     }
 
     function renderForeground() internal pure returns (string memory foreground) {
-        foreground = string.concat(renderForeground1(), renderForeground2(), renderForeground3());
+        foreground = string.concat(
+            '<g clip-path="url(#clip0_4414_291095)">',
+            renderForeground1(),
+            renderForeground2(),
+            renderForeground3(),
+            '</g>'
+        );
     }
 
     function renderForeground1() internal pure returns (string memory foreground1) {
         foreground1 = string.concat(
-            '<g clip-path="url(#clip0_4414_291095)">',
             '<rect width="800" height="1066" rx="16" fill="url(#paint0_linear_4414_291095)" /> <rect width="800" height="1066" rx="16" fill="url(#paint1_linear_4414_291095)" /> <rect width="800" height="1066" rx="16" fill="url(#paint2_linear_4414_291095)" />',
             '<path d="M306.5 1261C807.146 1261 1213 855.146 1213 354.5C1213 -146.146 807.146 -552 306.5 -552C-194.146 -552 -600 -146.146 -600 354.5C-600 855.146 -194.146 1261 306.5 1261Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
             '<path d="M306.498 1235.41C793.01 1235.41 1187.41 841.01 1187.41 354.498C1187.41 -132.014 793.01 -526.41 306.498 -526.41C-180.014 -526.41 -574.41 -132.014 -574.41 354.498C-574.41 841.01 -180.014 1235.41 306.498 1235.41Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
