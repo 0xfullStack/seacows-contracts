@@ -5,11 +5,20 @@ import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import './interfaces/ISeacowsRouter.sol';
 import './interfaces/ISeacowsERC721TradePair.sol';
+import './interfaces/IWETH.sol';
 import './lib/SeacowsLibrary.sol';
 
 contract SeacowsRouter is ISeacowsRouter {
     using SafeMath for uint;
     using SafeMath for uint112;
+
+    address public weth;
+
+    constructor(address _weth) {
+        require(_weth != address(0), 'Invalid WETH address');
+
+        weth = _weth;
+    }
 
     modifier checkDeadline(uint deadline) {
         require(deadline >= block.timestamp, 'SeacowsPositionManager: EXPIRED');
@@ -46,6 +55,31 @@ contract SeacowsRouter is ISeacowsRouter {
     }
 
     /**
+        @notice Swap from ETH to ERC721
+        @param _pair The pair to swap with
+        @param idsOut The NFT ids to swap out
+        @param amountInMax The max amount of ETH to input
+        @param to The address that receive the NFTs swapped out
+        @param deadline The timestamp of deadline in seconds
+     */
+    function swapETHForExactNFTs(
+        address _pair,
+        uint[] memory idsOut,
+        uint amountInMax,
+        address to,
+        uint deadline
+    ) external payable checkDeadline(deadline) returns (uint amountIn) {
+        // convert eth to weth
+        IWETH(weth).deposit{value: amountIn}();
+        IWETH(weth).transfer(_pair, amountIn);
+
+        amountIn = this.swapETHForExactNFTs(_pair, idsOut, amountInMax, to, deadline);
+
+        // refund remaining eth
+        _sendETH(msg.sender, msg.value - amountIn);
+    }
+
+    /**
         @notice Swap from ERC721 to ERC20
         @param _pair The pair to swap with
         @param idsIn The NFT ids to swap in
@@ -77,6 +111,28 @@ contract SeacowsRouter is ISeacowsRouter {
     }
 
     /**
+        @notice Swap from ERC721 to ETH
+        @param _pair The pair to swap with
+        @param idsIn The NFT ids to swap in
+        @param amountOutMin The min amount of ETH to swap out
+        @param to The address that receive the ETH swapped out
+        @param deadline The timestamp of deadline in seconds
+     */
+    function swapExactNFTsForETH(
+        address _pair,
+        uint[] memory idsIn,
+        uint amountOutMin,
+        address to,
+        uint deadline
+    ) external checkDeadline(deadline) returns (uint amountOut) {
+        amountOut = swapExactNFTsForTokens(_pair, idsIn, amountOutMin, address(this), deadline);
+        // withdraw eth
+        IWETH(weth).withdraw(amountOut);
+        // send to user
+        _sendETH(to, amountOut);
+    }
+
+    /**
         @notice Swap from ERC20 to ERC721
         @param _pairs The pairs to swap with
         @param idsOuts The array of NFT ids to swap out
@@ -91,7 +147,10 @@ contract SeacowsRouter is ISeacowsRouter {
         address to,
         uint deadline
     ) external virtual checkDeadline(deadline) returns (uint amountIn) {
-        require(_pairs.length == idsOuts.length && idsOuts.length == amountInMaxs.length, "SeacowsRouter: INVALID_PARAMS_LENGTH");
+        require(
+            _pairs.length == idsOuts.length && idsOuts.length == amountInMaxs.length,
+            'SeacowsRouter: INVALID_PARAMS_LENGTH'
+        );
         for (uint256 i = 0; i < _pairs.length; i++) {
             amountIn += swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], to, deadline);
         }
@@ -112,10 +171,82 @@ contract SeacowsRouter is ISeacowsRouter {
         address to,
         uint deadline
     ) external virtual checkDeadline(deadline) returns (uint amountOut) {
-        require(_pairs.length == idsIns.length && idsIns.length == amountOutMins.length, "SeacowsRouter: INVALID_PARAMS_LENGTH");
+        require(
+            _pairs.length == idsIns.length && idsIns.length == amountOutMins.length,
+            'SeacowsRouter: INVALID_PARAMS_LENGTH'
+        );
         for (uint256 i = 0; i < _pairs.length; i++) {
             amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], to, deadline);
         }
     }
-    
+
+    /**
+        @notice Swap from ETH to ERC721
+        @param _pairs The pairs to swap with
+        @param idsOuts The array of NFT ids to swap out
+        @param amountInMaxs The array of max amount of ETH to input
+        @param to The address that receive the NFTs swapped out
+        @param deadline The timestamp of deadline in seconds
+     */
+    function batchSwapETHForExactNFTs(
+        address[] calldata _pairs,
+        uint[][] calldata idsOuts,
+        uint[] calldata amountInMaxs,
+        address to,
+        uint deadline
+    ) external payable virtual checkDeadline(deadline) returns (uint amountIn) {
+        require(
+            _pairs.length == idsOuts.length && idsOuts.length == amountInMaxs.length,
+            'SeacowsRouter: INVALID_PARAMS_LENGTH'
+        );
+
+        // convert eth to weth
+        IWETH(weth).deposit{value: msg.value}();
+
+        for (uint256 i = 0; i < _pairs.length; i++) {
+            amountIn += this.swapETHForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], to, deadline);
+        }
+
+        // refund remaining eth
+        uint256 remainingAmount = msg.value - amountIn;
+        IWETH(weth).withdraw(remainingAmount);
+        _sendETH(msg.sender, remainingAmount);
+    }
+
+    /**
+        @notice Swap from ERC721 to ETH
+        @param _pairs The pairs to swap with
+        @param idsIns The array of NFT ids to swap in for each pair
+        @param amountOutMins The array of min amount of ETH to swap out
+        @param to The address that receive the ETH swapped out
+        @param deadline The timestamp of deadline in seconds
+     */
+    function batchSwapExactNFTsForETH(
+        address[] calldata _pairs,
+        uint[][] calldata idsIns,
+        uint[] calldata amountOutMins,
+        address to,
+        uint deadline
+    ) external virtual checkDeadline(deadline) returns (uint amountOut) {
+        require(
+            _pairs.length == idsIns.length && idsIns.length == amountOutMins.length,
+            'SeacowsRouter: INVALID_PARAMS_LENGTH'
+        );
+        for (uint256 i = 0; i < _pairs.length; i++) {
+            amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], address(this), deadline);
+        }
+
+        // withdraw eth
+        IWETH(weth).withdraw(amountOut);
+        // send to user
+        _sendETH(to, amountOut);
+    }
+
+    /** Internal functions */
+    function _sendETH(address to, uint256 amount) internal {
+        (bool sent, ) = to.call{value: amount}('');
+        require(sent, 'Failed to send Ether');
+    }
+
+    receive() external payable {}
 }
