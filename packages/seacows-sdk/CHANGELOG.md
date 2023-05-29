@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.9.0 (2023-05-29)
+
+
+### Features
+
+* update svg renderer ([#5](https://github.com/yolominds/seacows-contracts/issues/5)) ([be83916](https://github.com/yolominds/seacows-contracts/commit/be839166549a0c0853489aac269865cda0f5ce7c))
+
 ## 1.8.0 (2023-05-29)
 
 
