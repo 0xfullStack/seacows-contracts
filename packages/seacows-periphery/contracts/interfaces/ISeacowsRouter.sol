@@ -34,4 +34,20 @@ interface ISeacowsRouter {
         address to,
         uint deadline
     ) external returns (uint amountOut);
+
+    function swapETHForExactNFTs(
+        address _pair,
+        uint[] memory idsOut,
+        uint amountInMax,
+        address to,
+        uint deadline
+    ) external payable returns (uint amountIn);
+
+    function swapExactNFTsForETH(
+        address _pair,
+        uint[] memory idsIn,
+        uint amountOutMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountOut);
 }
