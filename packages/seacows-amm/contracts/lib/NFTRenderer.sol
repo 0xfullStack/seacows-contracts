@@ -41,9 +41,9 @@ library NFTRenderer {
             '"image":"data:image/svg+xml;base64,',
             Base64.encode(bytes(image)),
             '",',
-            '"attributes": "',
+            '"attributes": ',
             renderAttributes(params),
-            '"}'
+            '}'
         );
 
         return string.concat('data:application/json;base64,', Base64.encode(bytes(json)));
@@ -218,13 +218,13 @@ library NFTRenderer {
             ' pool. The owner of this NFT can modify or redeem the position.\n\nPool Address: ',
             Strings.toHexString(params.pool),
             '\n',
-            'Azuki',
+            'Azuki', // TODO; update erc721 name
             ' Address: ',
-            '0xf37a233fdec2f7e1e91d1b2332891cd328aed2c5',
+            '0xf37a233fdec2f7e1e91d1b2332891cd328aed2c5', // TODO; update erc721 address
             '\n',
-            'ETH',
+            'ETH', // TODO; update erc20 name
             ' Address: ',
-            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // TODO; update erc20 address
             '\nFee Tier: ',
             convertToFloatString(params.swapFee),
             '%\nToken ID: ',
@@ -234,7 +234,16 @@ library NFTRenderer {
     }
 
     function renderAttributes(RenderParams memory params) internal pure returns (string memory attributes) {
-        attributes = string.concat('');
+        attributes = string.concat(
+            '[{',
+            '"trait_type": "ERC20 Pair","value": "',
+            'ETH', // TODO; update erc20 token
+            '"},{"trait_type": "ERC721 Pair", "value": "',
+            'Azuki', // TODO; update erc721
+            '"},{"trait_type": "Fee Tier", "value": "',
+            convertToFloatString(params.swapFee),
+            '"}]'
+        );
     }
 
     function convertToFloatString(uint256 value) internal pure returns (string memory) {
