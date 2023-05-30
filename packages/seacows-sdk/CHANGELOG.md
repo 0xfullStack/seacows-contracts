@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.9.1 (2023-05-30)
+
+
+### Bug Fixes
+
+* update deployed address ([5b10fab](https://github.com/yolominds/seacows-contracts/commit/5b10fab3cb23729c9de7cb9deb0091f7eaa3a6ad))
+
 ## 1.9.0 (2023-05-29)
 
 
