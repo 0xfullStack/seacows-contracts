@@ -11,7 +11,10 @@ library NFTRenderer {
     struct RenderParams {
         address pool;
         uint256 id;
-        string symbol;
+        string tokenSymbol;
+        string nftSymbol;
+        address tokenAddress;
+        address nftAddress;
         uint256 swapFee;
         uint256 poolShare;
         address owner;
@@ -32,16 +35,36 @@ library NFTRenderer {
         string memory description = renderDescription(params);
 
         string memory json = string.concat(
-            '{"name":"Uniswap V3 Position",',
+            '{"name":"',
+            renderName(params.poolShare, params.tokenSymbol, params.nftSymbol),
+            '",',
             '"description":"',
             description,
             '",',
             '"image":"data:image/svg+xml;base64,',
             Base64.encode(bytes(image)),
-            '"}'
+            '",',
+            '"attributes": ',
+            renderAttributes(params),
+            '}'
         );
 
         return string.concat('data:application/json;base64,', Base64.encode(bytes(json)));
+    }
+
+    function renderName(
+        uint256 poolShare,
+        string memory tokenSymbol,
+        string memory nftSymbol
+    ) internal pure returns (string memory name) {
+        name = string.concat(
+            'SeaCows Swap Position V1 - ',
+            convertToFloatString(poolShare),
+            '% - ',
+            nftSymbol,
+            '/',
+            tokenSymbol
+        );
     }
 
     function renderForeground() internal pure returns (string memory foreground) {
@@ -126,7 +149,7 @@ library NFTRenderer {
         content = string.concat(
             renderPoolAddress(params.pool),
             renderId(params.id),
-            renderSymbol(params.symbol),
+            renderSymbol(params.tokenSymbol, params.nftSymbol),
             renderSwapFee(params.swapFee),
             renderPoolShare(params.poolShare),
             renderOwnerAddress(params.owner)
@@ -174,10 +197,15 @@ library NFTRenderer {
         );
     }
 
-    function renderSymbol(string memory _symbol) internal pure returns (string memory symbol) {
+    function renderSymbol(
+        string memory tokenSymbol,
+        string memory nftSymbol
+    ) internal pure returns (string memory symbol) {
         symbol = string.concat(
             '<text x="516.632" y="200.4" fill="black" class="text-quantico text-lg">',
-            _symbol,
+            nftSymbol,
+            '/',
+            tokenSymbol,
             '</text>'
         );
     }
@@ -203,7 +231,40 @@ library NFTRenderer {
     }
 
     function renderDescription(RenderParams memory params) internal pure returns (string memory description) {
-        description = string.concat(params.symbol, ' ', ' ', convertToFloatString(params.swapFee));
+        description = string.concat(
+            'This NFT represents a liquidity position in a Seacows V1 ',
+            params.nftSymbol,
+            '/',
+            params.tokenSymbol,
+            ' pool. The owner of this NFT can modify or redeem the position.\n\nPool Address: ',
+            Strings.toHexString(params.pool),
+            '\n',
+            params.nftSymbol,
+            ' Address: ',
+            Strings.toHexString(params.nftAddress),
+            '\n',
+            params.tokenSymbol,
+            ' Address: ',
+            Strings.toHexString(params.tokenAddress),
+            '\nFee Tier: ',
+            convertToFloatString(params.swapFee),
+            '%\nToken ID: ',
+            Strings.toString(params.id),
+            '\n\nDISCLAIMER: Due diligence is imperative when assessing this NFT. Make sure token addresses match the expected tokens, as token symbols may be imitated'
+        );
+    }
+
+    function renderAttributes(RenderParams memory params) internal pure returns (string memory attributes) {
+        attributes = string.concat(
+            '[{',
+            '"trait_type": "ERC20 Pair","value": "',
+            params.tokenSymbol,
+            '"},{"trait_type": "ERC721 Pair", "value": "',
+            params.nftSymbol,
+            '"},{"trait_type": "Fee Tier", "value": "',
+            convertToFloatString(params.swapFee),
+            '"}]'
+        );
     }
 
     function convertToFloatString(uint256 value) internal pure returns (string memory) {

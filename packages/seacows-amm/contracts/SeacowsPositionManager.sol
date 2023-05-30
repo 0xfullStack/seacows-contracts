@@ -414,7 +414,10 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
                 NFTRenderer.RenderParams({
                     pool: address(pair),
                     id: tokenId,
-                    symbol: string.concat(tokenSymbol, '/', collectionSymbol),
+                    tokenSymbol: tokenSymbol,
+                    nftSymbol: collectionSymbol,
+                    tokenAddress: pair.token(),
+                    nftAddress: pair.collection(),
                     swapFee: fee,
                     poolShare: poolShare,
                     owner: ownerOf(tokenId)
