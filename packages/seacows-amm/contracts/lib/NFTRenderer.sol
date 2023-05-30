@@ -32,16 +32,25 @@ library NFTRenderer {
         string memory description = renderDescription(params);
 
         string memory json = string.concat(
-            '{"name":"Uniswap V3 Position",',
+            '{"name":"',
+            renderName(params.poolShare, params.symbol),
+            '",',
             '"description":"',
             description,
             '",',
             '"image":"data:image/svg+xml;base64,',
             Base64.encode(bytes(image)),
+            '",',
+            '"attributes": "',
+            renderAttributes(params),
             '"}'
         );
 
         return string.concat('data:application/json;base64,', Base64.encode(bytes(json)));
+    }
+
+    function renderName(uint256 poolShare, string memory symbol) internal pure returns (string memory name) {
+        name = string.concat('SeaCows Swap Position V1 - ', convertToFloatString(_poolShare), '% - ', symbol);
     }
 
     function renderForeground() internal pure returns (string memory foreground) {
@@ -203,7 +212,29 @@ library NFTRenderer {
     }
 
     function renderDescription(RenderParams memory params) internal pure returns (string memory description) {
-        description = string.concat(params.symbol, ' ', ' ', convertToFloatString(params.swapFee));
+        description = string.concat(
+            'This NFT represents a liquidity position in a Seacows V1 ',
+            params.symbol,
+            ' pool. The owner of this NFT can modify or redeem the position.\n\nPool Address: ',
+            Strings.toHexString(params.pool),
+            '\n',
+            'Azuki',
+            ' Address: ',
+            '0xf37a233fdec2f7e1e91d1b2332891cd328aed2c5',
+            '\n',
+            'ETH',
+            ' Address: ',
+            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            '\nFee Tier: ',
+            convertToFloatString(params.swapFee),
+            '%\nToken ID: ',
+            Strings.toString(params.id),
+            '\n\nDISCLAIMER: Due diligence is imperative when assessing this NFT. Make sure token addresses match the expected tokens, as token symbols may be imitated'
+        );
+    }
+
+    function renderAttributes(RenderParams memory params) internal pure returns (string memory attributes) {
+        attributes = string.concat('');
     }
 
     function convertToFloatString(uint256 value) internal pure returns (string memory) {
