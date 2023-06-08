@@ -31,6 +31,7 @@ interface ISeacowsPositionManagerInterface extends ethers.utils.Interface {
     "mintValue(uint256,uint256)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
+    "seacowsBurnCallback(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotOfPair(address)": FunctionFragment;
@@ -72,6 +73,10 @@ interface ISeacowsPositionManagerInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "seacowsBurnCallback",
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -117,6 +122,10 @@ interface ISeacowsPositionManagerInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "seacowsBurnCallback",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -336,6 +345,13 @@ export class ISeacowsPositionManager extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setApprovalForAll(
       _operator: string,
       _approved: boolean,
@@ -454,6 +470,13 @@ export class ISeacowsPositionManager extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  seacowsBurnCallback(
+    _token: string,
+    from: string,
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setApprovalForAll(
     _operator: string,
     _approved: boolean,
@@ -566,6 +589,13 @@ export class ISeacowsPositionManager extends BaseContract {
       _to: string,
       _tokenId: BigNumberish,
       data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -835,6 +865,13 @@ export class ISeacowsPositionManager extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setApprovalForAll(
       _operator: string,
       _approved: boolean,
@@ -955,6 +992,13 @@ export class ISeacowsPositionManager extends BaseContract {
       _tokenId: BigNumberish,
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setApprovalForAll(

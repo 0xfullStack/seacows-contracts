@@ -39,24 +39,24 @@ const _abi = [
     name: "getComplemenetedAssetsOut",
     outputs: [
       {
-        internalType: "uint256",
-        name: "tokenAmountOut",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "nftAmountOut",
-        type: "uint256",
-      },
-      {
         internalType: "int256",
-        name: "tokenComplementAdjusted",
+        name: "tokenAmountOut",
         type: "int256",
       },
       {
-        internalType: "uint256",
-        name: "nftComplementAdjusted",
-        type: "uint256",
+        internalType: "int256",
+        name: "nftAmountOut",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "newTokenComplement",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "newNftComplement",
+        type: "int256",
       },
     ],
     stateMutability: "view",
@@ -67,9 +67,9 @@ const _abi = [
     name: "nftComplement",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "int256",
         name: "",
-        type: "uint256",
+        type: "int256",
       },
     ],
     stateMutability: "view",

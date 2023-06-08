@@ -23,10 +23,11 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   functions: {
     "COMPLEMENT_PRECISION()": FunctionFragment;
     "PERCENTAGE_PRECISION()": FunctionFragment;
-    "burn(address,uint256[])": FunctionFragment;
+    "burn(address,address,uint256[])": FunctionFragment;
     "collection()": FunctionFragment;
     "fee()": FunctionFragment;
     "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
+    "getComplementedBalance()": FunctionFragment;
     "getReserves()": FunctionFragment;
     "initialize(address,address,uint112)": FunctionFragment;
     "mint(uint256)": FunctionFragment;
@@ -46,7 +47,7 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "burn",
-    values: [string, BigNumberish[]]
+    values: [string, string, BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "collection",
@@ -56,6 +57,10 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getComplemenetedAssetsOut",
     values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getComplementedBalance",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getReserves",
@@ -96,6 +101,10 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getComplementedBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getReserves",
     data: BytesLike
   ): Result;
@@ -113,7 +122,7 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "Burn(address,uint256,uint256,address)": EventFragment;
+    "Burn(address,uint256,uint256,uint256,uint256,uint256[],address)": EventFragment;
     "Mint(address,uint256,uint256)": EventFragment;
     "Swap(address,uint256,uint256,uint256,uint256,address)": EventFragment;
     "Sync(uint112,uint112)": EventFragment;
@@ -126,10 +135,13 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
 }
 
 export type BurnEvent = TypedEvent<
-  [string, BigNumber, BigNumber, string] & {
+  [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[], string] & {
     sender: string;
-    amount0: BigNumber;
-    amount1: BigNumber;
+    cTokenOut: BigNumber;
+    cNftOut: BigNumber;
+    tokenAmountIn: BigNumber;
+    tokenAmountOut: BigNumber;
+    idsOut: BigNumber[];
     to: string;
   }
 >;
@@ -137,8 +149,8 @@ export type BurnEvent = TypedEvent<
 export type MintEvent = TypedEvent<
   [string, BigNumber, BigNumber] & {
     sender: string;
-    amount0: BigNumber;
-    amount1: BigNumber;
+    tokenAmount: BigNumber;
+    nftAmount: BigNumber;
   }
 >;
 
@@ -206,6 +218,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     burn(
+      from: string,
       to: string,
       ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -223,8 +236,17 @@ export class ISeacowsERC721TradePair extends BaseContract {
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
+      }
+    >;
+
+    getComplementedBalance(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        tokenBalance: BigNumber;
+        nftBalance: BigNumber;
       }
     >;
 
@@ -269,6 +291,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
   PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
   burn(
+    from: string,
     to: string,
     ids: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -286,9 +309,15 @@ export class ISeacowsERC721TradePair extends BaseContract {
     [BigNumber, BigNumber, BigNumber, BigNumber] & {
       tokenAmountOut: BigNumber;
       nftAmountOut: BigNumber;
-      tokenComplementAdjusted: BigNumber;
-      nftComplementAdjusted: BigNumber;
+      newTokenComplement: BigNumber;
+      newNftComplement: BigNumber;
     }
+  >;
+
+  getComplementedBalance(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber] & { tokenBalance: BigNumber; nftBalance: BigNumber }
   >;
 
   getReserves(
@@ -332,11 +361,18 @@ export class ISeacowsERC721TradePair extends BaseContract {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
+      from: string,
       to: string,
       ids: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { amount0: BigNumber; amount1: BigNumber }
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[]] & {
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenIn: BigNumber;
+        tokenOut: BigNumber;
+        idsOut: BigNumber[];
+      }
     >;
 
     collection(overrides?: CallOverrides): Promise<string>;
@@ -351,8 +387,17 @@ export class ISeacowsERC721TradePair extends BaseContract {
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
+      }
+    >;
+
+    getComplementedBalance(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        tokenBalance: BigNumber;
+        nftBalance: BigNumber;
       }
     >;
 
@@ -393,42 +438,64 @@ export class ISeacowsERC721TradePair extends BaseContract {
   };
 
   filters: {
-    "Burn(address,uint256,uint256,address)"(
+    "Burn(address,uint256,uint256,uint256,uint256,uint256[],address)"(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null,
+      cTokenOut?: null,
+      cNftOut?: null,
+      tokenAmountIn?: null,
+      tokenAmountOut?: null,
+      idsOut?: null,
       to?: string | null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber, string],
-      { sender: string; amount0: BigNumber; amount1: BigNumber; to: string }
+      [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[], string],
+      {
+        sender: string;
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenAmountIn: BigNumber;
+        tokenAmountOut: BigNumber;
+        idsOut: BigNumber[];
+        to: string;
+      }
     >;
 
     Burn(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null,
+      cTokenOut?: null,
+      cNftOut?: null,
+      tokenAmountIn?: null,
+      tokenAmountOut?: null,
+      idsOut?: null,
       to?: string | null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber, string],
-      { sender: string; amount0: BigNumber; amount1: BigNumber; to: string }
+      [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[], string],
+      {
+        sender: string;
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenAmountIn: BigNumber;
+        tokenAmountOut: BigNumber;
+        idsOut: BigNumber[];
+        to: string;
+      }
     >;
 
     "Mint(address,uint256,uint256)"(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null
+      tokenAmount?: null,
+      nftAmount?: null
     ): TypedEventFilter<
       [string, BigNumber, BigNumber],
-      { sender: string; amount0: BigNumber; amount1: BigNumber }
+      { sender: string; tokenAmount: BigNumber; nftAmount: BigNumber }
     >;
 
     Mint(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null
+      tokenAmount?: null,
+      nftAmount?: null
     ): TypedEventFilter<
       [string, BigNumber, BigNumber],
-      { sender: string; amount0: BigNumber; amount1: BigNumber }
+      { sender: string; tokenAmount: BigNumber; nftAmount: BigNumber }
     >;
 
     "Swap(address,uint256,uint256,uint256,uint256,address)"(
@@ -492,6 +559,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
+      from: string,
       to: string,
       ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -506,6 +574,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
       _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getComplementedBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     getReserves(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -545,6 +615,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     burn(
+      from: string,
       to: string,
       ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -557,6 +628,10 @@ export class ISeacowsERC721TradePair extends BaseContract {
     getComplemenetedAssetsOut(
       _tokenAmountOut: BigNumberish,
       _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getComplementedBalance(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

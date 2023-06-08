@@ -11,14 +11,32 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount0",
+        "name": "cTokenOut",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount1",
+        "name": "cNftOut",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenAmountIn",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenAmountOut",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "idsOut",
+        "type": "uint256[]"
       },
       {
         "indexed": true,
@@ -55,13 +73,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount0",
+        "name": "tokenAmount",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount1",
+        "name": "nftAmount",
         "type": "uint256"
       }
     ],
@@ -145,6 +163,19 @@
   },
   {
     "inputs": [],
+    "name": "COMPLEMENT_THRESHOLD",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "ONE_PERCENT",
     "outputs": [
       {
@@ -186,12 +217,17 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "to",
         "type": "address"
       },
       {
         "internalType": "uint256[]",
-        "name": "ids",
+        "name": "_ids",
         "type": "uint256[]"
       }
     ],
@@ -199,13 +235,28 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "amount0",
+        "name": "cTokenOut",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "amount1",
+        "name": "cNftOut",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "idsOut",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -241,36 +292,36 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_tokenAmountOut",
+        "name": "__tokenAmountOut",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "_nftAmountOut",
+        "name": "__nftAmountOut",
         "type": "uint256"
       }
     ],
     "name": "getComplemenetedAssetsOut",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "tokenAmountOut",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftAmountOut",
-        "type": "uint256"
-      },
-      {
         "internalType": "int256",
-        "name": "tokenComplementAdjusted",
+        "name": "tokenAmountOut",
         "type": "int256"
       },
       {
-        "internalType": "uint256",
-        "name": "nftComplementAdjusted",
-        "type": "uint256"
+        "internalType": "int256",
+        "name": "nftAmountOut",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "newTokenComplement",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "newNftComplement",
+        "type": "int256"
       }
     ],
     "stateMutability": "view",
@@ -364,9 +415,9 @@
     "name": "nftComplement",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "",
-        "type": "uint256"
+        "type": "int256"
       }
     ],
     "stateMutability": "view",

@@ -1,20 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { ISeacowsComplement } from "../interfaces/ISeacowsComplement.sol";
 
 // contract SeacowsComplement is IFeeManagement {
 contract SeacowsComplement is ISeacowsComplement {
-    using SafeMath for uint;
-    using SafeMath for uint256;
-
     int256 private _tokenComplement;
-    uint256 private _nftComplement;
+    int256 private _nftComplement;
 
-    uint public override constant COMPLEMENT_PRECISION = 10**18;
+    uint public constant COMPLEMENT_PRECISION = 10**18;
+    int public constant COMPLEMENT_THRESHOLD = 5 * 10**17;
 
     constructor() {}
 
@@ -22,45 +19,54 @@ contract SeacowsComplement is ISeacowsComplement {
         return _tokenComplement;
     }
 
-    function nftComplement() public view returns (uint256) {
+    function nftComplement() public view returns (int256) {
         return _nftComplement;
     }
 
-    function getComplemenetedAssetsOut(uint256 _tokenAmountOut, uint256 _nftAmountOut) public view returns (uint256 tokenAmountOut, uint256 nftAmountOut, int256 tokenComplementAdjusted, uint256 nftComplementAdjusted) {
-        uint256 _spot = _tokenAmountOut.div(_nftAmountOut);
-        uint256 _complementedNftAmountOut = _nftComplement + _nftAmountOut;
+    function getComplemenetedAssetsOut(int256 _tokenAmountOut, int256 _nftAmountOut) public view returns (int256 tokenAmountOut, int256 nftAmountOut, int256 newTokenComplement, int256 newNftComplement) {
+        int256 _complementedNftAmountOut = _nftComplement + _nftAmountOut;
+        int256 complement = int256(COMPLEMENT_PRECISION);
 
-        if (_complementedNftAmountOut >= COMPLEMENT_PRECISION ) {
-            // Wipe out all the decimals and get the integer amount of NFT out
-            nftAmountOut = uint256((_complementedNftAmountOut).div(COMPLEMENT_PRECISION).mul(COMPLEMENT_PRECISION));
-            nftComplementAdjusted = _complementedNftAmountOut - nftAmountOut;
+        int256 quotient = _complementedNftAmountOut / complement * complement;
+        int256 remainer = _complementedNftAmountOut - quotient;
+        if (remainer >= COMPLEMENT_THRESHOLD) {
+            quotient = quotient + complement;
+        }
 
-            if (nftAmountOut >= _nftAmountOut) {
-                uint __tokenComplement = (nftAmountOut - _nftAmountOut).mul(_spot);
-                tokenAmountOut = uint256(_tokenAmountOut - __tokenComplement);
-                tokenComplementAdjusted = _tokenComplement + int256(__tokenComplement);
-            } else {
-                uint __tokenComplement = (_nftAmountOut - nftAmountOut).mul(_spot);
-                tokenAmountOut = uint256(_tokenAmountOut + __tokenComplement);
-                tokenComplementAdjusted = _tokenComplement - int256(__tokenComplement);
-            }
+        if (quotient >= complement) {
+            nftAmountOut = quotient;
+            int256 nftChange = nftAmountOut - _nftAmountOut;
+            newNftComplement = _nftComplement + nftChange;
+
+            int256 tokenChange = nftChange * _tokenAmountOut / _nftAmountOut;
+            tokenAmountOut = _tokenAmountOut - tokenChange;
+            newTokenComplement = _tokenComplement - tokenChange;
         } else {
-            nftComplementAdjusted = _nftComplement + _nftAmountOut;
+            newNftComplement = _nftComplement - _nftAmountOut;
             nftAmountOut = 0;
 
-            uint256 __tokenComplement = uint256(_nftAmountOut.mul(_spot));
-            tokenAmountOut = uint256(_tokenAmountOut + __tokenComplement);
-            tokenComplementAdjusted = _tokenComplement - int256(__tokenComplement);
+            tokenAmountOut = 2 * _tokenAmountOut;
+            newTokenComplement = _tokenComplement + _tokenAmountOut;
         }
     }
 
     function _getComplementedBalance(address _token, address _collection) internal view returns (uint256 balance0, uint256 balance1) {
-        balance0 = uint256(int256(IERC20(_token).balanceOf(address(this))) - _tokenComplement);
-        balance1 = uint256(IERC721(_collection).balanceOf(address(this)).mul(COMPLEMENT_PRECISION)) - _nftComplement;
+        balance0 = uint256(int256(IERC20(_token).balanceOf(address(this))) + _tokenComplement);
+        balance1 = uint256(int256(IERC721(_collection).balanceOf(address(this)) * uint256(COMPLEMENT_PRECISION)) + _nftComplement);
     }
 
     // Expect _nftAmountOut = NFT quantity output * precision
-    function _updateComplement(uint256 _tokenAmountOut, uint256 _nftAmountOut) internal returns (uint256 tokenAmountOut, uint256 nftAmountOut) {
-        (tokenAmountOut, nftAmountOut, _tokenComplement, _nftComplement) = getComplemenetedAssetsOut(_tokenAmountOut, _nftAmountOut);
+    function _updateComplement(uint256 _tokenAmountOut, uint256 _nftAmountOut) internal returns (uint256 tokenAmountIn, uint256 tokenAmountOut, uint256 nftAmountOut) {
+        int256 tokenOut;
+        int256 nftOut;
+        (tokenOut, nftOut, _tokenComplement, _nftComplement) = getComplemenetedAssetsOut(int(_tokenAmountOut), int(_nftAmountOut));
+        if (tokenOut < 0) {
+            tokenAmountIn = uint256(0 - tokenOut);
+            tokenAmountOut = 0;
+        } else {
+            tokenAmountIn = 0;
+            tokenAmountOut = uint256(tokenOut);
+        }
+        nftAmountOut = uint256(nftOut);
     }
 }

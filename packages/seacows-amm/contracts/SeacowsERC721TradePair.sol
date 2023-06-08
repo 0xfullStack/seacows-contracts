@@ -101,36 +101,57 @@ contract SeacowsERC721TradePair is
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function burn(address to, uint256[] memory ids) public nonReentrant returns (uint amount0, uint amount1) {
-        (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
-        address _token = token; // gas savings
-        address _collection = collection; // gas savings
+    function burn(address from, address to, uint256[] memory _ids) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
         (uint balance0, uint balance1) = getComplementedBalance();
 
-        uint256 _pairTokenId = ISeacowsPositionManager(positionManager()).tokenOf(address(this));
-        uint liquidity = ISeacowsPositionManager(positionManager()).balanceOf(_pairTokenId);
+        ISeacowsPositionManager manager = ISeacowsPositionManager(positionManager());
 
+        uint nftAmountOut;
         {
             // scope to avoid stack too deep errors
-            uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
-            amount0 = liquidity.mul(balance0) / _totalSupply; // using balances ensures pro-rata distribution
-            amount1 = liquidity.mul(balance1) / _totalSupply; // using balances ensures pro-rata distribution
-            require(amount0 > 0 && amount1 > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_BURNED');
+            uint liquidity = manager.balanceOf(manager.tokenOf(address(this)));
+            cTokenOut = liquidity.mul(balance0) / totalSupply(); // using balances ensures pro-rata distribution
+            cNftOut = liquidity.mul(balance1) / totalSupply(); // using balances ensures pro-rata distribution
+            require(cTokenOut > 0 && cNftOut > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_BURNED');
 
-            (amount0, amount1) = _updateComplement(amount0, amount1);
-            require(ids.length * COMPLEMENT_PRECISION == amount1, 'SeacowsERC721TradePair: INVALID_IDS_TO_REMOVE');
-            _burn(_pairTokenId, liquidity);
+            uint nftOut;
+            (tokenIn, tokenOut, nftOut) = _updateComplement(cTokenOut, cNftOut);
+            _burn(manager.tokenOf(address(this)), liquidity);
+            nftAmountOut = nftOut / COMPLEMENT_PRECISION;
+
+            if (tokenOut > IERC20(token).balanceOf(address(this))) {
+                tokenOut = IERC20(token).balanceOf(address(this));
+            }
+        }
+        require(_ids.length >= nftAmountOut, 'SeacowsERC721TradePair: EXCEED_NFT_OUT_MAX');
+        IERC20Metadata(token).transfer(to, tokenOut);
+
+        { // scope to avoid stack too deep errors
+        idsOut = new uint[](nftAmountOut);
+        uint count = 0;
+        uint i = 0;
+        while (count < nftAmountOut && i < _ids.length) {
+            if (IERC721Metadata(collection).ownerOf(_ids[i]) == address(this)) {
+                IERC721Metadata(collection).safeTransferFrom(address(this), to, _ids[i]);
+                idsOut[count] = _ids[i];
+                count++;
+            }
+            i++;
+        }
+        require(count == nftAmountOut, 'SeacowsERC721TradePair: INSUFFICIENT_NFT_TO_WITHDRAW');
         }
 
-        IERC20Metadata(_token).transfer(to, amount0);
-        for (uint i = 0; i < ids.length; i++) {
-            IERC721Metadata(_collection).safeTransferFrom(address(this), to, ids[i]);
+        if (tokenIn > 0) {
+            manager.seacowsBurnCallback(token, from, tokenIn);
         }
-
+ 
         (balance0, balance1) = getComplementedBalance();
 
+        { // scope to avoid stack too deep errors
+        (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
         _update(balance0, balance1, _reserve0, _reserve1);
-        emit Burn(msg.sender, amount0, amount1, to);
+        }
+        emit Burn(msg.sender, cTokenOut, cNftOut, tokenIn, tokenOut, idsOut, to);
     }
 
     // this low-level function should be called from a contract which performs important safety checks
@@ -156,14 +177,14 @@ contract SeacowsERC721TradePair is
             // if (data.length > 0) ISeacowsCallee(to).uniswapV2Call(msg.sender, amount0Out, amount1Out, data);
             (balance0, balance1) = getComplementedBalance();
         }
-        uint amount0In = balance0 > _reserve0 - tokenAmountOut ? balance0 - (_reserve0 - tokenAmountOut) : 0;
-        uint amount1In = balance1 > _reserve1 - idsOut.length * COMPLEMENT_PRECISION
+        uint tokenAmountIn = balance0 > _reserve0 - tokenAmountOut ? balance0 - (_reserve0 - tokenAmountOut) : 0;
+        uint nftAmountIn = balance1 > _reserve1 - idsOut.length * COMPLEMENT_PRECISION
             ? balance1 - (_reserve1 - idsOut.length * COMPLEMENT_PRECISION)
             : 0;
-        require(amount0In > 0 || amount1In > 0, 'Seacows: INSUFFICIENT_INPUT_AMOUNT');
+        require(tokenAmountIn > 0 || nftAmountIn > 0, 'Seacows: INSUFFICIENT_INPUT_AMOUNT');
         {
             // scope for reserve{0,1}Adjusted, avoids stack too deep errors
-            uint balance0Adjusted = balance0.mul(PERCENTAGE_PRECISION).sub(amount0In.mul(fee));
+            uint balance0Adjusted = balance0.mul(PERCENTAGE_PRECISION).sub(tokenAmountIn.mul(fee));
             uint balance1Adjusted = balance1.mul(PERCENTAGE_PRECISION);
             require(
                 balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(PERCENTAGE_PRECISION ** 2),
@@ -172,7 +193,7 @@ contract SeacowsERC721TradePair is
         }
 
         _update(balance0, balance1, _reserve0, _reserve1);
-        emit Swap(msg.sender, amount0In, amount1In.div(COMPLEMENT_PRECISION), tokenAmountOut, idsOut.length, to);
+        emit Swap(msg.sender, tokenAmountIn, nftAmountIn, tokenAmountOut, idsOut.length * COMPLEMENT_PRECISION, to);
     }
 
     // force balances to match reserves
@@ -197,7 +218,7 @@ contract SeacowsERC721TradePair is
     }
 
     function _update(uint balance0, uint balance1, uint112 _reserve0, uint112 _reserve1) private {
-        require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, 'SeacowsERC721TradePair: OVERFLOW');
+        require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, 'SeacowsERC721TradePair: OVERFLOW ');
         uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {

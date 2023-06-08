@@ -117,8 +117,8 @@ export class ISeacowsComplement extends BaseContract {
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
       }
     >;
 
@@ -137,8 +137,8 @@ export class ISeacowsComplement extends BaseContract {
     [BigNumber, BigNumber, BigNumber, BigNumber] & {
       tokenAmountOut: BigNumber;
       nftAmountOut: BigNumber;
-      tokenComplementAdjusted: BigNumber;
-      nftComplementAdjusted: BigNumber;
+      newTokenComplement: BigNumber;
+      newNftComplement: BigNumber;
     }
   >;
 
@@ -157,8 +157,8 @@ export class ISeacowsComplement extends BaseContract {
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
       }
     >;
 

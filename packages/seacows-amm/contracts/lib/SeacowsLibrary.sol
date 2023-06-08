@@ -28,6 +28,10 @@ library SeacowsLibrary {
         require(reserveIn > 0 && reserveOut > 0, "SeacowsLibrary: INSUFFICIENT_LIQUIDITY");
         uint numerator = reserveIn.mul(amountOut).mul(feeDenominator);
         uint denominator = reserveOut.sub(amountOut).mul(feeDenominator.sub(feeNumerator));
-        tokenIn = (numerator / denominator).add(1);
+        if (denominator == 0) {
+            tokenIn = ~uint(0);
+        } else {
+            tokenIn = (numerator / denominator).add(1);
+        }
     }
 }

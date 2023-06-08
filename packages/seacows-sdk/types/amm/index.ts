@@ -34,6 +34,7 @@ export type { SeacowsComplement } from "./SeacowsComplement";
 export type { SeacowsERC3525 } from "./SeacowsERC3525";
 export type { SeacowsERC721TradePairFactory } from "./SeacowsERC721TradePairFactory";
 export type { SeacowsPairMetadata } from "./SeacowsPairMetadata";
+export type { ISeacowsCallback } from "./ISeacowsCallback";
 export type { ISeacowsComplement } from "./ISeacowsComplement";
 export type { ISeacowsERC3525 } from "./ISeacowsERC3525";
 export type { ISeacowsERC721TradePair } from "./ISeacowsERC721TradePair";
@@ -82,6 +83,7 @@ export { SeacowsComplement__factory } from "./factories/SeacowsComplement__facto
 export { SeacowsERC3525__factory } from "./factories/SeacowsERC3525__factory";
 export { SeacowsERC721TradePairFactory__factory } from "./factories/SeacowsERC721TradePairFactory__factory";
 export { SeacowsPairMetadata__factory } from "./factories/SeacowsPairMetadata__factory";
+export { ISeacowsCallback__factory } from "./factories/ISeacowsCallback__factory";
 export { ISeacowsComplement__factory } from "./factories/ISeacowsComplement__factory";
 export { ISeacowsERC3525__factory } from "./factories/ISeacowsERC3525__factory";
 export { ISeacowsERC721TradePair__factory } from "./factories/ISeacowsERC721TradePair__factory";

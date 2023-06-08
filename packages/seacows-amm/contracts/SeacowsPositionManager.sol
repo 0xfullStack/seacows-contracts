@@ -33,6 +33,13 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
     Counters.Counter private _slotGenerator;
 
+    struct RemoveLiquidityConstraint {
+        uint cTokenOutMin;
+        uint cNftOutMin;
+        uint tokenInMax;
+        uint[] nftIds;
+    }
+
     constructor(
         address template_,
         address _WETH
@@ -162,80 +169,86 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     }
 
     // **** REMOVE LIQUIDITY ****
-    /**
-        @notice Remove liquidity from the Pair based on the ERC20 address, ERC721 address and fee tier
-        @param token The ERC20 contract address
-        @param collection The ERC721 contract address
-        @param fee The fee tier. Please check TradePair for the fee tiers.
-        @param liquidity The amount of liquidity wanted to remove.
-        @param tokenMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
-        @param idsDesired The ids of ERC721 NFT to remove
-        @param fromTokenId The Position NFT that is used to burn the liquidity and redeem the assets.
-        @param to The address that will receive the withdrawn assets
-        @param deadline The timestamp of deadline in seconds
-     */
+    function seacowsBurnCallback(address _token, address from, uint256 _amount) external {
+        require(slotOfPair(msg.sender) != 0, "SeacowsPositionManager: UNAUTHORIZED_CALLER");
+        IERC20(_token).transferFrom(from, msg.sender, _amount);
+    }
+
+    // /**
+    //     @notice Remove liquidity from the Pair based on the ERC20 address, ERC721 address and fee tier
+    //     @param token The ERC20 contract address
+    //     @param collection The ERC721 contract address
+    //     @param fee The fee tier. Please check TradePair for the fee tiers.
+    //     @param liquidity The amount of liquidity wanted to remove.
+    //     @param tokenInMax,
+    //     @param tokenOutMin,
+    //     @param nftOutMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
+    //     @param idsDesired The ids of ERC721 NFT to remove
+    //     @param fromTokenId The Position NFT that is used to burn the liquidity and redeem the assets.
+    //     @param to The address that will receive the withdrawn assets
+    //     @param deadline The timestamp of deadline in seconds
+    //  */
     function removeLiquidity(
         address token,
         address collection,
         uint112 fee,
         uint liquidity,
-        uint tokenMin,
-        uint[] memory idsDesired,
+        RemoveLiquidityConstraint memory constraint,
         uint256 fromTokenId,
         address to,
         uint deadline
-    ) public virtual checkDeadline(deadline) returns (uint tokenAmount, uint nftAmount) {
+    ) public virtual checkDeadline(deadline) returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
         address pair = getPair(token, collection, fee);
-        uint256 _pairTokenId = tokenOf(pair);
 
-        transferFrom(fromTokenId, _pairTokenId, liquidity); // send liquidity to pair
-        (tokenAmount, ) = ISeacowsERC721TradePair(pair).burn(to, idsDesired);
-        require(tokenAmount >= tokenMin, 'SeacowsPositionManager: INSUFFICIENT_TOKEN_AMOUNT');
-        nftAmount = idsDesired.length;
+        transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
+        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(msg.sender, to, constraint.nftIds);
+        require(cTokenOut >= constraint.cTokenOutMin, string.concat('SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN', ' ', Strings.toString(cTokenOut), ' ', Strings.toString(constraint.cTokenOutMin)));       
+        require(cNftOut >= constraint.cNftOutMin, 'SeacowsPositionManager: BELOW_C_NFT_OUT_MIN');      
+        require(constraint.tokenInMax >= tokenIn, 'SeacowsPositionManager: EXCEED_TOKEN_IN_MAX');      
     }
 
-    /**
-        @notice Remove liquidity from the WETH Pair based on the ERC721 address and fee tier. Also convert WETH to ETH
-        @param collection The ERC721 contract address
-        @param fee The fee tier. Please check TradePair for the fee tiers.
-        @param liquidity The amount of liquidity wanted to remove.
-        @param tokenMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
-        @param idsDesired The ids of ERC721 NFT to remove
-        @param fromTokenId The position NFT that is used to burn the liquidity and redeem the assets.
-        @param to The address that will receive the withdrawn assets
-        @param deadline The timestamp of deadline in seconds
-     */
+    // /**
+    //     @notice Remove liquidity from the WETH Pair based on the ERC721 address and fee tier. Also convert WETH to ETH
+    //     @param collection The ERC721 contract address
+    //     @param fee The fee tier. Please check TradePair for the fee tiers.
+    //     @param liquidity The amount of liquidity wanted to remove.
+    //     @param tokenInMax,
+    //     @param tokenOutMin,
+    //     @param nftOutMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
+    //     @param idsDesired The ids of ERC721 NFT to remove
+    //     @param fromTokenId The position NFT that is used to burn the liquidity and redeem the assets.
+    //     @param to The address that will receive the withdrawn assets
+    //     @param deadline The timestamp of deadline in seconds
+    //  */
     function removeLiquidityETH(
         address collection,
         uint112 fee,
         uint liquidity,
-        uint tokenMin,
-        uint[] memory idsDesired,
+        RemoveLiquidityConstraint memory constraint,
         uint256 fromTokenId,
         address to,
         uint deadline
-    ) public virtual checkDeadline(deadline) returns (uint tokenAmount, uint nftAmount) {
+    ) public virtual checkDeadline(deadline) returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
-        (tokenAmount, nftAmount) = removeLiquidity(
+        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = removeLiquidity(
             WETH,
             collection,
             fee,
             liquidity,
-            tokenMin,
-            idsDesired,
+            constraint,
             fromTokenId,
             address(this),
             deadline
         );
 
-        for (uint i = 0; i < idsDesired.length; i++) {
-            IERC721(collection).safeTransferFrom(address(this), to, idsDesired[i]);
+        for (uint i = 0; i < idsOut.length; i++) {
+            IERC721(collection).safeTransferFrom(address(this), to, idsOut[i]);
         }
 
-        IWETH(WETH).withdraw(tokenAmount);
+        IWETH(WETH).withdraw(tokenOut);
 
-        (bool success, ) = to.call{value: tokenAmount}(new bytes(0));
+        (bool success, ) = to.call{value: tokenOut}(new bytes(0));
         require(success, 'TransferHelper::safeTransferETH: ETH transfer failed');
     }
 
@@ -393,6 +406,10 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
     function slotOfPair(address _pair) public view returns (uint256) {
         return _pairSlots[_pair];
+    }
+
+    function pairOfSlot(uint256 _slot) public view returns (address) {
+        return _slotPairs[_slot];
     }
 
     function tokenOf(address _pair) public view returns (uint256) {

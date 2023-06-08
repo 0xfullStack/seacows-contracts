@@ -7,6 +7,7 @@ export type { IERC165 } from "./IERC165";
 export type { ISeacowsComplement } from "./ISeacowsComplement";
 export type { ISeacowsERC721TradePair } from "./ISeacowsERC721TradePair";
 export type { ISeacowsRouter } from "./ISeacowsRouter";
+export type { IWETH } from "./IWETH";
 export type { SeacowsRouter } from "./SeacowsRouter";
 
 export { IERC20__factory } from "./factories/IERC20__factory";
@@ -15,4 +16,5 @@ export { IERC165__factory } from "./factories/IERC165__factory";
 export { ISeacowsComplement__factory } from "./factories/ISeacowsComplement__factory";
 export { ISeacowsERC721TradePair__factory } from "./factories/ISeacowsERC721TradePair__factory";
 export { ISeacowsRouter__factory } from "./factories/ISeacowsRouter__factory";
+export { IWETH__factory } from "./factories/IWETH__factory";
 export { SeacowsRouter__factory } from "./factories/SeacowsRouter__factory";

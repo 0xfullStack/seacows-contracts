@@ -1,7 +1,11 @@
+import { BigNumber } from 'ethers';
+
+export const BI_ZERO = BigNumber.from(0);
+
 export enum Environment {
-  DEV = "dev",
-  STAGING = "staging",
-  PRODUCTION = "prod",
+  DEV = 'dev',
+  STAGING = 'staging',
+  PRODUCTION = 'prod',
 }
 
 export enum SupportedChain {

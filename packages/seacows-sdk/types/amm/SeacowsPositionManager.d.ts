@@ -43,9 +43,11 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "removeLiquidity(address,address,uint112,uint256,uint256,uint256[],uint256,address,uint256)": FunctionFragment;
-    "removeLiquidityETH(address,uint112,uint256,uint256,uint256[],uint256,address,uint256)": FunctionFragment;
+    "pairOfSlot(uint256)": FunctionFragment;
+    "removeLiquidity(address,address,uint112,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
+    "removeLiquidityETH(address,uint112,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
+    "seacowsBurnCallback(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotOfPair(address)": FunctionFragment;
@@ -162,14 +164,22 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "pairOfSlot",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "removeLiquidity",
     values: [
       string,
       string,
       BigNumberish,
       BigNumberish,
-      BigNumberish,
-      BigNumberish[],
+      {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       BigNumberish,
       string,
       BigNumberish
@@ -181,8 +191,12 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
       string,
       BigNumberish,
       BigNumberish,
-      BigNumberish,
-      BigNumberish[],
+      {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       BigNumberish,
       string,
       BigNumberish
@@ -190,6 +204,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "seacowsBurnCallback",
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -297,6 +315,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pairOfSlot", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "removeLiquidity",
     data: BytesLike
@@ -307,6 +326,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "seacowsBurnCallback",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -620,13 +643,22 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { owner_: string }>;
 
+    pairOfSlot(
+      _slot: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     removeLiquidity(
       token: string,
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
@@ -637,8 +669,12 @@ export class SeacowsPositionManager extends BaseContract {
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
@@ -658,6 +694,13 @@ export class SeacowsPositionManager extends BaseContract {
       tokenId_: BigNumberish,
       data_: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setApprovalForAll(
@@ -884,13 +927,19 @@ export class SeacowsPositionManager extends BaseContract {
 
   ownerOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  pairOfSlot(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
   removeLiquidity(
     token: string,
     collection: string,
     fee: BigNumberish,
     liquidity: BigNumberish,
-    tokenMin: BigNumberish,
-    idsDesired: BigNumberish[],
+    constraint: {
+      cTokenOutMin: BigNumberish;
+      cNftOutMin: BigNumberish;
+      tokenInMax: BigNumberish;
+      nftIds: BigNumberish[];
+    },
     fromTokenId: BigNumberish,
     to: string,
     deadline: BigNumberish,
@@ -901,8 +950,12 @@ export class SeacowsPositionManager extends BaseContract {
     collection: string,
     fee: BigNumberish,
     liquidity: BigNumberish,
-    tokenMin: BigNumberish,
-    idsDesired: BigNumberish[],
+    constraint: {
+      cTokenOutMin: BigNumberish;
+      cNftOutMin: BigNumberish;
+      tokenInMax: BigNumberish;
+      nftIds: BigNumberish[];
+    },
     fromTokenId: BigNumberish,
     to: string,
     deadline: BigNumberish,
@@ -922,6 +975,13 @@ export class SeacowsPositionManager extends BaseContract {
     tokenId_: BigNumberish,
     data_: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  seacowsBurnCallback(
+    _token: string,
+    from: string,
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setApprovalForAll(
@@ -1163,33 +1223,55 @@ export class SeacowsPositionManager extends BaseContract {
 
     ownerOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+    pairOfSlot(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
     removeLiquidity(
       token: string,
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { tokenAmount: BigNumber; nftAmount: BigNumber }
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[]] & {
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenIn: BigNumber;
+        tokenOut: BigNumber;
+        idsOut: BigNumber[];
+      }
     >;
 
     removeLiquidityETH(
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { tokenAmount: BigNumber; nftAmount: BigNumber }
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[]] & {
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenIn: BigNumber;
+        tokenOut: BigNumber;
+        idsOut: BigNumber[];
+      }
     >;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -1204,6 +1286,13 @@ export class SeacowsPositionManager extends BaseContract {
       to_: string,
       tokenId_: BigNumberish,
       data_: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1584,13 +1673,22 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    pairOfSlot(
+      _slot: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     removeLiquidity(
       token: string,
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
@@ -1601,8 +1699,12 @@ export class SeacowsPositionManager extends BaseContract {
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
@@ -1622,6 +1724,13 @@ export class SeacowsPositionManager extends BaseContract {
       tokenId_: BigNumberish,
       data_: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setApprovalForAll(
@@ -1856,13 +1965,22 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    pairOfSlot(
+      _slot: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     removeLiquidity(
       token: string,
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
@@ -1873,8 +1991,12 @@ export class SeacowsPositionManager extends BaseContract {
       collection: string,
       fee: BigNumberish,
       liquidity: BigNumberish,
-      tokenMin: BigNumberish,
-      idsDesired: BigNumberish[],
+      constraint: {
+        cTokenOutMin: BigNumberish;
+        cNftOutMin: BigNumberish;
+        tokenInMax: BigNumberish;
+        nftIds: BigNumberish[];
+      },
       fromTokenId: BigNumberish,
       to: string,
       deadline: BigNumberish,
@@ -1894,6 +2016,13 @@ export class SeacowsPositionManager extends BaseContract {
       tokenId_: BigNumberish,
       data_: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    seacowsBurnCallback(
+      _token: string,
+      from: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setApprovalForAll(

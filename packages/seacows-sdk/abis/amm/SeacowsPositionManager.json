@@ -815,6 +815,25 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_slot",
+        "type": "uint256"
+      }
+    ],
+    "name": "pairOfSlot",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "token",
         "type": "address"
@@ -835,14 +854,31 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "tokenMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "idsDesired",
-        "type": "uint256[]"
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "cTokenOutMin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cNftOutMin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenInMax",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "nftIds",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct SeacowsPositionManager.RemoveLiquidityConstraint",
+        "name": "constraint",
+        "type": "tuple"
       },
       {
         "internalType": "uint256",
@@ -864,13 +900,28 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenAmount",
+        "name": "cTokenOut",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "nftAmount",
+        "name": "cNftOut",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "idsOut",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -894,14 +945,31 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "tokenMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "idsDesired",
-        "type": "uint256[]"
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "cTokenOutMin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cNftOutMin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenInMax",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "nftIds",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct SeacowsPositionManager.RemoveLiquidityConstraint",
+        "name": "constraint",
+        "type": "tuple"
       },
       {
         "internalType": "uint256",
@@ -923,13 +991,28 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenAmount",
+        "name": "cTokenOut",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "nftAmount",
+        "name": "cNftOut",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "idsOut",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -984,6 +1067,29 @@
     "name": "safeTransferFrom",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "seacowsBurnCallback",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

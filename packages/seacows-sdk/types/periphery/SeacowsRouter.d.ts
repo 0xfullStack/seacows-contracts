@@ -12,6 +12,7 @@ import {
   BaseContract,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -21,19 +22,40 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SeacowsRouterInterface extends ethers.utils.Interface {
   functions: {
+    "batchSwapETHForExactNFTs(address[],uint256[][],uint256[],address,uint256)": FunctionFragment;
+    "batchSwapExactNFTsForETH(address[],uint256[][],uint256[],address,uint256)": FunctionFragment;
     "batchSwapExactNFTsForTokens(address[],uint256[][],uint256[],address,uint256)": FunctionFragment;
     "batchSwapTokensForExactNFTs(address[],uint256[][],uint256[],address,uint256)": FunctionFragment;
+    "swapETHForExactNFTs(address,uint256[],uint256,address,uint256)": FunctionFragment;
+    "swapExactNFTsForETH(address,uint256[],uint256,address,uint256)": FunctionFragment;
     "swapExactNFTsForTokens(address,uint256[],uint256,address,uint256)": FunctionFragment;
     "swapTokensForExactNFTs(address,uint256[],uint256,address,uint256)": FunctionFragment;
+    "weth()": FunctionFragment;
   };
 
   encodeFunctionData(
+    functionFragment: "batchSwapETHForExactNFTs",
+    values: [string[], BigNumberish[][], BigNumberish[], string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "batchSwapExactNFTsForETH",
+    values: [string[], BigNumberish[][], BigNumberish[], string, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "batchSwapExactNFTsForTokens",
     values: [string[], BigNumberish[][], BigNumberish[], string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "batchSwapTokensForExactNFTs",
     values: [string[], BigNumberish[][], BigNumberish[], string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "swapETHForExactNFTs",
+    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "swapExactNFTsForETH",
+    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "swapExactNFTsForTokens",
@@ -43,13 +65,30 @@ interface SeacowsRouterInterface extends ethers.utils.Interface {
     functionFragment: "swapTokensForExactNFTs",
     values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "weth", values?: undefined): string;
 
   decodeFunctionResult(
+    functionFragment: "batchSwapETHForExactNFTs",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "batchSwapExactNFTsForETH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "batchSwapExactNFTsForTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "batchSwapTokensForExactNFTs",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "swapETHForExactNFTs",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "swapExactNFTsForETH",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -60,6 +99,7 @@ interface SeacowsRouterInterface extends ethers.utils.Interface {
     functionFragment: "swapTokensForExactNFTs",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "weth", data: BytesLike): Result;
 
   events: {};
 }
@@ -108,6 +148,24 @@ export class SeacowsRouter extends BaseContract {
   interface: SeacowsRouterInterface;
 
   functions: {
+    batchSwapETHForExactNFTs(
+      _pairs: string[],
+      idsOuts: BigNumberish[][],
+      amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    batchSwapExactNFTsForETH(
+      _pairs: string[],
+      idsIns: BigNumberish[][],
+      amountOutMins: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     batchSwapExactNFTsForTokens(
       _pairs: string[],
       idsIns: BigNumberish[][],
@@ -121,6 +179,24 @@ export class SeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOuts: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    swapETHForExactNFTs(
+      _pair: string,
+      idsOut: BigNumberish[],
+      amountInMax: BigNumberish,
+      to: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    swapExactNFTsForETH(
+      _pair: string,
+      idsIn: BigNumberish[],
+      amountOutMin: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -143,7 +219,27 @@ export class SeacowsRouter extends BaseContract {
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    weth(overrides?: CallOverrides): Promise<[string]>;
   };
+
+  batchSwapETHForExactNFTs(
+    _pairs: string[],
+    idsOuts: BigNumberish[][],
+    amountInMaxs: BigNumberish[],
+    to: string,
+    deadline: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  batchSwapExactNFTsForETH(
+    _pairs: string[],
+    idsIns: BigNumberish[][],
+    amountOutMins: BigNumberish[],
+    to: string,
+    deadline: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   batchSwapExactNFTsForTokens(
     _pairs: string[],
@@ -158,6 +254,24 @@ export class SeacowsRouter extends BaseContract {
     _pairs: string[],
     idsOuts: BigNumberish[][],
     amountInMaxs: BigNumberish[],
+    to: string,
+    deadline: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  swapETHForExactNFTs(
+    _pair: string,
+    idsOut: BigNumberish[],
+    amountInMax: BigNumberish,
+    to: string,
+    deadline: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  swapExactNFTsForETH(
+    _pair: string,
+    idsIn: BigNumberish[],
+    amountOutMin: BigNumberish,
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -181,7 +295,27 @@ export class SeacowsRouter extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  weth(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
+    batchSwapETHForExactNFTs(
+      _pairs: string[],
+      idsOuts: BigNumberish[][],
+      amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    batchSwapExactNFTsForETH(
+      _pairs: string[],
+      idsIns: BigNumberish[][],
+      amountOutMins: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     batchSwapExactNFTsForTokens(
       _pairs: string[],
       idsIns: BigNumberish[][],
@@ -195,6 +329,24 @@ export class SeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOuts: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    swapETHForExactNFTs(
+      _pair: string,
+      idsOut: BigNumberish[],
+      amountInMax: BigNumberish,
+      to: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    swapExactNFTsForETH(
+      _pair: string,
+      idsIn: BigNumberish[],
+      amountOutMin: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
@@ -217,11 +369,31 @@ export class SeacowsRouter extends BaseContract {
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    weth(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
+    batchSwapETHForExactNFTs(
+      _pairs: string[],
+      idsOuts: BigNumberish[][],
+      amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    batchSwapExactNFTsForETH(
+      _pairs: string[],
+      idsIns: BigNumberish[][],
+      amountOutMins: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     batchSwapExactNFTsForTokens(
       _pairs: string[],
       idsIns: BigNumberish[][],
@@ -235,6 +407,24 @@ export class SeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOuts: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    swapETHForExactNFTs(
+      _pair: string,
+      idsOut: BigNumberish[],
+      amountInMax: BigNumberish,
+      to: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    swapExactNFTsForETH(
+      _pair: string,
+      idsIn: BigNumberish[],
+      amountOutMin: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -257,9 +447,29 @@ export class SeacowsRouter extends BaseContract {
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    weth(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    batchSwapETHForExactNFTs(
+      _pairs: string[],
+      idsOuts: BigNumberish[][],
+      amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    batchSwapExactNFTsForETH(
+      _pairs: string[],
+      idsIns: BigNumberish[][],
+      amountOutMins: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     batchSwapExactNFTsForTokens(
       _pairs: string[],
       idsIns: BigNumberish[][],
@@ -273,6 +483,24 @@ export class SeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOuts: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      to: string,
+      deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    swapETHForExactNFTs(
+      _pair: string,
+      idsOut: BigNumberish[],
+      amountInMax: BigNumberish,
+      to: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    swapExactNFTsForETH(
+      _pair: string,
+      idsIn: BigNumberish[],
+      amountOutMin: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -295,5 +523,7 @@ export class SeacowsRouter extends BaseContract {
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

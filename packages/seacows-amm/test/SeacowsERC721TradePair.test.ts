@@ -184,9 +184,17 @@ describe('SeacowsERC721TradePair', () => {
       await manager.connect(bob)['transferFrom(uint256,uint256,uint256)'](3, pairTokenId, bobLiquidity);
 
       // Bob burn the liquidity and want to get back ERC721 with ID = [1]
-      await expect(pair.connect(bob).burn(bob.address, [1]))
+      await expect(pair.connect(bob).burn(bob.address, bob.address, [1]))
         .to.be.emit(pair, 'Burn')
-        .withArgs(bob.address, ethers.utils.parseEther('1'), ethers.utils.parseEther('1'), bob.address);
+        .withArgs(
+          bob.address,
+          ethers.utils.parseEther('1'),
+          ethers.utils.parseEther('1'),
+          0,
+          ethers.utils.parseEther('1'),
+          [1],
+          bob.address,
+        );
 
       // Owner of ERC721 ID = 1 is Bob now
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
@@ -265,7 +273,7 @@ describe('SeacowsERC721TradePair', () => {
        */
       await expect(pair.connect(alice).swap(tokenOutWithFee, [], alice.address))
         .to.be.emit(pair, 'Swap')
-        .withArgs(alice.address, 0, 1, tokenOutWithFee, 0, alice.address);
+        .withArgs(alice.address, 0, ethers.utils.parseEther('1'), tokenOutWithFee, 0, alice.address);
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6.792'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(0);
     });
@@ -301,7 +309,7 @@ describe('SeacowsERC721TradePair', () => {
        */
       await expect(pair.connect(bob).swap(0, [4], bob.address))
         .to.be.emit(pair, 'Swap')
-        .withArgs(bob.address, amount0InWithFee, 0, 0, 1, bob.address);
+        .withArgs(bob.address, amount0InWithFee, 0, 0, ethers.utils.parseEther('1'), bob.address);
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('9.189898989898989898'));
       expect(await erc721.balanceOf(bob.address)).to.be.equal(3);
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);

@@ -34,6 +34,11 @@ describe('MockSeacowsComplement', () => {
     }
   });
 
+  it('Should have correct constants', async () => {
+    expect(await MockSeacowsComplement.COMPLEMENT_PRECISION()).to.equal(ethers.utils.parseEther('1'));
+    expect(await MockSeacowsComplement.COMPLEMENT_THRESHOLD()).to.equal(ethers.utils.parseEther('0.5'));
+  });
+
   it('Should get the complemented balance correctly', async () => {
     const [tokenBalance, nftBalance] = await MockSeacowsComplement.getComplementedBalance(
       MockERC20.address,
@@ -51,16 +56,21 @@ describe('MockSeacowsComplement', () => {
    * Output:
    * Tokens: 0.4 ETH, NFTs: 0 NFTs
    */
-  it('should output 0 NFT but more tokens when complemented NFT amount < 1 NFT', async () => {
+  it('should output 0 NFT but more tokens when complemented NFT amount < 0.5 NFT', async () => {
     const expectedTokenOut = ethers.utils.parseEther('0.2');
     const expectedNFTOut = ethers.utils.parseEther('0.2');
+
+    expect(await MockSeacowsComplement.tokenComplement()).to.equal(0);
+    expect(await MockSeacowsComplement.nftComplement()).to.equal(0);
+
     await (await MockSeacowsComplement.updateComplement(expectedTokenOut, expectedNFTOut)).wait();
-    expect(await MockSeacowsComplement.amount0Out()).to.equal(ethers.utils.parseEther('0.4'));
-    expect(await MockSeacowsComplement.amount1Out()).to.equal(0);
+
+    expect(await MockSeacowsComplement.tokenAmountOut()).to.equal(ethers.utils.parseEther('0.4'));
+    expect(await MockSeacowsComplement.nftAmountOut()).to.equal(0);
 
     const [complement0, complement1] = await MockSeacowsComplement.complements();
-    expect(complement0).to.equal(ethers.utils.parseEther('-0.2'));
-    expect(complement1).to.equal(ethers.utils.parseEther('0.2'));
+    expect(complement0).to.equal(ethers.utils.parseEther('0.2'));
+    expect(complement1).to.equal(ethers.utils.parseEther('-0.2'));
   });
 
   /**
@@ -75,8 +85,8 @@ describe('MockSeacowsComplement', () => {
     const expectedTokenOut = ethers.utils.parseEther('1');
     const expectedNFTOut = ethers.utils.parseEther('1');
     await (await MockSeacowsComplement.updateComplement(expectedTokenOut, expectedNFTOut)).wait();
-    expect(await MockSeacowsComplement.amount0Out()).to.equal(ethers.utils.parseEther('1'));
-    expect(await MockSeacowsComplement.amount1Out()).to.equal(ethers.utils.parseEther('1'));
+    expect(await MockSeacowsComplement.tokenAmountOut()).to.equal(ethers.utils.parseEther('1'));
+    expect(await MockSeacowsComplement.nftAmountOut()).to.equal(ethers.utils.parseEther('1'));
 
     const [complement0, complement1] = await MockSeacowsComplement.complements();
     expect(complement0).to.equal(0);
@@ -89,18 +99,18 @@ describe('MockSeacowsComplement', () => {
    * Tokens: 2.9 ETH, NFTs: 2.9 NFTs
    *
    * Output:
-   * Tokens: 3.8 ETH, NFTs: 2 NFTs
+   * Tokens: 2.8 ETH, NFTs: 3 NFTs
    */
-  it('should output round off amount of NFT but more tokens when complemented NFT amount > 1 NFT', async () => {
+  it('should output round off amount of NFT but more tokens when complemented NFT amount > 0.5 NFT', async () => {
     const expectedTokenOut = ethers.utils.parseEther('2.9');
     const expectedNFTOut = ethers.utils.parseEther('2.9');
     await (await MockSeacowsComplement.updateComplement(expectedTokenOut, expectedNFTOut)).wait();
-    expect(await MockSeacowsComplement.amount0Out()).to.equal(ethers.utils.parseEther('3.8'));
-    expect(await MockSeacowsComplement.amount1Out()).to.equal(ethers.utils.parseEther('2'));
+    expect(await MockSeacowsComplement.tokenAmountOut()).to.equal(ethers.utils.parseEther('2.8'));
+    expect(await MockSeacowsComplement.nftAmountOut()).to.equal(ethers.utils.parseEther('3'));
 
     const [complement0, complement1] = await MockSeacowsComplement.complements();
-    expect(complement0).to.equal(ethers.utils.parseEther('-0.9'));
-    expect(complement1).to.equal(ethers.utils.parseEther('0.9'));
+    expect(complement0).to.equal(ethers.utils.parseEther('-0.1'));
+    expect(complement1).to.equal(ethers.utils.parseEther('0.1'));
   });
 
   /**
@@ -121,19 +131,19 @@ describe('MockSeacowsComplement', () => {
       await MockSeacowsComplement.updateComplement(ethers.utils.parseEther('0.2'), ethers.utils.parseEther('0.2'))
     ).wait();
     let [complement0, complement1] = await MockSeacowsComplement.complements();
-    expect(complement0).to.equal(ethers.utils.parseEther('-0.2'));
-    expect(complement1).to.equal(ethers.utils.parseEther('0.2'));
+    expect(complement0).to.equal(ethers.utils.parseEther('0.2'));
+    expect(complement1).to.equal(ethers.utils.parseEther('-0.2'));
 
     // Process actual output
     const expectedTokenOut = ethers.utils.parseEther('3.1');
     const expectedNFTOut = ethers.utils.parseEther('3.1');
     await (await MockSeacowsComplement.updateComplement(expectedTokenOut, expectedNFTOut)).wait();
-    expect(await MockSeacowsComplement.amount0Out()).to.equal(ethers.utils.parseEther('3.2'));
-    expect(await MockSeacowsComplement.amount1Out()).to.equal(ethers.utils.parseEther('3'));
+    expect(await MockSeacowsComplement.tokenAmountOut()).to.equal(ethers.utils.parseEther('3.2'));
+    expect(await MockSeacowsComplement.nftAmountOut()).to.equal(ethers.utils.parseEther('3'));
 
     [complement0, complement1] = await MockSeacowsComplement.complements();
-    expect(complement0).to.equal(ethers.utils.parseEther('-0.3'));
-    expect(complement1).to.equal(ethers.utils.parseEther('0.3'));
+    expect(complement0).to.equal(ethers.utils.parseEther('0.3'));
+    expect(complement1).to.equal(ethers.utils.parseEther('-0.3'));
   });
 
   /**
@@ -143,10 +153,10 @@ describe('MockSeacowsComplement', () => {
    * NFT Complement: 0.2 NFTs
    *
    * Input:
-   * Tokens: 2.9 ETH, NFTs: 2.9 NFTs
+   * Tokens: 2.6 ETH, NFTs: 2.6 NFTs
    *
    * Output:
-   * Tokens: 2.8 ETH, NFTs: 3 NFTs
+   * Tokens: 2.2 ETH, NFTs: 3 NFTs
    */
   it('should output less tokens when more NFTs are output', async () => {
     // Setup initial complement
@@ -154,15 +164,15 @@ describe('MockSeacowsComplement', () => {
       await MockSeacowsComplement.updateComplement(ethers.utils.parseEther('0.2'), ethers.utils.parseEther('0.2'))
     ).wait();
     let [complement0, complement1] = await MockSeacowsComplement.complements();
-    expect(complement0).to.equal(ethers.utils.parseEther('-0.2'));
-    expect(complement1).to.equal(ethers.utils.parseEther('0.2'));
+    expect(complement0).to.equal(ethers.utils.parseEther('0.2'));
+    expect(complement1).to.equal(ethers.utils.parseEther('-0.2'));
 
     // Process actual output
-    const expectedTokenOut = ethers.utils.parseEther('2.9');
-    const expectedNFTOut = ethers.utils.parseEther('2.9');
+    const expectedTokenOut = ethers.utils.parseEther('2.7');
+    const expectedNFTOut = ethers.utils.parseEther('2.7');
     await (await MockSeacowsComplement.updateComplement(expectedTokenOut, expectedNFTOut)).wait();
-    expect(await MockSeacowsComplement.amount0Out()).to.equal(ethers.utils.parseEther('2.8'));
-    expect(await MockSeacowsComplement.amount1Out()).to.equal(ethers.utils.parseEther('3'));
+    expect(await MockSeacowsComplement.tokenAmountOut()).to.equal(ethers.utils.parseEther('2.4'));
+    expect(await MockSeacowsComplement.nftAmountOut()).to.equal(ethers.utils.parseEther('3'));
 
     [complement0, complement1] = await MockSeacowsComplement.complements();
     expect(complement0).to.equal(ethers.utils.parseEther('-0.1'));

@@ -21,6 +21,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface SeacowsComplementInterface extends ethers.utils.Interface {
   functions: {
     "COMPLEMENT_PRECISION()": FunctionFragment;
+    "COMPLEMENT_THRESHOLD()": FunctionFragment;
     "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
     "nftComplement()": FunctionFragment;
     "tokenComplement()": FunctionFragment;
@@ -28,6 +29,10 @@ interface SeacowsComplementInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "COMPLEMENT_PRECISION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "COMPLEMENT_THRESHOLD",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -45,6 +50,10 @@ interface SeacowsComplementInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "COMPLEMENT_PRECISION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "COMPLEMENT_THRESHOLD",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -109,16 +118,18 @@ export class SeacowsComplement extends BaseContract {
   functions: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
       }
     >;
 
@@ -129,16 +140,18 @@ export class SeacowsComplement extends BaseContract {
 
   COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+  COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
+
   getComplemenetedAssetsOut(
-    _tokenAmountOut: BigNumberish,
-    _nftAmountOut: BigNumberish,
+    __tokenAmountOut: BigNumberish,
+    __nftAmountOut: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
     [BigNumber, BigNumber, BigNumber, BigNumber] & {
       tokenAmountOut: BigNumber;
       nftAmountOut: BigNumber;
-      tokenComplementAdjusted: BigNumber;
-      nftComplementAdjusted: BigNumber;
+      newTokenComplement: BigNumber;
+      newNftComplement: BigNumber;
     }
   >;
 
@@ -149,16 +162,18 @@ export class SeacowsComplement extends BaseContract {
   callStatic: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+    COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
+
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
       }
     >;
 
@@ -172,9 +187,11 @@ export class SeacowsComplement extends BaseContract {
   estimateGas: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+    COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
+
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -188,9 +205,13 @@ export class SeacowsComplement extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    COMPLEMENT_THRESHOLD(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

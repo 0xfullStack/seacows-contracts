@@ -22,10 +22,11 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   functions: {
     "COMPLEMENT_PRECISION()": FunctionFragment;
+    "COMPLEMENT_THRESHOLD()": FunctionFragment;
     "ONE_PERCENT()": FunctionFragment;
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "POINT_FIVE_PERCENT()": FunctionFragment;
-    "burn(address,uint256[])": FunctionFragment;
+    "burn(address,address,uint256[])": FunctionFragment;
     "collection()": FunctionFragment;
     "fee()": FunctionFragment;
     "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
@@ -54,6 +55,10 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "COMPLEMENT_THRESHOLD",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "ONE_PERCENT",
     values?: undefined
   ): string;
@@ -67,7 +72,7 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "burn",
-    values: [string, BigNumberish[]]
+    values: [string, string, BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "collection",
@@ -144,6 +149,10 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "COMPLEMENT_THRESHOLD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "ONE_PERCENT",
     data: BytesLike
   ): Result;
@@ -215,7 +224,7 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "Burn(address,uint256,uint256,address)": EventFragment;
+    "Burn(address,uint256,uint256,uint256,uint256,uint256[],address)": EventFragment;
     "Initialized(uint8)": EventFragment;
     "Mint(address,uint256,uint256)": EventFragment;
     "Swap(address,uint256,uint256,uint256,uint256,address)": EventFragment;
@@ -230,10 +239,13 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
 }
 
 export type BurnEvent = TypedEvent<
-  [string, BigNumber, BigNumber, string] & {
+  [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[], string] & {
     sender: string;
-    amount0: BigNumber;
-    amount1: BigNumber;
+    cTokenOut: BigNumber;
+    cNftOut: BigNumber;
+    tokenAmountIn: BigNumber;
+    tokenAmountOut: BigNumber;
+    idsOut: BigNumber[];
     to: string;
   }
 >;
@@ -243,8 +255,8 @@ export type InitializedEvent = TypedEvent<[number] & { version: number }>;
 export type MintEvent = TypedEvent<
   [string, BigNumber, BigNumber] & {
     sender: string;
-    amount0: BigNumber;
-    amount1: BigNumber;
+    tokenAmount: BigNumber;
+    nftAmount: BigNumber;
   }
 >;
 
@@ -309,6 +321,8 @@ export class SeacowsERC721TradePair extends BaseContract {
   functions: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     ONE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -316,8 +330,9 @@ export class SeacowsERC721TradePair extends BaseContract {
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     burn(
+      from: string,
       to: string,
-      ids: BigNumberish[],
+      _ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -326,15 +341,15 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
       }
     >;
 
@@ -427,6 +442,8 @@ export class SeacowsERC721TradePair extends BaseContract {
 
   COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+  COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
+
   ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
   PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -434,8 +451,9 @@ export class SeacowsERC721TradePair extends BaseContract {
   POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
   burn(
+    from: string,
     to: string,
-    ids: BigNumberish[],
+    _ids: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -444,15 +462,15 @@ export class SeacowsERC721TradePair extends BaseContract {
   fee(overrides?: CallOverrides): Promise<BigNumber>;
 
   getComplemenetedAssetsOut(
-    _tokenAmountOut: BigNumberish,
-    _nftAmountOut: BigNumberish,
+    __tokenAmountOut: BigNumberish,
+    __nftAmountOut: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
     [BigNumber, BigNumber, BigNumber, BigNumber] & {
       tokenAmountOut: BigNumber;
       nftAmountOut: BigNumber;
-      tokenComplementAdjusted: BigNumber;
-      nftComplementAdjusted: BigNumber;
+      newTokenComplement: BigNumber;
+      newNftComplement: BigNumber;
     }
   >;
 
@@ -542,6 +560,8 @@ export class SeacowsERC721TradePair extends BaseContract {
   callStatic: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+    COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
+
     ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -549,11 +569,18 @@ export class SeacowsERC721TradePair extends BaseContract {
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
+      from: string,
       to: string,
-      ids: BigNumberish[],
+      _ids: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & { amount0: BigNumber; amount1: BigNumber }
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[]] & {
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenIn: BigNumber;
+        tokenOut: BigNumber;
+        idsOut: BigNumber[];
+      }
     >;
 
     collection(overrides?: CallOverrides): Promise<string>;
@@ -561,15 +588,15 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<BigNumber>;
 
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         tokenAmountOut: BigNumber;
         nftAmountOut: BigNumber;
-        tokenComplementAdjusted: BigNumber;
-        nftComplementAdjusted: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
       }
     >;
 
@@ -659,24 +686,46 @@ export class SeacowsERC721TradePair extends BaseContract {
   };
 
   filters: {
-    "Burn(address,uint256,uint256,address)"(
+    "Burn(address,uint256,uint256,uint256,uint256,uint256[],address)"(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null,
+      cTokenOut?: null,
+      cNftOut?: null,
+      tokenAmountIn?: null,
+      tokenAmountOut?: null,
+      idsOut?: null,
       to?: string | null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber, string],
-      { sender: string; amount0: BigNumber; amount1: BigNumber; to: string }
+      [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[], string],
+      {
+        sender: string;
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenAmountIn: BigNumber;
+        tokenAmountOut: BigNumber;
+        idsOut: BigNumber[];
+        to: string;
+      }
     >;
 
     Burn(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null,
+      cTokenOut?: null,
+      cNftOut?: null,
+      tokenAmountIn?: null,
+      tokenAmountOut?: null,
+      idsOut?: null,
       to?: string | null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber, string],
-      { sender: string; amount0: BigNumber; amount1: BigNumber; to: string }
+      [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[], string],
+      {
+        sender: string;
+        cTokenOut: BigNumber;
+        cNftOut: BigNumber;
+        tokenAmountIn: BigNumber;
+        tokenAmountOut: BigNumber;
+        idsOut: BigNumber[];
+        to: string;
+      }
     >;
 
     "Initialized(uint8)"(
@@ -689,20 +738,20 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     "Mint(address,uint256,uint256)"(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null
+      tokenAmount?: null,
+      nftAmount?: null
     ): TypedEventFilter<
       [string, BigNumber, BigNumber],
-      { sender: string; amount0: BigNumber; amount1: BigNumber }
+      { sender: string; tokenAmount: BigNumber; nftAmount: BigNumber }
     >;
 
     Mint(
       sender?: string | null,
-      amount0?: null,
-      amount1?: null
+      tokenAmount?: null,
+      nftAmount?: null
     ): TypedEventFilter<
       [string, BigNumber, BigNumber],
-      { sender: string; amount0: BigNumber; amount1: BigNumber }
+      { sender: string; tokenAmount: BigNumber; nftAmount: BigNumber }
     >;
 
     "Swap(address,uint256,uint256,uint256,uint256,address)"(
@@ -763,6 +812,8 @@ export class SeacowsERC721TradePair extends BaseContract {
   estimateGas: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+    COMPLEMENT_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
+
     ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -770,8 +821,9 @@ export class SeacowsERC721TradePair extends BaseContract {
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
+      from: string,
       to: string,
-      ids: BigNumberish[],
+      _ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -780,8 +832,8 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<BigNumber>;
 
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -862,6 +914,10 @@ export class SeacowsERC721TradePair extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    COMPLEMENT_THRESHOLD(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     ONE_PERCENT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     PERCENTAGE_PRECISION(
@@ -873,8 +929,9 @@ export class SeacowsERC721TradePair extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     burn(
+      from: string,
       to: string,
-      ids: BigNumberish[],
+      _ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -883,8 +940,8 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getComplemenetedAssetsOut(
-      _tokenAmountOut: BigNumberish,
-      _nftAmountOut: BigNumberish,
+      __tokenAmountOut: BigNumberish,
+      __nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

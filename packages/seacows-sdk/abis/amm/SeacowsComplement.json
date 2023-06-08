@@ -18,39 +18,52 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "COMPLEMENT_THRESHOLD",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_tokenAmountOut",
+        "name": "__tokenAmountOut",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "_nftAmountOut",
+        "name": "__nftAmountOut",
         "type": "uint256"
       }
     ],
     "name": "getComplemenetedAssetsOut",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "tokenAmountOut",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftAmountOut",
-        "type": "uint256"
-      },
-      {
         "internalType": "int256",
-        "name": "tokenComplementAdjusted",
+        "name": "tokenAmountOut",
         "type": "int256"
       },
       {
-        "internalType": "uint256",
-        "name": "nftComplementAdjusted",
-        "type": "uint256"
+        "internalType": "int256",
+        "name": "nftAmountOut",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "newTokenComplement",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "newNftComplement",
+        "type": "int256"
       }
     ],
     "stateMutability": "view",
@@ -61,9 +74,9 @@
     "name": "nftComplement",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "",
-        "type": "uint256"
+        "type": "int256"
       }
     ],
     "stateMutability": "view",

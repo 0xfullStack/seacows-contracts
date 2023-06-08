@@ -5,11 +5,11 @@ import { SeacowsComplement } from "../base/SeacowsComplement.sol";
 
 // contract SeacowsComplement is IFeeManagement {
 contract MockSeacowsComplement is SeacowsComplement {
-    // To store the amount0Out of last updateComplement
-    uint256 public amount0Out; 
+    // To store the tokenAmountOut of last updateComplement
+    uint256 public tokenAmountOut; 
 
-    // To store the amount1Out of last updateComplement
-    uint256 public amount1Out;
+    // To store the nftAmountOut of last updateComplement
+    uint256 public nftAmountOut;
 
     constructor() SeacowsComplement() {}
 
@@ -19,12 +19,12 @@ contract MockSeacowsComplement is SeacowsComplement {
     }
 
     function updateComplement(uint256 _amount0Out, uint256 _amount1Out) public {
-        (amount0Out, amount1Out) = _updateComplement(_amount0Out, _amount1Out);
+        (, tokenAmountOut, nftAmountOut) = _updateComplement(_amount0Out, _amount1Out);
     }
 
-    function complements() public view  returns (int256 _complement0, uint256 _complement1) {
-        _complement0 = tokenComplement();
-        _complement1 = nftComplement();
+    function complements() public view  returns (int256 _tokenComplement, int256 _nftComplement) {
+        _tokenComplement = tokenComplement();
+        _nftComplement = nftComplement();
     }
 
 }

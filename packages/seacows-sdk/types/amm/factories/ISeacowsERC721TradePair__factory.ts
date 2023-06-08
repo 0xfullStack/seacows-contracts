@@ -22,14 +22,32 @@ const _abi = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount0",
+        name: "cTokenOut",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount1",
+        name: "cNftOut",
         type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "tokenAmountIn",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "tokenAmountOut",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256[]",
+        name: "idsOut",
+        type: "uint256[]",
       },
       {
         indexed: true,
@@ -53,13 +71,13 @@ const _abi = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount0",
+        name: "tokenAmount",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount1",
+        name: "nftAmount",
         type: "uint256",
       },
     ],
@@ -158,6 +176,11 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        internalType: "address",
         name: "to",
         type: "address",
       },
@@ -171,13 +194,28 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "amount0",
+        name: "cTokenOut",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "amount1",
+        name: "cNftOut",
         type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "idsOut",
+        type: "uint256[]",
       },
     ],
     stateMutability: "nonpayable",
@@ -225,23 +263,41 @@ const _abi = [
     name: "getComplemenetedAssetsOut",
     outputs: [
       {
-        internalType: "uint256",
-        name: "tokenAmountOut",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "nftAmountOut",
-        type: "uint256",
-      },
-      {
         internalType: "int256",
-        name: "tokenComplementAdjusted",
+        name: "tokenAmountOut",
         type: "int256",
       },
       {
+        internalType: "int256",
+        name: "nftAmountOut",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "newTokenComplement",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "newNftComplement",
+        type: "int256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getComplementedBalance",
+    outputs: [
+      {
         internalType: "uint256",
-        name: "nftComplementAdjusted",
+        name: "tokenBalance",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "nftBalance",
         type: "uint256",
       },
     ],
@@ -318,9 +374,9 @@ const _abi = [
     name: "nftComplement",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "int256",
         name: "",
-        type: "uint256",
+        type: "int256",
       },
     ],
     stateMutability: "view",

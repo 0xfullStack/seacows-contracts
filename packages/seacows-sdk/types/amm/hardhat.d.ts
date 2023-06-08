@@ -157,6 +157,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SeacowsPairMetadata__factory>;
     getContractFactory(
+      name: "ISeacowsCallback",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ISeacowsCallback__factory>;
+    getContractFactory(
       name: "ISeacowsComplement",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISeacowsComplement__factory>;
@@ -393,6 +397,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.SeacowsPairMetadata>;
+    getContractAt(
+      name: "ISeacowsCallback",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ISeacowsCallback>;
     getContractAt(
       name: "ISeacowsComplement",
       address: string,
