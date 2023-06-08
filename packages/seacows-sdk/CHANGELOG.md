@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.10.0 (2023-06-08)
+
+
+### Features
+
+* complement method updated ([1830db6](https://github.com/yolominds/seacows-contracts/commit/1830db6ece371fd729efadf8e524c04d9b0706a3))
+
 ### 1.9.3 (2023-05-30)
 
 ### 1.9.2 (2023-05-30)
