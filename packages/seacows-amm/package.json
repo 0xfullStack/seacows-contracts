@@ -50,6 +50,7 @@
     "ethers": "^5.7.2",
     "hardhat": "^2.11.2",
     "hardhat-abi-exporter": "^2.9.0",
+    "hardhat-contract-sizer": "^2.9.0",
     "hardhat-deploy": "^0.11.15",
     "hardhat-gas-reporter": "^1.0.8",
     "husky": "^8.0.3",

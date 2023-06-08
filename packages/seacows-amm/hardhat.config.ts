@@ -10,6 +10,7 @@ import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
+import 'hardhat-contract-sizer';
 import * as tdly from '@tenderly/hardhat-tenderly';
 import './tasks';
 

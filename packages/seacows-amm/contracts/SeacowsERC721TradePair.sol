@@ -14,9 +14,6 @@ import './lib/UQ112x112.sol';
 import './base/SeacowsComplement.sol';
 import './base/SeacowsPairMetadata.sol';
 
-/// @title The base contract for an NFT/TOKEN AMM pair
-/// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
-/// @notice This implements the core swap logic from NFT to TOKEN
 contract SeacowsERC721TradePair is
     ReentrancyGuardUpgradeable,
     SeacowsComplement,

@@ -17,9 +17,6 @@ import {IWETH} from './interfaces/IWETH.sol';
 import {SeacowsLibrary} from './lib/SeacowsLibrary.sol';
 import {NFTRenderer} from './lib/NFTRenderer.sol';
 
-/// @title The base contract for an NFT/TOKEN AMM pair
-/// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
-/// @notice This implements the core swap logic from NFT to TOKEN
 contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory, ISeacowsPositionManager {
     using Counters for Counters.Counter;
 
@@ -174,20 +171,17 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         IERC20(_token).transferFrom(from, msg.sender, _amount);
     }
 
-    // /**
-    //     @notice Remove liquidity from the Pair based on the ERC20 address, ERC721 address and fee tier
-    //     @param token The ERC20 contract address
-    //     @param collection The ERC721 contract address
-    //     @param fee The fee tier. Please check TradePair for the fee tiers.
-    //     @param liquidity The amount of liquidity wanted to remove.
-    //     @param tokenInMax,
-    //     @param tokenOutMin,
-    //     @param nftOutMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
-    //     @param idsDesired The ids of ERC721 NFT to remove
-    //     @param fromTokenId The Position NFT that is used to burn the liquidity and redeem the assets.
-    //     @param to The address that will receive the withdrawn assets
-    //     @param deadline The timestamp of deadline in seconds
-    //  */
+    /**
+        @notice Remove liquidity from the Pair based on the ERC20 address, ERC721 address and fee tier
+        @param token The ERC20 contract address
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param liquidity The amount of liquidity wanted to remove.
+        @param constraint The constraint to prevent txn get reverted after slippage. Ref: RemoveLiquidityConstraint
+        @param fromTokenId The Position NFT that is used to burn the liquidity and redeem the assets.
+        @param to The address that will receive the withdrawn assets
+        @param deadline The timestamp of deadline in seconds
+     */
     function removeLiquidity(
         address token,
         address collection,
@@ -208,19 +202,16 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         require(constraint.tokenInMax >= tokenIn, 'SeacowsPositionManager: EXCEED_TOKEN_IN_MAX');      
     }
 
-    // /**
-    //     @notice Remove liquidity from the WETH Pair based on the ERC721 address and fee tier. Also convert WETH to ETH
-    //     @param collection The ERC721 contract address
-    //     @param fee The fee tier. Please check TradePair for the fee tiers.
-    //     @param liquidity The amount of liquidity wanted to remove.
-    //     @param tokenInMax,
-    //     @param tokenOutMin,
-    //     @param nftOutMin The min. amount of ERC20 token wanted to remove. Scenario: the txn is processed after a long waiting time.
-    //     @param idsDesired The ids of ERC721 NFT to remove
-    //     @param fromTokenId The position NFT that is used to burn the liquidity and redeem the assets.
-    //     @param to The address that will receive the withdrawn assets
-    //     @param deadline The timestamp of deadline in seconds
-    //  */
+    /**
+        @notice Remove liquidity from the WETH Pair based on the ERC721 address and fee tier. Also convert WETH to ETH
+        @param collection The ERC721 contract address
+        @param fee The fee tier. Please check TradePair for the fee tiers.
+        @param liquidity The amount of liquidity wanted to remove.
+        @param constraint The constraint to prevent txn get reverted after slippage. Ref: RemoveLiquidityConstraint
+        @param fromTokenId The position NFT that is used to burn the liquidity and redeem the assets.
+        @param to The address that will receive the withdrawn assets
+        @param deadline The timestamp of deadline in seconds
+     */
     function removeLiquidityETH(
         address collection,
         uint112 fee,
@@ -341,67 +332,6 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
     function burnValue(uint256 tokenId, uint256 burnValue_) public onlyPair(slotOf(tokenId)) {
         _burnValue(tokenId, burnValue_);
-    }
-
-    // **** SWAP ****
-    /**
-        @notice Swap from ERC20 to ERC721
-        @param _pair The pair to swap with
-        @param idsOut The NFT ids to swap out
-        @param amountInMax The max amount of ERC20 to input
-        @param to The address that receive the NFTs swapped out
-        @param deadline The timestamp of deadline in seconds
-     */
-    function swapTokensForExactNFTs(
-        address _pair,
-        uint[] memory idsOut,
-        uint amountInMax,
-        address to,
-        uint deadline
-    ) external virtual checkDeadline(deadline) returns (uint amountIn) {
-        ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_pair);
-        (uint tokenReserve, uint nftReserve, ) = pair.getReserves();
-        amountIn = SeacowsLibrary.getAmountIn(
-            idsOut.length * pair.COMPLEMENT_PRECISION(),
-            tokenReserve,
-            nftReserve,
-            pair.fee(),
-            pair.PERCENTAGE_PRECISION()
-        );
-        require(amountIn <= amountInMax, 'SeacowsPositionManager: EXCESSIVE_INPUT_AMOUNT');
-        IERC20(pair.token()).transferFrom(msg.sender, _pair, amountIn);
-        pair.swap(0, idsOut, to);
-    }
-
-    /**
-        @notice Swap from ERC721 to ERC20
-        @param _pair The pair to swap with
-        @param idsIn The NFT ids to swap in
-        @param amountOutMin The min amount of ERC20 to swap out
-        @param to The address that receive the ERC20 swapped out
-        @param deadline The timestamp of deadline in seconds
-     */
-    function swapExactNFTsForTokens(
-        address _pair,
-        uint[] memory idsIn,
-        uint amountOutMin,
-        address to,
-        uint deadline
-    ) external virtual checkDeadline(deadline) returns (uint amountOut) {
-        ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_pair);
-        (uint tokenReserve, uint nftReserve, ) = pair.getReserves();
-        amountOut = SeacowsLibrary.getAmountOut(
-            idsIn.length * pair.COMPLEMENT_PRECISION(),
-            tokenReserve,
-            nftReserve,
-            pair.fee(),
-            pair.PERCENTAGE_PRECISION()
-        );
-        require(amountOut >= amountOutMin, 'SeacowsPositionManager: INSUFFICIENT_OUTPUT_AMOUNT');
-        for (uint i = 0; i < idsIn.length; i++) {
-            IERC721(pair.collection()).safeTransferFrom(msg.sender, _pair, idsIn[i]);
-        }
-        pair.swap(amountOut, new uint[](0), to);
     }
 
     function slotOfPair(address _pair) public view returns (uint256) {

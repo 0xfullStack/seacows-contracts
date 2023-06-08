@@ -2,12 +2,9 @@
 pragma solidity ^0.8.13;
 
 import '@openzeppelin/contracts/utils/Strings.sol';
-import './BitMath.sol';
 import 'base64-sol/base64.sol';
 
 library NFTRenderer {
-    uint256 public constant PERCENTAGE_PRECISION = 10 ** 4;
-
     struct RenderParams {
         address pool;
         uint256 id;
@@ -32,14 +29,13 @@ library NFTRenderer {
             renderBackground(),
             '</svg>'
         );
-        string memory description = renderDescription(params);
 
         string memory json = string.concat(
             '{"name":"',
             renderName(params.poolShare, params.tokenSymbol, params.nftSymbol),
             '",',
             '"description":"',
-            description,
+            renderDescription(params),
             '",',
             '"image":"data:image/svg+xml;base64,',
             Base64.encode(bytes(image)),
@@ -58,7 +54,7 @@ library NFTRenderer {
         string memory nftSymbol
     ) internal pure returns (string memory name) {
         name = string.concat(
-            'SeaCows Swap Position V1 - ',
+            'SeaCows Position V1 - ',
             convertToFloatString(poolShare),
             '% - ',
             nftSymbol,
@@ -72,7 +68,7 @@ library NFTRenderer {
             '<g clip-path="url(#clip0_4414_291095)">',
             renderForeground1(),
             renderForeground2(),
-            renderForeground3(),
+            // renderForeground3(),
             '</g>'
         );
     }
@@ -106,24 +102,24 @@ library NFTRenderer {
         );
     }
 
-    function renderForeground3() internal pure returns (string memory foreground3) {
-        foreground3 = string.concat(
-            '<path d="M306.497 800.151C552.623 800.151 752.147 600.627 752.147 354.501C752.147 108.376 552.623 -91.1484 306.497 -91.1484C60.3718 -91.1484 -139.152 108.376 -139.152 354.501C-139.152 600.627 60.3718 800.151 306.497 800.151Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.499 774.531C538.475 774.531 726.529 586.477 726.529 354.501C726.529 122.525 538.475 -65.5293 306.499 -65.5293C74.5226 -65.5293 -113.531 122.525 -113.531 354.501C-113.531 586.477 74.5226 774.531 306.499 774.531Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.501 748.939C524.343 748.939 700.939 572.343 700.939 354.501C700.939 136.658 524.343 -39.9375 306.501 -39.9375C88.6585 -39.9375 -87.9375 136.658 -87.9375 354.501C-87.9375 572.343 88.6585 748.939 306.501 748.939Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.502 723.316C510.195 723.316 675.32 558.191 675.32 354.498C675.32 150.805 510.195 -14.3203 306.502 -14.3203C102.809 -14.3203 -62.3164 150.805 -62.3164 354.498C-62.3164 558.191 102.809 723.316 306.502 723.316Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.5 697.726C496.058 697.726 649.726 544.058 649.726 354.5C649.726 164.941 496.058 11.2734 306.5 11.2734C116.941 11.2734 -36.7266 164.941 -36.7266 354.5C-36.7266 544.058 116.941 697.726 306.5 697.726Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.501 672.134C481.926 672.134 624.136 529.924 624.136 354.5C624.136 179.075 481.926 36.8652 306.501 36.8652C131.077 36.8652 -11.1328 179.075 -11.1328 354.5C-11.1328 529.924 131.077 672.134 306.501 672.134Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.499 646.514C467.774 646.514 598.514 515.774 598.514 354.499C598.514 193.224 467.774 62.4844 306.499 62.4844C145.224 62.4844 14.4844 193.224 14.4844 354.499C14.4844 515.774 145.224 646.514 306.499 646.514Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.497 620.923C453.638 620.923 572.919 501.642 572.919 354.501C572.919 207.36 453.638 88.0781 306.497 88.0781C159.356 88.0781 40.0742 207.36 40.0742 354.501C40.0742 501.642 159.356 620.923 306.497 620.923Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.498 595.303C439.49 595.303 547.301 487.492 547.301 354.5C547.301 221.508 439.49 113.697 306.498 113.697C173.506 113.697 65.6953 221.508 65.6953 354.5C65.6953 487.492 173.506 595.303 306.498 595.303Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.5 569.711C425.358 569.711 521.711 473.358 521.711 354.5C521.711 235.642 425.358 139.289 306.5 139.289C187.642 139.289 91.2891 235.642 91.2891 354.5C91.2891 473.358 187.642 569.711 306.5 569.711Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.501 544.092C411.21 544.092 496.092 459.21 496.092 354.501C496.092 249.793 411.21 164.91 306.501 164.91C201.793 164.91 116.91 249.793 116.91 354.501C116.91 459.21 201.793 544.092 306.501 544.092Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.499 518.498C397.073 518.498 470.498 445.073 470.498 354.499C470.498 263.925 397.073 190.5 306.499 190.5C215.925 190.5 142.5 263.925 142.5 354.499C142.5 445.073 215.925 518.498 306.499 518.498Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.501 492.908C382.941 492.908 444.908 430.941 444.908 354.501C444.908 278.061 382.941 216.094 306.501 216.094C230.061 216.094 168.094 278.061 168.094 354.501C168.094 430.941 230.061 492.908 306.501 492.908Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
-            '<path d="M306.502 467.288C368.793 467.288 419.29 416.791 419.29 354.5C419.29 292.21 368.793 241.713 306.502 241.713C244.211 241.713 193.715 292.21 193.715 354.5C193.715 416.791 244.211 467.288 306.502 467.288Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />'
-        );
-    }
+    // function renderForeground3() internal pure returns (string memory foreground3) {
+    //     foreground3 = string.concat(
+    //         '<path d="M306.497 800.151C552.623 800.151 752.147 600.627 752.147 354.501C752.147 108.376 552.623 -91.1484 306.497 -91.1484C60.3718 -91.1484 -139.152 108.376 -139.152 354.501C-139.152 600.627 60.3718 800.151 306.497 800.151Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.499 774.531C538.475 774.531 726.529 586.477 726.529 354.501C726.529 122.525 538.475 -65.5293 306.499 -65.5293C74.5226 -65.5293 -113.531 122.525 -113.531 354.501C-113.531 586.477 74.5226 774.531 306.499 774.531Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.501 748.939C524.343 748.939 700.939 572.343 700.939 354.501C700.939 136.658 524.343 -39.9375 306.501 -39.9375C88.6585 -39.9375 -87.9375 136.658 -87.9375 354.501C-87.9375 572.343 88.6585 748.939 306.501 748.939Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.502 723.316C510.195 723.316 675.32 558.191 675.32 354.498C675.32 150.805 510.195 -14.3203 306.502 -14.3203C102.809 -14.3203 -62.3164 150.805 -62.3164 354.498C-62.3164 558.191 102.809 723.316 306.502 723.316Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.5 697.726C496.058 697.726 649.726 544.058 649.726 354.5C649.726 164.941 496.058 11.2734 306.5 11.2734C116.941 11.2734 -36.7266 164.941 -36.7266 354.5C-36.7266 544.058 116.941 697.726 306.5 697.726Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.501 672.134C481.926 672.134 624.136 529.924 624.136 354.5C624.136 179.075 481.926 36.8652 306.501 36.8652C131.077 36.8652 -11.1328 179.075 -11.1328 354.5C-11.1328 529.924 131.077 672.134 306.501 672.134Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.499 646.514C467.774 646.514 598.514 515.774 598.514 354.499C598.514 193.224 467.774 62.4844 306.499 62.4844C145.224 62.4844 14.4844 193.224 14.4844 354.499C14.4844 515.774 145.224 646.514 306.499 646.514Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.497 620.923C453.638 620.923 572.919 501.642 572.919 354.501C572.919 207.36 453.638 88.0781 306.497 88.0781C159.356 88.0781 40.0742 207.36 40.0742 354.501C40.0742 501.642 159.356 620.923 306.497 620.923Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.498 595.303C439.49 595.303 547.301 487.492 547.301 354.5C547.301 221.508 439.49 113.697 306.498 113.697C173.506 113.697 65.6953 221.508 65.6953 354.5C65.6953 487.492 173.506 595.303 306.498 595.303Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.5 569.711C425.358 569.711 521.711 473.358 521.711 354.5C521.711 235.642 425.358 139.289 306.5 139.289C187.642 139.289 91.2891 235.642 91.2891 354.5C91.2891 473.358 187.642 569.711 306.5 569.711Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.501 544.092C411.21 544.092 496.092 459.21 496.092 354.501C496.092 249.793 411.21 164.91 306.501 164.91C201.793 164.91 116.91 249.793 116.91 354.501C116.91 459.21 201.793 544.092 306.501 544.092Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.499 518.498C397.073 518.498 470.498 445.073 470.498 354.499C470.498 263.925 397.073 190.5 306.499 190.5C215.925 190.5 142.5 263.925 142.5 354.499C142.5 445.073 215.925 518.498 306.499 518.498Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.501 492.908C382.941 492.908 444.908 430.941 444.908 354.501C444.908 278.061 382.941 216.094 306.501 216.094C230.061 216.094 168.094 278.061 168.094 354.501C168.094 430.941 230.061 492.908 306.501 492.908Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />',
+    //         '<path d="M306.502 467.288C368.793 467.288 419.29 416.791 419.29 354.5C419.29 292.21 368.793 241.713 306.502 241.713C244.211 241.713 193.715 292.21 193.715 354.5C193.715 416.791 244.211 467.288 306.502 467.288Z" stroke="white" stroke-opacity="0.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />'
+    //     );
+    // }
 
     function renderBackground() internal pure returns (string memory background) {
         background = string.concat(
@@ -257,9 +253,9 @@ library NFTRenderer {
     function renderAttributes(RenderParams memory params) internal pure returns (string memory attributes) {
         attributes = string.concat(
             '[{',
-            '"trait_type": "ERC20 Pair","value": "',
+            '"trait_type": "ERC20","value": "',
             params.tokenSymbol,
-            '"},{"trait_type": "ERC721 Pair", "value": "',
+            '"},{"trait_type": "ERC721", "value": "',
             params.nftSymbol,
             '"},{"trait_type": "Fee Tier", "value": "',
             convertToFloatString(params.swapFee),
@@ -272,8 +268,6 @@ library NFTRenderer {
         uint256 quotient = value / precision;
         uint256 remainderRaw = value % precision;
 
-        string memory integerPart = Strings.toString(quotient);
-        string memory fractionalPartRaw = Strings.toString(remainderRaw);
         string memory fractionalPart;
 
         if (remainderRaw != 0) {
@@ -284,7 +278,7 @@ library NFTRenderer {
             }
             fractionalPart = Strings.toString(remainder);
             // Pad fractional part with zeros if needed
-            uint256 fractionalPartLength = bytes(fractionalPartRaw).length;
+            uint256 fractionalPartLength = bytes(Strings.toString(remainderRaw)).length;
             for (uint256 i = fractionalPartLength; i < 4; i++) {
                 fractionalPart = string.concat('0', fractionalPart);
             }
@@ -292,6 +286,6 @@ library NFTRenderer {
             fractionalPart = string.concat('.', fractionalPart);
         }
 
-        return string.concat(integerPart, fractionalPart);
+        return string.concat(Strings.toString(quotient), fractionalPart);
     }
 }
