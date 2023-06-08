@@ -18,34 +18,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface NFTRendererInterface extends ethers.utils.Interface {
+interface ERC165Interface extends ethers.utils.Interface {
   functions: {
-    "render((address,uint256,string,string,address,address,uint256,uint256,address))": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "render",
-    values: [
-      {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      }
-    ]
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "render", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
 
-export class NFTRenderer extends BaseContract {
+export class ERC165 extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -86,89 +77,39 @@ export class NFTRenderer extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: NFTRendererInterface;
+  interface: ERC165Interface;
 
   functions: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
+    supportsInterface(
+      interfaceId: BytesLike,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<[boolean]>;
   };
 
-  render(
-    params: {
-      pool: string;
-      id: BigNumberish;
-      tokenSymbol: string;
-      nftSymbol: string;
-      tokenAddress: string;
-      nftAddress: string;
-      swapFee: BigNumberish;
-      poolShare: BigNumberish;
-      owner: string;
-    },
+  supportsInterface(
+    interfaceId: BytesLike,
     overrides?: CallOverrides
-  ): Promise<string>;
+  ): Promise<boolean>;
 
   callStatic: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
+    supportsInterface(
+      interfaceId: BytesLike,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<boolean>;
   };
 
   filters: {};
 
   estimateGas: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
+    supportsInterface(
+      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
+    supportsInterface(
+      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

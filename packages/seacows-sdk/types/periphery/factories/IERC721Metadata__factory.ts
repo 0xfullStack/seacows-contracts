@@ -4,7 +4,10 @@
 
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
-import type { IERC721, IERC721Interface } from "../IERC721";
+import type {
+  IERC721Metadata,
+  IERC721MetadataInterface,
+} from "../IERC721Metadata";
 
 const _abi = [
   {
@@ -163,6 +166,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "name",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -270,6 +286,38 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "symbol",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "tokenURI",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -294,15 +342,15 @@ const _abi = [
   },
 ];
 
-export class IERC721__factory {
+export class IERC721Metadata__factory {
   static readonly abi = _abi;
-  static createInterface(): IERC721Interface {
-    return new utils.Interface(_abi) as IERC721Interface;
+  static createInterface(): IERC721MetadataInterface {
+    return new utils.Interface(_abi) as IERC721MetadataInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IERC721 {
-    return new Contract(address, _abi, signerOrProvider) as IERC721;
+  ): IERC721Metadata {
+    return new Contract(address, _abi, signerOrProvider) as IERC721Metadata;
   }
 }

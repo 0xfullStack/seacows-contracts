@@ -26,7 +26,7 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "burn(address,address,uint256[])": FunctionFragment;
     "collection()": FunctionFragment;
     "fee()": FunctionFragment;
-    "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
+    "getComplemenetedAssetsOut(int256,int256)": FunctionFragment;
     "getComplementedBalance()": FunctionFragment;
     "getReserves()": FunctionFragment;
     "initialize(address,address,uint112)": FunctionFragment;
@@ -35,6 +35,7 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "swap(uint256,uint256[],address)": FunctionFragment;
     "token()": FunctionFragment;
     "tokenComplement()": FunctionFragment;
+    "totalSupply()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -84,6 +85,10 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     functionFragment: "tokenComplement",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "COMPLEMENT_PRECISION",
@@ -118,6 +123,10 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "tokenComplement",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
 
@@ -284,6 +293,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
     token(overrides?: CallOverrides): Promise<[string]>;
 
     tokenComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -354,6 +365,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
   token(overrides?: CallOverrides): Promise<string>;
 
   tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -435,6 +448,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
     token(overrides?: CallOverrides): Promise<string>;
 
     tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -603,6 +618,8 @@ export class ISeacowsERC721TradePair extends BaseContract {
     token(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -661,5 +678,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

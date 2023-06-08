@@ -21,7 +21,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface ISeacowsComplementInterface extends ethers.utils.Interface {
   functions: {
     "COMPLEMENT_PRECISION()": FunctionFragment;
-    "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
+    "getComplemenetedAssetsOut(int256,int256)": FunctionFragment;
     "nftComplement()": FunctionFragment;
     "tokenComplement()": FunctionFragment;
   };

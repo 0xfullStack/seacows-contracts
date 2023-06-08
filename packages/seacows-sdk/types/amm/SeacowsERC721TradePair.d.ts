@@ -29,7 +29,7 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "burn(address,address,uint256[])": FunctionFragment;
     "collection()": FunctionFragment;
     "fee()": FunctionFragment;
-    "getComplemenetedAssetsOut(uint256,uint256)": FunctionFragment;
+    "getComplemenetedAssetsOut(int256,int256)": FunctionFragment;
     "getComplementedBalance()": FunctionFragment;
     "getReserves()": FunctionFragment;
     "initialize(address,address,uint112)": FunctionFragment;
@@ -341,8 +341,8 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getComplemenetedAssetsOut(
-      __tokenAmountOut: BigNumberish,
-      __nftAmountOut: BigNumberish,
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
@@ -462,8 +462,8 @@ export class SeacowsERC721TradePair extends BaseContract {
   fee(overrides?: CallOverrides): Promise<BigNumber>;
 
   getComplemenetedAssetsOut(
-    __tokenAmountOut: BigNumberish,
-    __nftAmountOut: BigNumberish,
+    _tokenAmountOut: BigNumberish,
+    _nftAmountOut: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
     [BigNumber, BigNumber, BigNumber, BigNumber] & {
@@ -588,8 +588,8 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<BigNumber>;
 
     getComplemenetedAssetsOut(
-      __tokenAmountOut: BigNumberish,
-      __nftAmountOut: BigNumberish,
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
@@ -832,8 +832,8 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<BigNumber>;
 
     getComplemenetedAssetsOut(
-      __tokenAmountOut: BigNumberish,
-      __nftAmountOut: BigNumberish,
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -940,8 +940,8 @@ export class SeacowsERC721TradePair extends BaseContract {
     fee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getComplemenetedAssetsOut(
-      __tokenAmountOut: BigNumberish,
-      __nftAmountOut: BigNumberish,
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

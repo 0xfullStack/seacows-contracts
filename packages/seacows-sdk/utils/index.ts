@@ -193,6 +193,8 @@ const getWithdrawAssetsOutMin = async (
   slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
 ): Promise<{
+  cTokenOut: BigNumber;
+  cNftOut: BigNumber;
   cTokenOutMin: BigNumber;
   cNftOutMin: BigNumber;
   tokenInMax: BigNumber;
@@ -203,14 +205,14 @@ const getWithdrawAssetsOutMin = async (
   const totalSupply = await pairContract.totalSupply();
   const complement = await pairContract.COMPLEMENT_PRECISION();
 
-  const tokenAmount = liquidity.mul(tokenBalance).div(totalSupply);
-  const nftAmount = liquidity.mul(nftBalance).div(totalSupply);
+  const cTokenOut = liquidity.mul(tokenBalance).div(totalSupply);
+  const cNftOut = liquidity.mul(nftBalance).div(totalSupply);
 
   // const [tokenOutMin, nftOutMin] = await pairContract.getComplemenetedAssetsOut(tokenAmount, nftAmount);
-  const cTokenOutMin = tokenAmount
+  const cTokenOutMin = cTokenOut
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
-  const cNftOutMin = nftAmount
+  const cNftOutMin = cNftOut
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
 
@@ -219,6 +221,8 @@ const getWithdrawAssetsOutMin = async (
     : BI_ZERO;
 
   return {
+    cTokenOut,
+    cNftOut,
     cTokenOutMin,
     cNftOutMin,
     tokenInMax,

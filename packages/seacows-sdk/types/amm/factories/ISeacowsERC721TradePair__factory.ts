@@ -250,14 +250,14 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
+        internalType: "int256",
         name: "_tokenAmountOut",
-        type: "uint256",
+        type: "int256",
       },
       {
-        internalType: "uint256",
+        internalType: "int256",
         name: "_nftAmountOut",
-        type: "uint256",
+        type: "int256",
       },
     ],
     name: "getComplemenetedAssetsOut",
@@ -426,6 +426,19 @@ const _abi = [
         internalType: "int256",
         name: "",
         type: "int256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalSupply",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

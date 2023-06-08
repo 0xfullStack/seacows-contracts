@@ -53,8 +53,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "slotOfPair(address)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
-    "swapExactNFTsForTokens(address,uint256[],uint256,address,uint256)": FunctionFragment;
-    "swapTokensForExactNFTs(address,uint256[],uint256,address,uint256)": FunctionFragment;
     "symbol()": FunctionFragment;
     "template()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
@@ -227,14 +225,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(
-    functionFragment: "swapExactNFTsForTokens",
-    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "swapTokensForExactNFTs",
-    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(functionFragment: "template", values?: undefined): string;
   encodeFunctionData(
@@ -341,14 +331,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactNFTsForTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapTokensForExactNFTs",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
@@ -723,24 +705,6 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    swapExactNFTsForTokens(
-      _pair: string,
-      idsIn: BigNumberish[],
-      amountOutMin: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    swapTokensForExactNFTs(
-      _pair: string,
-      idsOut: BigNumberish[],
-      amountInMax: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     template(overrides?: CallOverrides): Promise<[string]>;
@@ -1000,24 +964,6 @@ export class SeacowsPositionManager extends BaseContract {
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
-
-  swapExactNFTsForTokens(
-    _pair: string,
-    idsIn: BigNumberish[],
-    amountOutMin: BigNumberish,
-    to: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  swapTokensForExactNFTs(
-    _pair: string,
-    idsOut: BigNumberish[],
-    amountInMax: BigNumberish,
-    to: string,
-    deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -1315,24 +1261,6 @@ export class SeacowsPositionManager extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
-
-    swapExactNFTsForTokens(
-      _pair: string,
-      idsIn: BigNumberish[],
-      amountOutMin: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    swapTokensForExactNFTs(
-      _pair: string,
-      idsOut: BigNumberish[],
-      amountInMax: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -1753,24 +1681,6 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    swapExactNFTsForTokens(
-      _pair: string,
-      idsIn: BigNumberish[],
-      amountOutMin: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    swapTokensForExactNFTs(
-      _pair: string,
-      idsOut: BigNumberish[],
-      amountInMax: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     template(overrides?: CallOverrides): Promise<BigNumber>;
@@ -2049,24 +1959,6 @@ export class SeacowsPositionManager extends BaseContract {
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    swapExactNFTsForTokens(
-      _pair: string,
-      idsIn: BigNumberish[],
-      amountOutMin: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    swapTokensForExactNFTs(
-      _pair: string,
-      idsOut: BigNumberish[],
-      amountInMax: BigNumberish,
-      to: string,
-      deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;

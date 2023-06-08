@@ -11,6 +11,7 @@ import {
   PopulatedTransaction,
   BaseContract,
   ContractTransaction,
+  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -18,34 +19,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface NFTRendererInterface extends ethers.utils.Interface {
+interface IERC721ReceiverInterface extends ethers.utils.Interface {
   functions: {
-    "render((address,uint256,string,string,address,address,uint256,uint256,address))": FunctionFragment;
+    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "render",
-    values: [
-      {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      }
-    ]
+    functionFragment: "onERC721Received",
+    values: [string, string, BigNumberish, BytesLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "render", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC721Received",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
 
-export class NFTRenderer extends BaseContract {
+export class IERC721Receiver extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -86,53 +78,32 @@ export class NFTRenderer extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: NFTRendererInterface;
+  interface: IERC721ReceiverInterface;
 
   functions: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+    onERC721Received(
+      operator: string,
+      from: string,
+      tokenId: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
-  render(
-    params: {
-      pool: string;
-      id: BigNumberish;
-      tokenSymbol: string;
-      nftSymbol: string;
-      tokenAddress: string;
-      nftAddress: string;
-      swapFee: BigNumberish;
-      poolShare: BigNumberish;
-      owner: string;
-    },
-    overrides?: CallOverrides
-  ): Promise<string>;
+  onERC721Received(
+    operator: string,
+    from: string,
+    tokenId: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
+    onERC721Received(
+      operator: string,
+      from: string,
+      tokenId: BigNumberish,
+      data: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
   };
@@ -140,36 +111,22 @@ export class NFTRenderer extends BaseContract {
   filters: {};
 
   estimateGas: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
-      overrides?: CallOverrides
+    onERC721Received(
+      operator: string,
+      from: string,
+      tokenId: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    render(
-      params: {
-        pool: string;
-        id: BigNumberish;
-        tokenSymbol: string;
-        nftSymbol: string;
-        tokenAddress: string;
-        nftAddress: string;
-        swapFee: BigNumberish;
-        poolShare: BigNumberish;
-        owner: string;
-      },
-      overrides?: CallOverrides
+    onERC721Received(
+      operator: string,
+      from: string,
+      tokenId: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

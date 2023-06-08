@@ -66,7 +66,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@yolominds/seacows-sdk": "*"
+    "@yolominds/seacows-sdk": "*",
+    "@yolominds/seacows-amm": "*"
   },
   "files": [
     "dist/*"

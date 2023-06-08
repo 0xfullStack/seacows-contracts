@@ -16,7 +16,7 @@ interface ISeacowsERC721TradePair is ISeacowsComplement {
     );
     event Sync(uint112 reserve0, uint112 reserve1);
 
-
+    function totalSupply() external view returns (uint256);
     function token() external view returns (address);
     function collection() external view returns (address);
     function fee() external view returns (uint);

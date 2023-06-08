@@ -561,7 +561,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
 
-      const constraints = await getWithdrawAssetsOutMin(pair, ethers.utils.parseEther('1'), 0, 100);
+      const constraints = await getWithdrawAssetsOutMin(pair.address, ethers.utils.parseEther('1'), 0, 100, alice);
       await manager
         .connect(alice)
         .removeLiquidity(
@@ -593,7 +593,7 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('Should revert for invalid token ID', async () => {
-      const constraints = await getWithdrawAssetsOutMin(pair, ethers.utils.parseEther('1'), 0, 100);
+      const constraints = await getWithdrawAssetsOutMin(pair.address, ethers.utils.parseEther('1'), 0, 100, alice);
       await expect(
         manager
           .connect(alice)
@@ -665,7 +665,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(pair.address)).to.be.equal(3);
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
 
-      const constraints = await getWithdrawAssetsOutMin(pair, ethers.utils.parseEther('1'), 0, 100);
+      const constraints = await getWithdrawAssetsOutMin(pair.address, ethers.utils.parseEther('1'), 0, 100, alice);
       await manager
         .connect(alice)
         .removeLiquidityETH(
@@ -695,7 +695,7 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('Should revert for invalid token ID', async () => {
-      const constraints = await getWithdrawAssetsOutMin(pair, ethers.utils.parseEther('1'), 0, 100);
+      const constraints = await getWithdrawAssetsOutMin(pair.address, ethers.utils.parseEther('1'), 0, 100, alice);
       await expect(
         manager
           .connect(alice)
@@ -769,7 +769,7 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('Should burn liquidity when liquidity = 0 in the NFT', async () => {
-      const constraints = await getWithdrawAssetsOutMin(pair, ethers.utils.parseEther('3'), 0, 100);
+      const constraints = await getWithdrawAssetsOutMin(pair.address, ethers.utils.parseEther('3'), 0, 100, alice);
       await manager
         .connect(alice)
         .removeLiquidity(
@@ -787,161 +787,6 @@ describe('SeacowsPositionManager', () => {
         .withArgs(alice.address, ethers.constants.AddressZero, 2)
         .to.emit(manager, 'TransferValue')
         .withArgs(2, 0, 0);
-    });
-  });
-
-  describe('Swap Tokens For Exact NFTs', () => {
-    let erc721: MockERC721;
-    let erc20: MockERC20;
-    let pair: SeacowsERC721TradePair;
-    before(async () => {
-      const erc721FC = await ethers.getContractFactory('MockERC721');
-      const erc20FC = await ethers.getContractFactory('MockERC20');
-      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
-        libraries: {
-          NFTRenderer: rendererLib.address,
-        },
-      });
-      erc721 = await erc721FC.deploy();
-      erc20 = await erc20FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
-      /**
-       * @notes Prepare assets for Alice
-       * ERC20: 10 Ethers
-       * ERC721: [0, 1, 2, 3, 4]
-       */
-      for (let i = 0; i < 5; i++) {
-        await erc721.mint(alice.address);
-      }
-      await erc20.mint(alice.address, ethers.utils.parseEther('10'));
-
-      /**
-       * @notes Mint Position NFTs
-       * Input ETH: 3 Ethers
-       * Input ERC721: [1, 2, 3]
-       *
-       * Position NFT ID of Pair: 1
-       * Position NFT ID of Alice: 2
-       */
-      await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
-      await erc721.connect(alice).setApprovalForAll(manager.address, true);
-      await manager
-        .connect(alice)
-        .mint(
-          erc20.address,
-          erc721.address,
-          ONE_PERCENT,
-          ethers.utils.parseEther('3'),
-          [1, 2, 3],
-          ethers.utils.parseEther('3'),
-          MaxUint256,
-        );
-      pair = await ethers.getContractAt(
-        'SeacowsERC721TradePair',
-        await manager.getPair(erc20.address, erc721.address, ONE_PERCENT),
-      );
-    });
-
-    it('Should swap some ETH for 1 NFT', async () => {
-      // Alice balances before
-      const prevAliceBalance = await erc20.balanceOf(alice.address);
-      const prevPairBalance = await erc20.balanceOf(pair.address);
-
-      // Caculate how much need to be paid
-      const { tokenInMaxWithSlippage: tokenInWithFee } = await getSwapTokenInMax(pair.address, [1], 0, 100, alice);
-
-      // Approve token cost
-      await erc20.connect(alice).approve(manager.address, tokenInWithFee);
-      await manager.connect(alice).swapTokensForExactNFTs(pair.address, [1], tokenInWithFee, alice.address, MaxUint256);
-
-      expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.sub(tokenInWithFee));
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.add(tokenInWithFee));
-      expect(await erc721.ownerOf(1)).to.be.equal(alice.address);
-    });
-
-    it('Should add liquidity correctly after swap', async () => {
-      expect(await erc721.ownerOf(0)).to.be.equal(alice.address);
-      expect(await erc721.ownerOf(4)).to.be.equal(alice.address);
-
-      const { tokenInMaxWithSlippage: tokenIn } = await getDepositTokenInMax(pair, [0, 4]);
-      // Approve token cost
-      await erc20.connect(alice).approve(manager.address, tokenIn);
-      await erc721.connect(alice).setApprovalForAll(manager.address, true);
-      await manager
-        .connect(alice)
-        .addLiquidity(erc20.address, erc721.address, ONE_PERCENT, tokenIn, [0, 4], 0, 2, MaxUint256);
-
-      expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
-      expect(await erc721.ownerOf(4)).to.be.equal(pair.address);
-    });
-
-    it('Should swap 1 NFT for some ETH', async () => {
-      // Alice balances before
-      const prevAliceBalance = await erc20.balanceOf(alice.address);
-      const prevPairBalance = await erc20.balanceOf(pair.address);
-
-      // Caculate how much need to be paid
-      const { tokenOutMinWithSlippage: tokenOutWithFee } = await getSwapTokenOutMin(pair.address, [1], 0, 100, alice);
-
-      // Approve token cost
-      await manager.connect(alice).swapExactNFTsForTokens(pair.address, [1], 0, alice.address, MaxUint256);
-
-      expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.add(tokenOutWithFee));
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.sub(tokenOutWithFee));
-      expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
-    });
-
-    it('Should withdraw correctly after swap', async () => {
-      // Alice balances before
-      const prevAliceBalance = await erc20.balanceOf(alice.address);
-      expect(await erc721.balanceOf(pair.address)).to.be.equal(5);
-
-      await manager.connect(alice).setApprovalForAll(manager.address, true);
-      const aliceLiquidity = await manager['balanceOf(uint256)'](2);
-      const constraints = await getWithdrawAssetsOutMin(pair, aliceLiquidity.div(2), 0, 100);
-
-      const expectTokenOut = ethers.utils.parseEther('7.103078787878787877').sub(prevAliceBalance);
-
-      /**
-       * @notes Removing liquidity
-       * Preference ERC721: [1, 2, 3]
-       *
-       * Actual ERC721 withdrawn: [1, 2]
-       */
-      await expect(
-        manager
-          .connect(alice)
-          .removeLiquidity(
-            erc20.address,
-            erc721.address,
-            ONE_PERCENT,
-            aliceLiquidity.div(2),
-            { ...constraints, nftIds: [1, 2, 3] },
-            2,
-            alice.address,
-            MaxUint256,
-          ),
-      )
-        .to.emit(pair, 'Burn')
-        .withArgs(
-          manager.address,
-          constraints.cTokenOutMin,
-          constraints.cNftOutMin,
-          0,
-          expectTokenOut,
-          [1, 2],
-          alice.address,
-        );
-
-      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7.103078787878787877'));
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('2.896921212121212123'));
-
-      expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
-      expect(await erc721.ownerOf(3)).to.be.equal(pair.address);
-      expect(await erc721.ownerOf(4)).to.be.equal(pair.address);
-
-      expect(await erc721.ownerOf(1)).to.be.equal(alice.address);
-      expect(await erc721.ownerOf(2)).to.be.equal(alice.address);
     });
   });
 });

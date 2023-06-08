@@ -81,6 +81,6 @@ describe('NFTRenderer', () => {
 
   it('Should render NFT SVG correctly', async () => {
     // Only log it to debug
-    console.log(await manager.tokenURI(1));
+    // console.log(await manager.tokenURI(1));
   });
 });

@@ -84,7 +84,7 @@ const config: HardhatUserConfig = {
     path: 'abis',
     runOnCompile: true,
     clear: true,
-    only: ['Seacows*'],
+    only: ['Seacows*', 'NFT*'],
     rename: (sourceName: string, contractName: string) => {
       if (sourceName.match(/^@solvprotocol\/erc-3525/) != null) {
         return 'ERC3525/' + contractName;
