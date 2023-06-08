@@ -7,7 +7,6 @@ import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/proxy/Clones.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
-import "@openzeppelin/contracts/utils/Strings.sol";
 import {SeacowsERC3525} from './base/SeacowsERC3525.sol';
 import {SeacowsERC721TradePairFactory} from './base/SeacowsERC721TradePairFactory.sol';
 
@@ -197,7 +196,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
         transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
         (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(msg.sender, to, constraint.nftIds);
-        require(cTokenOut >= constraint.cTokenOutMin, string.concat('SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN', ' ', Strings.toString(cTokenOut), ' ', Strings.toString(constraint.cTokenOutMin)));       
+        require(cTokenOut >= constraint.cTokenOutMin, 'SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN');       
         require(cNftOut >= constraint.cNftOutMin, 'SeacowsPositionManager: BELOW_C_NFT_OUT_MIN');      
         require(constraint.tokenInMax >= tokenIn, 'SeacowsPositionManager: EXCEED_TOKEN_IN_MAX');      
     }

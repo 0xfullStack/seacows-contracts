@@ -1,5 +1,7 @@
 import { type ActionType } from 'hardhat/types';
 import { Environment, SupportedChain, addresses, getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
+import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
+import ROUTER_ABI from '@yolominds/seacows-sdk/abis/periphery/SeacowsRouter.json';
 // import { addresses } from '../deployed';
 import ERC20_FAUCET_ABI from './abis/ERC20Faucet.json';
 import ERC721_FAUCET_ABI from './abis/ERC721Faucet.json';
@@ -17,13 +19,14 @@ const faucets = {
 
 export const initialize: ActionType<{ env: Environment }> = async ({ env }, { ethers, network }) => {
   const chainId = network.config.chainId as SupportedChain;
-  const { weth, manager } = addresses[env][chainId];
+  const { weth, router, manager } = addresses[env][chainId];
   const { erc20, erc721 } = faucets[env][chainId];
   const [owner] = await ethers.getSigners();
 
   const ERC20Contract = new ethers.Contract(erc20, ERC20_FAUCET_ABI, owner);
   const ERC721Contract = new ethers.Contract(erc721, ERC721_FAUCET_ABI, owner);
   const ManagerContract = await ethers.getContractAt('SeacowsPositionManager', manager);
+  const RouterContract = new ethers.Contract(router, ROUTER_ABI, owner) as SeacowsRouter;
 
   try {
     // Prepare assets
@@ -85,7 +88,7 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
     const { tokenInMax: amountIn } = await getSwapTokenInMax(pair, ids.slice(0, 1), 0, 100, owner);
     console.log('Approving Manager to spend ERC20');
     await (await ERC20Contract.connect(owner).approve(ManagerContract.address, amountIn)).wait();
-    await ManagerContract.connect(owner).swapTokensForExactNFTs(
+    await RouterContract.connect(owner).swapTokensForExactNFTs(
       pair,
       ids.slice(0, 1),
       amountIn,
@@ -94,7 +97,7 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
     );
 
     const { tokenOutMin: amountOut } = await getSwapTokenOutMin(pair, ids.slice(0, 1), 0, 100, owner);
-    await ManagerContract.connect(owner).swapExactNFTsForTokens(
+    await RouterContract.connect(owner).swapExactNFTsForTokens(
       pair,
       ids.slice(0, 1),
       amountOut,
