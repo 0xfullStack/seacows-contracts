@@ -17,7 +17,7 @@ contract SeacowsRouter is ISeacowsRouter {
     }
 
     modifier checkDeadline(uint deadline) {
-        require(deadline >= block.timestamp, 'SeacowsPositionManager: EXPIRED');
+        require(deadline >= block.timestamp, 'SeacowsRouter: EXPIRED');
         _;
     }
 
@@ -45,7 +45,7 @@ contract SeacowsRouter is ISeacowsRouter {
             pair.fee(),
             pair.PERCENTAGE_PRECISION()
         );
-        require(amountIn <= amountInMax, 'SeacowsPositionManager: EXCESSIVE_INPUT_AMOUNT');
+        require(amountIn <= amountInMax, 'SeacowsRouter: EXCESSIVE_INPUT_AMOUNT');
         IERC20(pair.token()).transferFrom(msg.sender, _pair, amountIn);
         pair.swap(0, idsOut, to);
     }
@@ -99,7 +99,7 @@ contract SeacowsRouter is ISeacowsRouter {
             pair.fee(),
             pair.PERCENTAGE_PRECISION()
         );
-        require(amountOut >= amountOutMin, 'SeacowsPositionManager: INSUFFICIENT_OUTPUT_AMOUNT');
+        require(amountOut >= amountOutMin, 'SeacowsRouter: INSUFFICIENT_OUTPUT_AMOUNT');
         for (uint i = 0; i < idsIn.length; i++) {
             IERC721(pair.collection()).safeTransferFrom(msg.sender, _pair, idsIn[i]);
         }
