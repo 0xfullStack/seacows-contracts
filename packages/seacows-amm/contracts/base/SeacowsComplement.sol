@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { ISeacowsComplement } from "../interfaces/ISeacowsComplement.sol";
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import {ISeacowsComplement} from '../interfaces/ISeacowsComplement.sol';
 
 // contract SeacowsComplement is IFeeManagement {
 contract SeacowsComplement is ISeacowsComplement {
     int256 private _tokenComplement;
     int256 private _nftComplement;
 
-    uint public constant COMPLEMENT_PRECISION = 10**18;
-    int public constant COMPLEMENT_THRESHOLD = 5 * 10**17;
+    uint public constant COMPLEMENT_PRECISION = 10 ** 18;
+    int public constant COMPLEMENT_THRESHOLD = 5 * 10 ** 17;
 
     constructor() {}
 
@@ -23,11 +23,18 @@ contract SeacowsComplement is ISeacowsComplement {
         return _nftComplement;
     }
 
-    function getComplemenetedAssetsOut(int256 _tokenAmountOut, int256 _nftAmountOut) public view returns (int256 tokenAmountOut, int256 nftAmountOut, int256 newTokenComplement, int256 newNftComplement) {
+    function getComplemenetedAssetsOut(
+        int256 _tokenAmountOut,
+        int256 _nftAmountOut
+    )
+        public
+        view
+        returns (int256 tokenAmountOut, int256 nftAmountOut, int256 newTokenComplement, int256 newNftComplement)
+    {
         int256 _complementedNftAmountOut = _nftComplement + _nftAmountOut;
         int256 complement = int256(COMPLEMENT_PRECISION);
 
-        int256 quotient = _complementedNftAmountOut / complement * complement;
+        int256 quotient = (_complementedNftAmountOut / complement) * complement;
         int256 remainer = _complementedNftAmountOut - quotient;
         if (remainer >= COMPLEMENT_THRESHOLD) {
             quotient = quotient + complement;
@@ -38,7 +45,7 @@ contract SeacowsComplement is ISeacowsComplement {
             int256 nftChange = nftAmountOut - _nftAmountOut;
             newNftComplement = _nftComplement + nftChange;
 
-            int256 tokenChange = nftChange * _tokenAmountOut / _nftAmountOut;
+            int256 tokenChange = (nftChange * _tokenAmountOut) / _nftAmountOut;
             tokenAmountOut = _tokenAmountOut - tokenChange;
             newTokenComplement = _tokenComplement - tokenChange;
         } else {
@@ -50,16 +57,27 @@ contract SeacowsComplement is ISeacowsComplement {
         }
     }
 
-    function _getComplementedBalance(address _token, address _collection) internal view returns (uint256 balance0, uint256 balance1) {
+    function _getComplementedBalance(
+        address _token,
+        address _collection
+    ) internal view returns (uint256 balance0, uint256 balance1) {
         balance0 = uint256(int256(IERC20(_token).balanceOf(address(this))) + _tokenComplement);
-        balance1 = uint256(int256(IERC721(_collection).balanceOf(address(this)) * uint256(COMPLEMENT_PRECISION)) + _nftComplement);
+        balance1 = uint256(
+            int256(IERC721(_collection).balanceOf(address(this)) * uint256(COMPLEMENT_PRECISION)) + _nftComplement
+        );
     }
 
     // Expect _nftAmountOut = NFT quantity output * precision
-    function _updateComplement(uint256 _tokenAmountOut, uint256 _nftAmountOut) internal returns (uint256 tokenAmountIn, uint256 tokenAmountOut, uint256 nftAmountOut) {
+    function _updateComplement(
+        uint256 _tokenAmountOut,
+        uint256 _nftAmountOut
+    ) internal returns (uint256 tokenAmountIn, uint256 tokenAmountOut, uint256 nftAmountOut) {
         int256 tokenOut;
         int256 nftOut;
-        (tokenOut, nftOut, _tokenComplement, _nftComplement) = getComplemenetedAssetsOut(int(_tokenAmountOut), int(_nftAmountOut));
+        (tokenOut, nftOut, _tokenComplement, _nftComplement) = getComplemenetedAssetsOut(
+            int(_tokenAmountOut),
+            int(_nftAmountOut)
+        );
         if (tokenOut < 0) {
             tokenAmountIn = uint256(0 - tokenOut);
             tokenAmountOut = 0;

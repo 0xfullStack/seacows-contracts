@@ -90,8 +90,15 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         if (tokenReserve == 0 && nftReserve == 0) {
             (tokenAmount, ids) = (tokenDesired, idsDesired);
         } else {
-            uint tokenOptimal = SeacowsLibrary.quote(idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION(), nftReserve, tokenReserve);
-            require(tokenOptimal <= tokenDesired && tokenOptimal >= tokenMin, 'SeacowsPositionManager: INSUFFICIENT_B_AMOUNT');
+            uint tokenOptimal = SeacowsLibrary.quote(
+                idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION(),
+                nftReserve,
+                tokenReserve
+            );
+            require(
+                tokenOptimal <= tokenDesired && tokenOptimal >= tokenMin,
+                'SeacowsPositionManager: INSUFFICIENT_B_AMOUNT'
+            );
             (tokenAmount, ids) = (tokenOptimal, idsDesired);
         }
     }
@@ -122,8 +129,12 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         address pair = getPair(token, collection, fee);
 
         IERC20(token).transferFrom(msg.sender, pair, tokenAmount);
-        for (uint i = 0; i < idsDesired.length; i++) {
+        for (uint i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
+
+            unchecked {
+                ++i;
+            }
         }
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
     }
@@ -145,15 +156,19 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint tokenMin,
         uint256 toTokenId,
         uint deadline
-    ) public payable checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
+    ) external payable checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
         require(_exists(toTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
         (tokenAmount, ids) = _addLiquidity(WETH, collection, fee, msg.value, idsDesired, tokenMin);
         address pair = getPair(WETH, collection, fee);
         IWETH(WETH).deposit{value: tokenAmount}();
         assert(IWETH(WETH).transfer(pair, tokenAmount));
 
-        for (uint i = 0; i < idsDesired.length; i++) {
+        for (uint i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
+
+            unchecked {
+                ++i;
+            }
         }
 
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
@@ -166,7 +181,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
 
     // **** REMOVE LIQUIDITY ****
     function seacowsBurnCallback(address _token, address from, uint256 _amount) external {
-        require(slotOfPair(msg.sender) != 0, "SeacowsPositionManager: UNAUTHORIZED_CALLER");
+        require(slotOfPair(msg.sender) != 0, 'SeacowsPositionManager: UNAUTHORIZED_CALLER');
         IERC20(_token).transferFrom(from, msg.sender, _amount);
     }
 
@@ -190,15 +205,24 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint256 fromTokenId,
         address to,
         uint deadline
-    ) public virtual checkDeadline(deadline) returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
+    )
+        public
+        virtual
+        checkDeadline(deadline)
+        returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut)
+    {
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
         address pair = getPair(token, collection, fee);
 
         transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
-        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(msg.sender, to, constraint.nftIds);
-        require(cTokenOut >= constraint.cTokenOutMin, 'SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN');       
-        require(cNftOut >= constraint.cNftOutMin, 'SeacowsPositionManager: BELOW_C_NFT_OUT_MIN');      
-        require(constraint.tokenInMax >= tokenIn, 'SeacowsPositionManager: EXCEED_TOKEN_IN_MAX');      
+        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(
+            msg.sender,
+            to,
+            constraint.nftIds
+        );
+        require(cTokenOut >= constraint.cTokenOutMin, 'SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN');
+        require(cNftOut >= constraint.cNftOutMin, 'SeacowsPositionManager: BELOW_C_NFT_OUT_MIN');
+        require(constraint.tokenInMax >= tokenIn, 'SeacowsPositionManager: EXCEED_TOKEN_IN_MAX');
     }
 
     /**
@@ -219,7 +243,12 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint256 fromTokenId,
         address to,
         uint deadline
-    ) public virtual checkDeadline(deadline) returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
+    )
+        public
+        virtual
+        checkDeadline(deadline)
+        returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut)
+    {
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
         (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = removeLiquidity(
             WETH,
@@ -232,8 +261,12 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
             deadline
         );
 
-        for (uint i = 0; i < idsOut.length; i++) {
+        for (uint i; i < idsOut.length; ) {
             IERC721(collection).safeTransferFrom(address(this), to, idsOut[i]);
+
+            unchecked {
+                ++i;
+            }
         }
 
         IWETH(WETH).withdraw(tokenOut);
@@ -260,12 +293,12 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint[] memory idsDesired,
         uint tokenMin,
         uint deadline
-    ) public returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
+    ) external returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
         address pair = getPair(token, collection, fee);
         if (pair == address(0)) {
             pair = createPair(token, collection, fee);
         }
-        uint256 tokenId = _mint(msg.sender, slotOfPair(pair), 0);
+        uint256 tokenId = _mint(msg.sender, _pairSlots[pair], 0);
         (tokenAmount, ids, liquidity) = addLiquidity(
             token,
             collection,
@@ -293,18 +326,22 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         uint[] memory idsDesired,
         uint tokenMin,
         uint deadline
-    ) public payable checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
+    ) external payable checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
         address pair = getPair(WETH, collection, fee);
         if (pair == address(0)) {
             pair = createPair(WETH, collection, fee);
         }
-        uint256 toTokenId = _mint(msg.sender, slotOfPair(pair), 0);
+        uint256 toTokenId = _mint(msg.sender, _pairSlots[pair], 0);
         (tokenAmount, ids) = _addLiquidity(WETH, collection, fee, msg.value, idsDesired, tokenMin);
         IWETH(WETH).deposit{value: tokenAmount}();
         assert(IWETH(WETH).transfer(pair, tokenAmount));
 
-        for (uint i = 0; i < idsDesired.length; i++) {
+        for (uint i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
+
+            unchecked {
+                ++i;
+            }
         }
 
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);

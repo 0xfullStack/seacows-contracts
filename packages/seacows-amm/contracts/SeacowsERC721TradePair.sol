@@ -20,7 +20,6 @@ contract SeacowsERC721TradePair is
     SeacowsPairMetadata,
     ISeacowsERC721TradePair
 {
-    using SafeMath for uint;
     using SafeMath for uint112;
     using UQ112x112 for uint224;
 
@@ -81,8 +80,8 @@ contract SeacowsERC721TradePair is
     function mint(uint256 toTokenId) public nonReentrant returns (uint liquidity) {
         (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
         (uint balance0, uint balance1) = getComplementedBalance();
-        uint112 amount0 = uint112(balance0.sub(_reserve0));
-        uint112 amount1 = uint112(balance1.sub(_reserve1));
+        uint112 amount0 = uint112(balance0 - _reserve0);
+        uint112 amount1 = uint112(balance1 - _reserve1);
 
         uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
         if (_totalSupply == 0) {
@@ -98,7 +97,11 @@ contract SeacowsERC721TradePair is
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function burn(address from, address to, uint256[] memory _ids) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
+    function burn(
+        address from,
+        address to,
+        uint256[] memory _ids
+    ) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
         (uint balance0, uint balance1) = getComplementedBalance();
 
         ISeacowsPositionManager manager = ISeacowsPositionManager(positionManager());
@@ -107,8 +110,8 @@ contract SeacowsERC721TradePair is
         {
             // scope to avoid stack too deep errors
             uint liquidity = manager.balanceOf(manager.tokenOf(address(this)));
-            cTokenOut = liquidity.mul(balance0) / totalSupply(); // using balances ensures pro-rata distribution
-            cNftOut = liquidity.mul(balance1) / totalSupply(); // using balances ensures pro-rata distribution
+            cTokenOut = (liquidity * balance0) / totalSupply(); // using balances ensures pro-rata distribution
+            cNftOut = (liquidity * balance1) / totalSupply(); // using balances ensures pro-rata distribution
             require(cTokenOut > 0 && cNftOut > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_BURNED');
 
             uint nftOut;
@@ -123,30 +126,32 @@ contract SeacowsERC721TradePair is
         require(_ids.length >= nftAmountOut, 'SeacowsERC721TradePair: EXCEED_NFT_OUT_MAX');
         IERC20Metadata(token).transfer(to, tokenOut);
 
-        { // scope to avoid stack too deep errors
-        idsOut = new uint[](nftAmountOut);
-        uint count = 0;
-        uint i = 0;
-        while (count < nftAmountOut && i < _ids.length) {
-            if (IERC721Metadata(collection).ownerOf(_ids[i]) == address(this)) {
-                IERC721Metadata(collection).safeTransferFrom(address(this), to, _ids[i]);
-                idsOut[count] = _ids[i];
-                count++;
+        {
+            // scope to avoid stack too deep errors
+            idsOut = new uint[](nftAmountOut);
+            uint count = 0;
+            uint i = 0;
+            while (count < nftAmountOut && i < _ids.length) {
+                if (IERC721Metadata(collection).ownerOf(_ids[i]) == address(this)) {
+                    IERC721Metadata(collection).safeTransferFrom(address(this), to, _ids[i]);
+                    idsOut[count] = _ids[i];
+                    count++;
+                }
+                i++;
             }
-            i++;
-        }
-        require(count == nftAmountOut, 'SeacowsERC721TradePair: INSUFFICIENT_NFT_TO_WITHDRAW');
+            require(count == nftAmountOut, 'SeacowsERC721TradePair: INSUFFICIENT_NFT_TO_WITHDRAW');
         }
 
         if (tokenIn > 0) {
             manager.seacowsBurnCallback(token, from, tokenIn);
         }
- 
+
         (balance0, balance1) = getComplementedBalance();
 
-        { // scope to avoid stack too deep errors
-        (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
-        _update(balance0, balance1, _reserve0, _reserve1);
+        {
+            // scope to avoid stack too deep errors
+            (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
+            _update(balance0, balance1, _reserve0, _reserve1);
         }
         emit Burn(msg.sender, cTokenOut, cNftOut, tokenIn, tokenOut, idsOut, to);
     }
@@ -181,10 +186,10 @@ contract SeacowsERC721TradePair is
         require(tokenAmountIn > 0 || nftAmountIn > 0, 'Seacows: INSUFFICIENT_INPUT_AMOUNT');
         {
             // scope for reserve{0,1}Adjusted, avoids stack too deep errors
-            uint balance0Adjusted = balance0.mul(PERCENTAGE_PRECISION).sub(tokenAmountIn.mul(fee));
-            uint balance1Adjusted = balance1.mul(PERCENTAGE_PRECISION);
+            uint balance0Adjusted = balance0 * PERCENTAGE_PRECISION - tokenAmountIn * fee;
+            uint balance1Adjusted = balance1 * PERCENTAGE_PRECISION;
             require(
-                balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(PERCENTAGE_PRECISION ** 2),
+                balance0Adjusted * balance1Adjusted >= uint(_reserve0) * _reserve1 * (PERCENTAGE_PRECISION ** 2),
                 'Seacows: K'
             );
         }
@@ -199,11 +204,11 @@ contract SeacowsERC721TradePair is
         address _collection = collection; // gas savings
         (uint balance0, uint balance1) = getComplementedBalance();
         require(
-            balance1.sub(reserve1).div(COMPLEMENT_PRECISION) == ids.length,
+            (balance1 - reserve1) / COMPLEMENT_PRECISION == ids.length,
             'SeacowsERC721TradePair: SKIM_QUANTITY_UNMATCH'
         );
 
-        IERC20Metadata(_token).transfer(to, balance0.sub(reserve0));
+        IERC20Metadata(_token).transfer(to, balance0 / reserve0);
         for (uint i = 0; i < ids.length; i++) {
             IERC721Metadata(_collection).safeTransferFrom(address(this), to, ids[i]);
         }

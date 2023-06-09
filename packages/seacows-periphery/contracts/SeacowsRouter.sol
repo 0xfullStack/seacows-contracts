@@ -2,16 +2,12 @@
 pragma solidity ^0.8.13;
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import './interfaces/ISeacowsRouter.sol';
 import './interfaces/ISeacowsERC721TradePair.sol';
 import './interfaces/IWETH.sol';
 import './lib/SeacowsLibrary.sol';
 
 contract SeacowsRouter is ISeacowsRouter {
-    using SafeMath for uint;
-    using SafeMath for uint112;
-
     address public weth;
 
     constructor(address _weth) {
