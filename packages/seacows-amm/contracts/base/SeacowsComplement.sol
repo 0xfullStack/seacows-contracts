@@ -11,7 +11,7 @@ contract SeacowsComplement is ISeacowsComplement {
     int256 private _nftComplement;
 
     uint public constant COMPLEMENT_PRECISION = 10 ** 18;
-    int public constant COMPLEMENT_THRESHOLD = 5 * 10 ** 17;
+    int public constant COMPLEMENT_THRESHOLD = -5 * 10 ** 17;
 
     constructor() {}
 
@@ -31,12 +31,12 @@ contract SeacowsComplement is ISeacowsComplement {
         view
         returns (int256 tokenAmountOut, int256 nftAmountOut, int256 newTokenComplement, int256 newNftComplement)
     {
-        int256 _complementedNftAmountOut = _nftComplement + _nftAmountOut;
         int256 complement = int256(COMPLEMENT_PRECISION);
 
-        int256 quotient = (_complementedNftAmountOut / complement) * complement;
-        int256 remainer = _complementedNftAmountOut - quotient;
-        if (remainer >= COMPLEMENT_THRESHOLD) {
+        int256 quotient = (_nftAmountOut / complement) * complement;
+        int256 remainer = quotient - _nftAmountOut;
+
+        if (remainer + _nftComplement <= COMPLEMENT_THRESHOLD) {
             quotient = quotient + complement;
         }
 

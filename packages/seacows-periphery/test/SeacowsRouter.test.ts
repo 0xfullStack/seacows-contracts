@@ -166,7 +166,12 @@ describe('SeacowsRouter', () => {
       await manager.connect(alice).setApprovalForAll(manager.address, true);
       const aliceLiquidity = await manager['balanceOf(uint256)'](2);
 
-      const constraints = await getWithdrawAssetsOutMin(pair, aliceLiquidity.div(2), 0, 100);
+      const { cNftOutMin, cTokenOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
+        pair,
+        aliceLiquidity.div(2),
+        0,
+        100,
+      );
       /**
        * @notes Removing liquidity
        * Preference ERC721: [1, 2, 3]
@@ -181,7 +186,7 @@ describe('SeacowsRouter', () => {
             erc721.address,
             ONE_PERCENT,
             aliceLiquidity.div(2),
-            { ...constraints, nftIds: [1, 2, 3] },
+            { cNftOutMin, cTokenOutMin, tokenInMax: tokenInRange[1], nftIds: [1, 2, 3] },
             2,
             alice.address,
             MaxUint256,
@@ -190,8 +195,8 @@ describe('SeacowsRouter', () => {
         .to.emit(pair, 'Burn')
         .withArgs(
           manager.address,
-          constraints.cTokenOutMin,
-          constraints.cNftOutMin,
+          cTokenOutMin,
+          cNftOutMin,
           0,
           ethers.utils.parseEther('2.896921212121212122'),
           [1, 2, 3],

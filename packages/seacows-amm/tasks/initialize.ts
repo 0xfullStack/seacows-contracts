@@ -87,7 +87,7 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
 
     const { tokenInMax: amountIn } = await getSwapTokenInMax(pair, ids.slice(0, 1), 0, 100, owner);
     console.log('Approving Manager to spend ERC20');
-    await (await ERC20Contract.connect(owner).approve(ManagerContract.address, amountIn)).wait();
+    await (await ERC20Contract.connect(owner).approve(RouterContract.address, amountIn)).wait();
     await RouterContract.connect(owner).swapTokensForExactNFTs(
       pair,
       ids.slice(0, 1),

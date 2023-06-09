@@ -193,11 +193,11 @@ const getWithdrawAssetsOutMin = async (
   slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
 ): Promise<{
-  cTokenOut: BigNumber;
-  cNftOut: BigNumber;
   cTokenOutMin: BigNumber;
   cNftOutMin: BigNumber;
-  tokenInMax: BigNumber;
+  tokenInRange: [BigNumber, BigNumber];
+  tokenOutRange: [BigNumber, BigNumber];
+  nftOutRange: [number, number];
 }> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
@@ -208,7 +208,6 @@ const getWithdrawAssetsOutMin = async (
   const cTokenOut = liquidity.mul(tokenBalance).div(totalSupply);
   const cNftOut = liquidity.mul(nftBalance).div(totalSupply);
 
-  // const [tokenOutMin, nftOutMin] = await pairContract.getComplemenetedAssetsOut(tokenAmount, nftAmount);
   const cTokenOutMin = cTokenOut
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
@@ -216,16 +215,29 @@ const getWithdrawAssetsOutMin = async (
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
 
+  const nftOutMax = cNftOut.div(complement).add(1);
+  const nftOutMin = cNftOutMin.div(complement);
+
   const tokenInMax = cNftOutMin.lt(complement.div(2))
-    ? complement.sub(cNftOutMin.sub(cNftOutMin.div(complement).mul(complement)))
+    ? complement
+        .sub(cNftOutMin.sub(cNftOutMin.div(complement).mul(complement)))
+        .mul(cTokenOutMin)
+        .div(cNftOutMin)
     : BI_ZERO;
 
+  let tokenOutMin = cTokenOutMin.sub(nftOutMax.mul(complement).sub(cNftOut).mul(cTokenOutMin).div(cNftOutMin));
+  if (tokenOutMin.lte(BI_ZERO)) {
+    tokenOutMin = BI_ZERO;
+  }
+
+  const tokenOutMax = cTokenOut.add(cNftOutMin.sub(nftOutMin.mul(complement)).mul(cTokenOutMin).div(cNftOutMin));
+
   return {
-    cTokenOut,
-    cNftOut,
     cTokenOutMin,
     cNftOutMin,
-    tokenInMax,
+    tokenInRange: [BI_ZERO, tokenInMax],
+    tokenOutRange: [tokenOutMin, tokenOutMax],
+    nftOutRange: [nftOutMin.toNumber(), nftOutMax.toNumber()],
   };
   // const complement = await pairContract.COMPLEMENT_PRECISION();
 
