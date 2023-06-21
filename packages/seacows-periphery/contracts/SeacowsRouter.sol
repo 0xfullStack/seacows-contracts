@@ -69,7 +69,7 @@ contract SeacowsRouter is ISeacowsRouter {
         IWETH(weth).deposit{value: amountIn}();
         IWETH(weth).transfer(_pair, amountIn);
 
-        amountIn = this.swapETHForExactNFTs(_pair, idsOut, amountInMax, to, deadline);
+        amountIn = this.swapTokensForExactNFTs(_pair, idsOut, amountInMax, to, deadline);
 
         // refund remaining eth
         _sendETH(msg.sender, msg.value - amountIn);
@@ -200,7 +200,7 @@ contract SeacowsRouter is ISeacowsRouter {
         IWETH(weth).deposit{value: msg.value}();
 
         for (uint256 i = 0; i < _pairs.length; i++) {
-            amountIn += this.swapETHForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], to, deadline);
+            amountIn += this.swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], to, deadline);
         }
 
         // refund remaining eth
