@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.13.0 (2023-06-21)
+
+
+### Features
+
+* added more fee handling and rewarder ([d4aee4b](https://github.com/yolominds/seacows-contracts/commit/d4aee4b3926c5d7fa8c5aa8e3d61074a7db0bede))
+
 ## 1.12.0 (2023-06-09)
 
 
