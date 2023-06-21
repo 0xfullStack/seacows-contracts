@@ -9,6 +9,7 @@
     "deploy:dev:goerli": "hardhat deploy:seacows --env dev --network goerli",
     "deploy:dev:mumbai": "hardhat deploy:seacows --env dev --network mumbai",
     "test": "hardhat test",
+    "size": "hardhat size-contracts",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
   "devDependencies": {

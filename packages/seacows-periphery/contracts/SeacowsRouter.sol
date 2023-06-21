@@ -2,8 +2,8 @@
 pragma solidity ^0.8.13;
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import '@yolominds/seacows-amm/contracts/interfaces/ISeacowsERC721TradePair.sol';
 import './interfaces/ISeacowsRouter.sol';
-import './interfaces/ISeacowsERC721TradePair.sol';
 import './interfaces/IWETH.sol';
 import './lib/SeacowsLibrary.sol';
 
@@ -42,7 +42,7 @@ contract SeacowsRouter is ISeacowsRouter {
             idsOut.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,
             nftReserve,
-            pair.fee(),
+            pair.feePercent() + pair.protocolFeePercent(),
             pair.PERCENTAGE_PRECISION()
         );
         require(amountIn <= amountInMax, 'SeacowsRouter: EXCESSIVE_INPUT_AMOUNT');
@@ -96,7 +96,7 @@ contract SeacowsRouter is ISeacowsRouter {
             idsIn.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,
             nftReserve,
-            pair.fee(),
+            pair.feePercent() + pair.protocolFeePercent(),
             pair.PERCENTAGE_PRECISION()
         );
         require(amountOut >= amountOutMin, 'SeacowsRouter: INSUFFICIENT_OUTPUT_AMOUNT');

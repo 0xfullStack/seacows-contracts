@@ -1,4 +1,5 @@
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { MaxUint256 } from '@ethersproject/constants';
@@ -18,6 +19,7 @@ describe('SeacowsERC721TradePair', () => {
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let carol: SignerWithAddress;
+  let feeTo: SignerWithAddress;
 
   let weth: WETH;
   let erc721: MockERC721;
@@ -29,7 +31,7 @@ describe('SeacowsERC721TradePair', () => {
 
   // Prepare contracts
   before(async () => {
-    [owner, alice, bob, carol] = await ethers.getSigners();
+    [owner, alice, bob, carol, feeTo] = await ethers.getSigners();
 
     const WETHFC = await ethers.getContractFactory('WETH');
     const MockERC721FC = await ethers.getContractFactory('MockERC721');
@@ -56,9 +58,11 @@ describe('SeacowsERC721TradePair', () => {
     before(async () => {
       // Create a pair
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
+      await manager.setFeeTo(feeTo.address);
+
       const address = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
       pair = await ethers.getContractAt('SeacowsERC721TradePair', address);
-
+      await pair.setProtocolFeePercent(await pair.MAX_PROTOCOL_FEE_PERCENT());
       /**
        * @notes Prepare assets for Alice
        * ERC721: [0, 1, 2, 3, 4]
@@ -241,9 +245,27 @@ describe('SeacowsERC721TradePair', () => {
   });
 
   describe('Swap', () => {
+    let feePercent: BigNumber;
+    let protocolFeePercent: BigNumber;
+    let precision: BigNumber;
+    before(async () => {
+      feePercent = await pair.feePercent();
+      protocolFeePercent = await pair.protocolFeePercent();
+      precision = await pair.PERCENTAGE_PRECISION();
+    });
+
+    it('should have correct initial state', async () => {
+      /**
+       * FeeTo address
+       * ERC20 balance: 0 ethers
+       */
+      expect(await manager.feeTo()).to.be.equal(feeTo.address);
+      expect(await erc20.balanceOf(feeTo.address)).to.be.equal(0);
+
+      expect(protocolFeePercent).to.be.equal(await pair.MAX_PROTOCOL_FEE_PERCENT());
+    });
+
     it('Should swap out ERC20 token successfully', async () => {
-      const fee = await pair.fee();
-      const precision = await pair.PERCENTAGE_PRECISION();
       /**
        * @notes Summary of Alice before swap
        * ERC721: [4]
@@ -258,49 +280,53 @@ describe('SeacowsERC721TradePair', () => {
        * Swap in ERC721: [4]
        * Swap out ERC20 (Including fee): 0.792 Ethers
        */
-      const [tokenReserve, nftReserve] = await pair.getReserves();
       await erc721.connect(alice)['safeTransferFrom(address,address,uint256)'](alice.address, pair.address, 4);
-      const tokenOut = getTokenOut(BigNumber.from(1).mul(await pair.COMPLEMENT_PRECISION()), tokenReserve, nftReserve);
-      const tokenOutWithFee = tokenOut.mul(precision.sub(fee)).div(precision);
+      const { tokenOutMin } = await getSwapTokenOutMin(pair, [4], 0, 100);
 
       // Expected ERC20 output after = 0.784 Ethers
-      expect(tokenOutWithFee).to.be.equal(ethers.utils.parseEther('0.792'));
+      expect(tokenOutMin).to.be.equal(ethers.utils.parseEther('0.712'));
 
       /**
        * @notes Summary of Alice after swap
        * ERC721: []
        * ERC20: 6.792 Ethers
        */
-      await expect(pair.connect(alice).swap(tokenOutWithFee, [], alice.address))
+      await expect(pair.connect(alice).swap(tokenOutMin, [], alice.address))
         .to.be.emit(pair, 'Swap')
-        .withArgs(alice.address, 0, ethers.utils.parseEther('1'), tokenOutWithFee, 0, alice.address);
-      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6.792'));
+        .withArgs(alice.address, 0, ethers.utils.parseEther('1'), tokenOutMin, 0, alice.address);
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6.712'));
+      expect(await erc20.balanceOf(feeTo.address)).to.be.equal(ethers.utils.parseEther('0.08'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(0);
     });
 
     it('Should swap out NFT successfully', async () => {
+      const prevBobBalance = await erc20.balanceOf(bob.address);
       /**
        * @notes Summary of Bob before swap
        * ERC721: [1, 6]
        * ERC20: 10 Ethers
-       * Pair NFT: [4]
+       * Pair ERC721: [0, 2, 3, 4, 5]
+       * Pair ERC20: 3.208 Ethers
        */
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('10'));
       expect(await erc721.balanceOf(bob.address)).to.be.equal(2);
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('3.208'));
+      expect(await erc721.balanceOf(pair.address)).to.be.equal(5);
+      expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
+      expect(await erc721.ownerOf(2)).to.be.equal(pair.address);
+      expect(await erc721.ownerOf(3)).to.be.equal(pair.address);
+      expect(await erc721.ownerOf(4)).to.be.equal(pair.address);
+      expect(await erc721.ownerOf(5)).to.be.equal(pair.address);
 
       /**
        * @notes Bob's swap
        * Swap in ERC20 (including fee): 0.81002 ether
        * Swap out ERC721: [6]
        */
-      const fee = await pair.fee();
-      const precision = await pair.PERCENTAGE_PRECISION();
-      const [tokenReserve, nftReserve] = await pair.getReserves();
-      const amount0In = getTokenIn(BigNumber.from(1).mul(await pair.COMPLEMENT_PRECISION()), tokenReserve, nftReserve);
-      const amount0InWithFee = amount0In.mul(precision).div(precision.sub(fee)).add(1);
+      const { tokenInMax } = await getSwapTokenInMax(pair, [4], 0, 100);
 
-      await erc20.connect(bob).transfer(pair.address, amount0InWithFee);
-      expect(amount0InWithFee).to.be.equal(ethers.utils.parseEther('0.810101010101010102'));
+      await erc20.connect(bob).transfer(pair.address, tokenInMax);
+      expect(tokenInMax).to.be.equal(ethers.utils.parseEther('0.888'));
 
       /**
        * @notes Summary of Bob after swap
@@ -309,8 +335,8 @@ describe('SeacowsERC721TradePair', () => {
        */
       await expect(pair.connect(bob).swap(0, [4], bob.address))
         .to.be.emit(pair, 'Swap')
-        .withArgs(bob.address, amount0InWithFee, 0, 0, ethers.utils.parseEther('1'), bob.address);
-      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('9.189898989898989898'));
+        .withArgs(bob.address, tokenInMax, 0, 0, ethers.utils.parseEther('1'), bob.address);
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(prevBobBalance.sub(tokenInMax));
       expect(await erc721.balanceOf(bob.address)).to.be.equal(3);
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
       expect(await erc721.ownerOf(4)).to.be.equal(bob.address);

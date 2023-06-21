@@ -33,6 +33,8 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "burnValue(uint256,uint256)": FunctionFragment;
     "contractURI()": FunctionFragment;
     "createPair(address,address,uint112)": FunctionFragment;
+    "feeManager()": FunctionFragment;
+    "feeTo()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getPair(address,address,uint112)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
@@ -49,6 +51,8 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "seacowsBurnCallback(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setFeeManager(address)": FunctionFragment;
+    "setFeeTo(address)": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotOfPair(address)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
@@ -116,6 +120,11 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "createPair",
     values: [string, string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "feeManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "feeTo", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
@@ -213,6 +222,11 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "setFeeManager",
+    values: [string]
+  ): string;
+  encodeFunctionData(functionFragment: "setFeeTo", values: [string]): string;
+  encodeFunctionData(
     functionFragment: "slotOf",
     values: [BigNumberish]
   ): string;
@@ -280,6 +294,8 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "feeManager", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "feeTo", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -326,6 +342,11 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setFeeManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setFeeTo", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOfPair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
@@ -564,6 +585,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    feeManager(overrides?: CallOverrides): Promise<[string]>;
+
+    feeTo(overrides?: CallOverrides): Promise<[string]>;
+
     getApproved(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
@@ -688,6 +713,16 @@ export class SeacowsPositionManager extends BaseContract {
     setApprovalForAll(
       operator_: string,
       approved_: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setFeeTo(
+      _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -833,6 +868,10 @@ export class SeacowsPositionManager extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  feeManager(overrides?: CallOverrides): Promise<string>;
+
+  feeTo(overrides?: CallOverrides): Promise<string>;
+
   getApproved(
     tokenId_: BigNumberish,
     overrides?: CallOverrides
@@ -951,6 +990,16 @@ export class SeacowsPositionManager extends BaseContract {
   setApprovalForAll(
     operator_: string,
     approved_: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setFeeManager(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setFeeTo(
+    _to: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1098,6 +1147,10 @@ export class SeacowsPositionManager extends BaseContract {
       _fee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    feeManager(overrides?: CallOverrides): Promise<string>;
+
+    feeTo(overrides?: CallOverrides): Promise<string>;
 
     getApproved(
       tokenId_: BigNumberish,
@@ -1247,6 +1300,10 @@ export class SeacowsPositionManager extends BaseContract {
       approved_: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    setFeeManager(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    setFeeTo(_to: string, overrides?: CallOverrides): Promise<void>;
 
     slotOf(
       tokenId_: BigNumberish,
@@ -1540,6 +1597,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    feeManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    feeTo(overrides?: CallOverrides): Promise<BigNumber>;
+
     getApproved(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
@@ -1664,6 +1725,16 @@ export class SeacowsPositionManager extends BaseContract {
     setApprovalForAll(
       operator_: string,
       approved_: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setFeeTo(
+      _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1812,6 +1883,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    feeManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    feeTo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
@@ -1938,6 +2013,16 @@ export class SeacowsPositionManager extends BaseContract {
     setApprovalForAll(
       operator_: string,
       approved_: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setFeeTo(
+      _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

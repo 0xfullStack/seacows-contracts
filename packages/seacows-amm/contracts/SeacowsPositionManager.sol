@@ -9,23 +9,19 @@ import '@openzeppelin/contracts/proxy/Clones.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import {SeacowsERC3525} from './base/SeacowsERC3525.sol';
 import {SeacowsERC721TradePairFactory} from './base/SeacowsERC721TradePairFactory.sol';
+import {FeeManagement} from './base/FeeManagement.sol';
 
 import {ISeacowsPositionManager} from './interfaces/ISeacowsPositionManager.sol';
 import {ISeacowsERC721TradePair} from './interfaces/ISeacowsERC721TradePair.sol';
 import {IWETH} from './interfaces/IWETH.sol';
-import {SeacowsLibrary} from './lib/SeacowsLibrary.sol';
 import {NFTRenderer} from './lib/NFTRenderer.sol';
 
-contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory, ISeacowsPositionManager {
+contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory, FeeManagement, ISeacowsPositionManager {
     using Counters for Counters.Counter;
 
     uint256 public constant PERCENTAGE_PRECISION = 10 ** 4;
 
     address public immutable WETH;
-
-    mapping(address => uint256) private _pairSlots;
-    mapping(address => uint256) private _pairTokenIds;
-    mapping(uint256 => address) private _slotPairs;
 
     Counters.Counter private _slotGenerator;
 
@@ -44,7 +40,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     }
 
     modifier onlyPair(uint256 _slot) {
-        require(_pairSlots[msg.sender] == _slot, 'SeacowsPositionManager: Only Pair');
+        require(pairSlots[msg.sender] == _slot, 'SeacowsPositionManager: Only Pair');
         _;
     }
 
@@ -67,9 +63,9 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         _pair = _createPair(_token, _collection, _fee);
         uint256 _slot = _createSlot(_pair);
         uint256 tokenId = _mint(_pair, _slot, 0);
-        _pairSlots[_pair] = _slot;
-        _pairTokenIds[_pair] = tokenId;
-        _slotPairs[_slot] = _pair;
+        pairSlots[_pair] = _slot;
+        pairTokenIds[_pair] = tokenId;
+        slotPairs[_slot] = _pair;
 
         emit PairCreated(_token, _collection, _fee, _slot, _pair);
     }
@@ -90,11 +86,9 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         if (tokenReserve == 0 && nftReserve == 0) {
             (tokenAmount, ids) = (tokenDesired, idsDesired);
         } else {
-            uint tokenOptimal = SeacowsLibrary.quote(
-                idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION(),
-                nftReserve,
-                tokenReserve
-            );
+            require(idsDesired.length > 0, 'SeacowsPositionManager: INSUFFICIENT_AMOUNT');
+            require(tokenReserve > 0 && nftReserve > 0, 'SeacowsPositionManager: INSUFFICIENT_LIQUIDITY');
+            uint tokenOptimal = (idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION() * tokenReserve) / nftReserve;
             require(
                 tokenOptimal <= tokenDesired && tokenOptimal >= tokenMin,
                 'SeacowsPositionManager: INSUFFICIENT_B_AMOUNT'
@@ -298,7 +292,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         if (pair == address(0)) {
             pair = createPair(token, collection, fee);
         }
-        uint256 tokenId = _mint(msg.sender, _pairSlots[pair], 0);
+        uint256 tokenId = _mint(msg.sender, pairSlots[pair], 0);
         (tokenAmount, ids, liquidity) = addLiquidity(
             token,
             collection,
@@ -331,7 +325,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         if (pair == address(0)) {
             pair = createPair(WETH, collection, fee);
         }
-        uint256 toTokenId = _mint(msg.sender, _pairSlots[pair], 0);
+        uint256 toTokenId = _mint(msg.sender, pairSlots[pair], 0);
         (tokenAmount, ids) = _addLiquidity(WETH, collection, fee, msg.value, idsDesired, tokenMin);
         IWETH(WETH).deposit{value: tokenAmount}();
         assert(IWETH(WETH).transfer(pair, tokenAmount));
@@ -371,25 +365,25 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     }
 
     function slotOfPair(address _pair) public view returns (uint256) {
-        return _pairSlots[_pair];
+        return pairSlots[_pair];
     }
 
     function pairOfSlot(uint256 _slot) public view returns (address) {
-        return _slotPairs[_slot];
+        return slotPairs[_slot];
     }
 
     function tokenOf(address _pair) public view returns (uint256) {
-        return _pairTokenIds[_pair];
+        return pairTokenIds[_pair];
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
 
         uint256 slotId = slotOf(tokenId);
-        ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_slotPairs[slotId]);
+        ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(slotPairs[slotId]);
         string memory tokenSymbol = ERC20(pair.token()).symbol();
         string memory collectionSymbol = ERC721(pair.collection()).symbol();
-        uint256 fee = pair.fee();
+        uint256 fee = pair.feePercent();
         uint256 poolShare = (balanceOf(tokenId) * PERCENTAGE_PRECISION) / totalSupply();
 
         return
@@ -411,6 +405,6 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
     function _createSlot(address _pair) internal returns (uint256 newSlot) {
         _slotGenerator.increment();
         newSlot = _slotGenerator.current();
-        _pairSlots[_pair] = newSlot;
+        pairSlots[_pair] = newSlot;
     }
 }

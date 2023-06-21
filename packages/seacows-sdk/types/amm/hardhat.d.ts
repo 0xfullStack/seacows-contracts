@@ -141,6 +141,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC3525MetadataDescriptorUpgradeable__factory>;
     getContractFactory(
+      name: "FeeManagement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FeeManagement__factory>;
+    getContractFactory(
+      name: "RoyaltyManagement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RoyaltyManagement__factory>;
+    getContractFactory(
       name: "SeacowsComplement",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SeacowsComplement__factory>;
@@ -156,6 +164,18 @@ declare module "hardhat/types/runtime" {
       name: "SeacowsPairMetadata",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SeacowsPairMetadata__factory>;
+    getContractFactory(
+      name: "SeacowsRewarder",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SeacowsRewarder__factory>;
+    getContractFactory(
+      name: "IFeeManagement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IFeeManagement__factory>;
+    getContractFactory(
+      name: "IRoyaltyRegistry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRoyaltyRegistry__factory>;
     getContractFactory(
       name: "ISeacowsCallback",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -176,6 +196,10 @@ declare module "hardhat/types/runtime" {
       name: "ISeacowsERC721TradePairFactory",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISeacowsERC721TradePairFactory__factory>;
+    getContractFactory(
+      name: "ISeacowsPairMetadata",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ISeacowsPairMetadata__factory>;
     getContractFactory(
       name: "ISeacowsPositionManager",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -378,6 +402,16 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC3525MetadataDescriptorUpgradeable>;
     getContractAt(
+      name: "FeeManagement",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FeeManagement>;
+    getContractAt(
+      name: "RoyaltyManagement",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RoyaltyManagement>;
+    getContractAt(
       name: "SeacowsComplement",
       address: string,
       signer?: ethers.Signer
@@ -397,6 +431,21 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.SeacowsPairMetadata>;
+    getContractAt(
+      name: "SeacowsRewarder",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SeacowsRewarder>;
+    getContractAt(
+      name: "IFeeManagement",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IFeeManagement>;
+    getContractAt(
+      name: "IRoyaltyRegistry",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IRoyaltyRegistry>;
     getContractAt(
       name: "ISeacowsCallback",
       address: string,
@@ -422,6 +471,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ISeacowsERC721TradePairFactory>;
+    getContractAt(
+      name: "ISeacowsPairMetadata",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ISeacowsPairMetadata>;
     getContractAt(
       name: "ISeacowsPositionManager",
       address: string,

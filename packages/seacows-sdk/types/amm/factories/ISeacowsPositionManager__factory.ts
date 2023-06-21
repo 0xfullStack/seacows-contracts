@@ -319,6 +319,32 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "feeManager",
+    outputs: [
+      {
+        internalType: "address",
+        name: "feeManager",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "feeTo",
+    outputs: [
+      {
+        internalType: "address",
+        name: "feeTo",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -486,6 +512,32 @@ const _abi = [
       },
     ],
     name: "setApprovalForAll",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+    ],
+    name: "setFeeManager",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+    ],
+    name: "setFeeTo",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

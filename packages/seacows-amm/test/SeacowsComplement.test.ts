@@ -39,15 +39,6 @@ describe('MockSeacowsComplement', () => {
     expect(await MockSeacowsComplement.COMPLEMENT_THRESHOLD()).to.equal(ethers.utils.parseEther('-0.5'));
   });
 
-  it('Should get the complemented balance correctly', async () => {
-    const [tokenBalance, nftBalance] = await MockSeacowsComplement.getComplementedBalance(
-      MockERC20.address,
-      MockERC721.address,
-    );
-    expect(tokenBalance).to.equal(ethers.utils.parseEther('4'));
-    expect(nftBalance).to.be.equal(ethers.utils.parseEther('4'));
-  });
-
   /**
    * @notes
    * Input:

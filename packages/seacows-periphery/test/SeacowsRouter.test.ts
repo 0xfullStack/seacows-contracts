@@ -69,6 +69,7 @@ describe('SeacowsRouter', () => {
       );
       manager = (await SeacowsPositionManagerFactory.deploy(template.address, weth.address)) as SeacowsPositionManager;
       await manager.deployed();
+      await manager.setFeeTo(ethers.constants.AddressZero);
 
       /**
        * @notes Prepare assets for Alice
@@ -105,6 +106,12 @@ describe('SeacowsRouter', () => {
         SeacowsERC721TradePairAbi,
         await manager.getPair(erc20.address, erc721.address, ONE_PERCENT),
       )) as SeacowsERC721TradePair;
+      await pair.connect(owner).setProtocolFeePercent(0);
+    });
+
+    it('Should have correct initial state', async () => {
+      expect(await manager.feeTo()).to.be.equal(ethers.constants.AddressZero);
+      expect(await pair.protocolFeePercent()).to.be.equal(0);
     });
 
     it('Should swap some ETH for 1 NFT', async () => {

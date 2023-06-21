@@ -9,6 +9,7 @@ const getTokenInMax = (
   complement: BigNumber,
   tokenReserve: BigNumber,
   nftReserve: BigNumber,
+  protocolFeeNumerator: BigNumber,
   feeNumerator: BigNumber,
   feeDenominator: BigNumber,
   slippageNumerator: number,
@@ -16,7 +17,10 @@ const getTokenInMax = (
 ): { tokenInMax: BigNumber; tokenInMaxWithSlippage: BigNumber } => {
   const nftsOut = BigNumber.from(idsOut.length).mul(complement);
   const tokenIn = tokenReserve.mul(nftsOut).div(nftReserve.sub(nftsOut));
-  const tokenInWithFee = tokenIn.mul(feeDenominator).div(feeDenominator.sub(feeNumerator)).add(1);
+
+  // tokenInWithFee = tokenIn * (1 + Protocol Fee Percent + Fee Percent)
+  const tokenInWithFee = tokenIn.mul(feeDenominator.add(protocolFeeNumerator).add(feeNumerator)).div(feeDenominator);
+
   return {
     tokenInMax: tokenInWithFee,
     tokenInMaxWithSlippage: tokenInWithFee
@@ -30,6 +34,7 @@ const getTokenOutMin = (
   complement: BigNumber,
   tokenReserve: BigNumber,
   nftReserve: BigNumber,
+  protocolFeeNumerator: BigNumber,
   feeNumerator: BigNumber,
   feeDenominator: BigNumber,
   slippageNumerator: number,
@@ -37,7 +42,10 @@ const getTokenOutMin = (
 ): { tokenOutMin: BigNumber; tokenOutMinWithSlippage: BigNumber } => {
   const nftsIn = BigNumber.from(idsIn.length).mul(complement);
   const tokenOut = tokenReserve.mul(nftsIn).div(nftReserve.add(nftsIn));
-  const tokenOutWithFee = tokenOut.mul(feeDenominator.sub(feeNumerator)).div(feeDenominator);
+
+  // tokenOutWithFee = tokenOut * (1 - Protocol Fee Percent - Fee Percent)
+  const tokenOutWithFee = tokenOut.mul(feeDenominator.sub(feeNumerator).sub(protocolFeeNumerator)).div(feeDenominator);
+
   return {
     tokenOutMin: tokenOutWithFee,
     tokenOutMinWithSlippage: tokenOutWithFee
@@ -66,13 +74,15 @@ const getSwapTokenInMax = async (
 
   const complement = await pairContract.COMPLEMENT_PRECISION();
   const [tokenReserve, nftReserve] = await pairContract.getReserves();
-  const feeNumerator = await pairContract.fee();
+  const feeNumerator = await pairContract.feePercent();
+  const protocolFeeNumerator = await pairContract.protocolFeePercent();
   const feeDenominator = await pairContract.PERCENTAGE_PRECISION();
   return getTokenInMax(
     idsOut,
     complement,
     tokenReserve,
     nftReserve,
+    protocolFeeNumerator,
     feeNumerator,
     feeDenominator,
     slippageNumerator,
@@ -100,7 +110,8 @@ const getSwapTokenOutMin = async (
 
   const complement = await pairContract.COMPLEMENT_PRECISION();
   const [tokenReserve, nftReserve] = await pairContract.getReserves();
-  const feeNumerator = await pairContract.fee();
+  const feeNumerator = await pairContract.feePercent();
+  const protocolFeeNumerator = await pairContract.protocolFeePercent();
   const feeDenominator = await pairContract.PERCENTAGE_PRECISION();
 
   return getTokenOutMin(
@@ -108,6 +119,7 @@ const getSwapTokenOutMin = async (
     complement,
     tokenReserve,
     nftReserve,
+    protocolFeeNumerator,
     feeNumerator,
     feeDenominator,
     slippageNumerator,
@@ -141,40 +153,6 @@ const getDepositTokenInMax = async (
     tokenInMaxWithSlippage: tokenInMax
       .mul(BigNumber.from(slippageDenominator + slippageNumerator))
       .div(BigNumber.from(slippageDenominator)),
-  };
-};
-
-const getAssetsInOutRange = (
-  tokenOut: BigNumber,
-  nftOut: BigNumber,
-  complement: BigNumber,
-): {
-  tokenInRange: [BigNumber, BigNumber];
-  tokenOutRange: [BigNumber, BigNumber];
-  nftOutRange: [number, number];
-} => {
-  const quotient = tokenOut.div(complement).mul(complement);
-  const remainder = tokenOut.sub(quotient);
-
-  // Calculate for NFT out Min, Token out Max
-  const tokenOutMax = tokenOut.mul(remainder.add(nftOut).div(nftOut));
-
-  // Calculatefor NFT out Max, Token out Min
-  let tokenOutMin;
-  let tokenInMax;
-  const extraNft = complement.sub(remainder);
-  if (tokenOut.gte(complement.div(2))) {
-    tokenInMax = tokenOut.mul(extraNft.sub(nftOut).div(nftOut));
-    tokenOutMin = BI_ZERO;
-  } else {
-    tokenInMax = BI_ZERO;
-    tokenOutMin = tokenOut.mul(nftOut.sub(extraNft).div(nftOut));
-  }
-
-  return {
-    tokenInRange: [BI_ZERO, tokenInMax],
-    tokenOutRange: [tokenOutMin, tokenOutMax],
-    nftOutRange: [quotient.div(complement).toNumber(), quotient.div(complement).toNumber() + 1],
   };
 };
 
@@ -239,30 +217,6 @@ const getWithdrawAssetsOutMin = async (
     tokenOutRange: [tokenOutMin, tokenOutMax],
     nftOutRange: [nftOutMin.toNumber(), nftOutMax.toNumber()],
   };
-  // const complement = await pairContract.COMPLEMENT_PRECISION();
-
-  // const tokenOutAmount = liquidity.mul(tokenBalance).div(totalSupply);
-  // const nftOutAmount = liquidity.mul(nftBalance).div(totalSupply);
-
-  // const tokenOutSlippage = liquidity.mul(tokenBalance).mul(slippageNumerator).div(totalSupply).div(slippageDenominator);
-  // const nftOutSlippage = liquidity.mul(nftBalance).mul(slippageNumerator).div(totalSupply).div(slippageDenominator);
-
-  // // Calculate NFT out Min, Token out Max
-  // const nftOutMin = nftOutAmount.sub(nftOutSlippage);
-  // const nftOutMinQuotient = nftOutMin.div(complement).mul(complement);
-  // const nftOutMinRemainder = nftOutMin.sub(nftOutMinQuotient);
-  // const tokenOutMax = nftOutMinRemainder.mul(tokenOutAmount).div(nftOutAmount);
-
-  // // Calculate NFT out Max, Token out Min
-  // const nftOutMax = nftOutAmount.add(nftOutSlippage);
-  // const nftOutMaxQuotient = nftOutMax.div(complement).mul(complement);
-  // const nftOutMaxRemainder = nftOutMax.sub(nftOutMaxQuotient);
-
-  // return {
-  //   tokenInRange,
-  //   tokenOutRange: [, tokenOutAmount.add()],
-  //   nftOutRange: [nftOutMinQuotient.div(complement).toNumber(), nftOutMaxQuotient.div(complement).toNumber() + 1],
-  // };
 };
 
 export {

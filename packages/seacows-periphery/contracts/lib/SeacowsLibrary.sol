@@ -21,7 +21,7 @@ library SeacowsLibrary {
         require(tokenReserve > 0 && nftReserve > 0, 'SeacowsLibrary: INSUFFICIENT_LIQUIDITY');
         uint numerator = nftIn * tokenReserve * (feeDenominator - feeNumerator);
         uint denominator = (nftReserve + nftIn) * feeDenominator;
-        tokenOut = (numerator / denominator) - 1;
+        tokenOut = numerator / denominator;
     }
 
     // given an output amount of an asset and pair reserves, returns a required input amount of the other asset
@@ -34,8 +34,8 @@ library SeacowsLibrary {
     ) internal pure returns (uint tokenIn) {
         require(amountOut > 0, 'SeacowsLibrary: INSUFFICIENT_OUTPUT_AMOUNT');
         require(reserveIn > 0 && reserveOut > 0, 'SeacowsLibrary: INSUFFICIENT_LIQUIDITY');
-        uint numerator = reserveIn * amountOut * feeDenominator;
-        uint denominator = (reserveOut - amountOut) * (feeDenominator - feeNumerator);
-        tokenIn = (numerator / denominator) + 1;
+        uint numerator = reserveIn * amountOut * (feeDenominator + feeNumerator);
+        uint denominator = (reserveOut - amountOut) * (feeDenominator);
+        tokenIn = numerator / denominator;
     }
 }

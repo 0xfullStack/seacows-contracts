@@ -11,7 +11,6 @@ import {
   PopulatedTransaction,
   BaseContract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -19,16 +18,11 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
+interface ISeacowsPairMetadataInterface extends ethers.utils.Interface {
   functions: {
     "balanceOf(uint256)": FunctionFragment;
     "collection()": FunctionFragment;
-    "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
-    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "positionManager()": FunctionFragment;
-    "slot()": FunctionFragment;
-    "supportsInterface(bytes4)": FunctionFragment;
     "token()": FunctionFragment;
     "totalSupply()": FunctionFragment;
   };
@@ -42,25 +36,8 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "onERC3525Received",
-    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "onERC721Received",
-    values: [string, string, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "positionManager",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "slot", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "supportsInterface",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(
@@ -70,40 +47,17 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "onERC3525Received",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "onERC721Received",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "positionManager",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "slot", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "supportsInterface",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
 
-  events: {
-    "Initialized(uint8)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+  events: {};
 }
 
-export type InitializedEvent = TypedEvent<[number] & { version: number }>;
-
-export class SeacowsPairMetadata extends BaseContract {
+export class ISeacowsPairMetadata extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -144,7 +98,7 @@ export class SeacowsPairMetadata extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: SeacowsPairMetadataInterface;
+  interface: ISeacowsPairMetadataInterface;
 
   functions: {
     balanceOf(
@@ -154,36 +108,10 @@ export class SeacowsPairMetadata extends BaseContract {
 
     collection(overrides?: CallOverrides): Promise<[string]>;
 
-    onERC3525Received(
-      _operator: string,
-      _fromTokenId: BigNumberish,
-      _toTokenId: BigNumberish,
-      _value: BigNumberish,
-      _data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     ownerOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    positionManager(overrides?: CallOverrides): Promise<[string]>;
-
-    slot(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    supportsInterface(
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
 
     token(overrides?: CallOverrides): Promise<[string]>;
 
@@ -197,33 +125,7 @@ export class SeacowsPairMetadata extends BaseContract {
 
   collection(overrides?: CallOverrides): Promise<string>;
 
-  onERC3525Received(
-    _operator: string,
-    _fromTokenId: BigNumberish,
-    _toTokenId: BigNumberish,
-    _value: BigNumberish,
-    _data: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  onERC721Received(
-    arg0: string,
-    arg1: string,
-    arg2: BigNumberish,
-    arg3: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  positionManager(overrides?: CallOverrides): Promise<string>;
-
-  slot(overrides?: CallOverrides): Promise<BigNumber>;
-
-  supportsInterface(
-    interfaceId: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
 
   token(overrides?: CallOverrides): Promise<string>;
 
@@ -237,48 +139,14 @@ export class SeacowsPairMetadata extends BaseContract {
 
     collection(overrides?: CallOverrides): Promise<string>;
 
-    onERC3525Received(
-      _operator: string,
-      _fromTokenId: BigNumberish,
-      _toTokenId: BigNumberish,
-      _value: BigNumberish,
-      _data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    positionManager(overrides?: CallOverrides): Promise<string>;
-
-    slot(overrides?: CallOverrides): Promise<BigNumber>;
-
-    supportsInterface(
-      interfaceId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
 
     token(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
-  filters: {
-    "Initialized(uint8)"(
-      version?: null
-    ): TypedEventFilter<[number], { version: number }>;
-
-    Initialized(
-      version?: null
-    ): TypedEventFilter<[number], { version: number }>;
-  };
+  filters: {};
 
   estimateGas: {
     balanceOf(
@@ -288,34 +156,8 @@ export class SeacowsPairMetadata extends BaseContract {
 
     collection(overrides?: CallOverrides): Promise<BigNumber>;
 
-    onERC3525Received(
-      _operator: string,
-      _fromTokenId: BigNumberish,
-      _toTokenId: BigNumberish,
-      _value: BigNumberish,
-      _data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     ownerOf(
       _tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    positionManager(overrides?: CallOverrides): Promise<BigNumber>;
-
-    slot(overrides?: CallOverrides): Promise<BigNumber>;
-
-    supportsInterface(
-      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -332,34 +174,8 @@ export class SeacowsPairMetadata extends BaseContract {
 
     collection(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    onERC3525Received(
-      _operator: string,
-      _fromTokenId: BigNumberish,
-      _toTokenId: BigNumberish,
-      _value: BigNumberish,
-      _data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     ownerOf(
       _tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    slot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    supportsInterface(
-      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

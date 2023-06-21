@@ -7,13 +7,15 @@ import {ERC3525} from '@solvprotocol/erc-3525/ERC3525.sol';
 import {IERC3525} from '@solvprotocol/erc-3525/IERC3525.sol';
 import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
+import {ISeacowsERC721TradePair} from '../interfaces/ISeacowsERC721TradePair.sol';
 
 /// @title The base contract for an NFT/TOKEN AMM pair
 /// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
 /// @notice This implements the core swap logic from NFT to TOKEN
 contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
-    // address => slot => tokenId
-    // mapping(address => mapping(uint256 => uint256)) private ownerSlotsToken;
+    mapping(address => uint256) public pairSlots;
+    mapping(address => uint256) public pairTokenIds;
+    mapping(uint256 => address) public slotPairs;
 
     // slot => totalValueSupply
     mapping(uint256 => uint256) private totalValueSupplyInSlot;
@@ -27,6 +29,25 @@ contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
     function totalValueSupplyOf(uint256 _slot) public view virtual returns (uint256) {
         return totalValueSupplyInSlot[_slot];
     }
+
+    // function _beforeValueTransfer(
+    //     address from_,
+    //     address to_,
+    //     uint256 fromTokenId_,
+    //     uint256 toTokenId_,
+    //     uint256 slot_,
+    //     uint256 value_
+    // ) internal override {
+    //     // Minting
+    //     if (from_ == address(0) && fromTokenId_ == 0) {
+    //         ISeacowsERC721TradePair(slotPairs[slot_]).updateSwapFee();
+    //     }
+
+    //     // Burning
+    //     if (to_ == address(0) && toTokenId_ == 0) {
+    //         totalValueSupplyInSlot[slot_] -= value_;
+    //     }
+    // }
 
     function _afterValueTransfer(
         address from_,

@@ -69,7 +69,7 @@ describe('SeacowsPositionManager', () => {
       const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
 
       expect(await pair.positionManager()).to.be.equal(manager.address);
-      expect(await pair.fee()).to.be.equal(ONE_PERCENT);
+      expect(await pair.feePercent()).to.be.equal(ONE_PERCENT);
       expect(await pair.PERCENTAGE_PRECISION()).to.be.equal(10000);
       expect(await pair.ONE_PERCENT()).to.be.equal(ONE_PERCENT);
       expect(await pair.POINT_FIVE_PERCENT()).to.be.equal(POINT_FIVE_PERCENT);
@@ -677,11 +677,11 @@ describe('SeacowsPositionManager', () => {
        * Input ETH: 49.424242424242424243 Ethers
        * Input ERC721: [2, 3]
        */
-      await erc20.connect(bob).approve(router.address, ethers.utils.parseEther('49.424242424242424243'));
+      await erc20.connect(bob).approve(router.address, ethers.utils.parseEther('49.42'));
       await router
         .connect(bob)
         .swapTokensForExactNFTs(pair.address, [3, 5, 6, 7, 8, 9], MaxUint256, bob.address, MaxUint256);
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('49.424242424242424243'));
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('49.42'));
       expect(await pair.nftComplement()).to.be.equal(0);
 
       /**

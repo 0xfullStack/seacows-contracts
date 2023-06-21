@@ -3,10 +3,10 @@
   "compilerOptions": {
     "outDir": "dist",
     "allowJs": true,
+    "checkJs": false,
     "target": "es5",
     "allowUnreachableCode": false,
     "noImplicitAny": false,
-    "typeRoots": [ "./typings" ],
     "resolveJsonModule": true,
     "useUnknownInCatchVariables": false,
     "declaration": true,
@@ -15,10 +15,5 @@
   },
   "include": [
       "./**/*"
-  ],
-  "exclude": [
-      "./plugins/**/*",
-      "./typings/**/*",
-      "./dist/**/*" // This is what fixed it!
   ]
 }

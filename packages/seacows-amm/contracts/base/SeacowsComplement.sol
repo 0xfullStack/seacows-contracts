@@ -57,16 +57,6 @@ contract SeacowsComplement is ISeacowsComplement {
         }
     }
 
-    function _getComplementedBalance(
-        address _token,
-        address _collection
-    ) internal view returns (uint256 balance0, uint256 balance1) {
-        balance0 = uint256(int256(IERC20(_token).balanceOf(address(this))) + _tokenComplement);
-        balance1 = uint256(
-            int256(IERC721(_collection).balanceOf(address(this)) * uint256(COMPLEMENT_PRECISION)) + _nftComplement
-        );
-    }
-
     // Expect _nftAmountOut = NFT quantity output * precision
     function _updateComplement(
         uint256 _tokenAmountOut,

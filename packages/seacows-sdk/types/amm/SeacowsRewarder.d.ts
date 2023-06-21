@@ -19,26 +19,54 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
+interface SeacowsRewarderInterface extends ethers.utils.Interface {
   functions: {
+    "ACC_REWARD_PER_SHARE_PRECISION()": FunctionFragment;
+    "accRewardPerShare()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
+    "collect(uint256)": FunctionFragment;
     "collection()": FunctionFragment;
+    "getPendingReward(uint256)": FunctionFragment;
+    "lastRewardBalance()": FunctionFragment;
     "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "positionInfos(uint256)": FunctionFragment;
     "positionManager()": FunctionFragment;
+    "rewardBalance()": FunctionFragment;
     "slot()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "token()": FunctionFragment;
     "totalSupply()": FunctionFragment;
+    "updateReward()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "ACC_REWARD_PER_SHARE_PRECISION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "accRewardPerShare",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "collect",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "collection",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPendingReward",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lastRewardBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -54,7 +82,15 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "positionInfos",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "positionManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rewardBalance",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "slot", values?: undefined): string;
@@ -67,9 +103,30 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     functionFragment: "totalSupply",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "updateReward",
+    values?: undefined
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "ACC_REWARD_PER_SHARE_PRECISION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "accRewardPerShare",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "collect", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getPendingReward",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lastRewardBalance",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "onERC3525Received",
     data: BytesLike
@@ -80,7 +137,15 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "positionInfos",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "positionManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "slot", data: BytesLike): Result;
@@ -93,6 +158,10 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateReward",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Initialized(uint8)": EventFragment;
@@ -103,7 +172,7 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
 
 export type InitializedEvent = TypedEvent<[number] & { version: number }>;
 
-export class SeacowsPairMetadata extends BaseContract {
+export class SeacowsRewarder extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -144,15 +213,33 @@ export class SeacowsPairMetadata extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: SeacowsPairMetadataInterface;
+  interface: SeacowsRewarderInterface;
 
   functions: {
+    ACC_REWARD_PER_SHARE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    accRewardPerShare(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    collect(
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     collection(overrides?: CallOverrides): Promise<[string]>;
+
+    getPendingReward(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    lastRewardBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     onERC3525Received(
       _operator: string,
@@ -176,7 +263,19 @@ export class SeacowsPairMetadata extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    positionInfos(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        rewardDebt: BigNumber;
+        unclaimedReward: BigNumber;
+      }
+    >;
+
     positionManager(overrides?: CallOverrides): Promise<[string]>;
+
+    rewardBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     slot(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -188,14 +287,34 @@ export class SeacowsPairMetadata extends BaseContract {
     token(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    updateReward(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
+
+  ACC_REWARD_PER_SHARE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
   balanceOf(
     _tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  collect(
+    _tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   collection(overrides?: CallOverrides): Promise<string>;
+
+  getPendingReward(
+    _tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  lastRewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   onERC3525Received(
     _operator: string,
@@ -216,7 +335,19 @@ export class SeacowsPairMetadata extends BaseContract {
 
   ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  positionInfos(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      rewardDebt: BigNumber;
+      unclaimedReward: BigNumber;
+    }
+  >;
+
   positionManager(overrides?: CallOverrides): Promise<string>;
+
+  rewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   slot(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -229,13 +360,32 @@ export class SeacowsPairMetadata extends BaseContract {
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+  updateReward(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
+    ACC_REWARD_PER_SHARE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    collect(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
     collection(overrides?: CallOverrides): Promise<string>;
+
+    getPendingReward(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lastRewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC3525Received(
       _operator: string,
@@ -256,7 +406,19 @@ export class SeacowsPairMetadata extends BaseContract {
 
     ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+    positionInfos(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        rewardDebt: BigNumber;
+        unclaimedReward: BigNumber;
+      }
+    >;
+
     positionManager(overrides?: CallOverrides): Promise<string>;
+
+    rewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     slot(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -268,6 +430,8 @@ export class SeacowsPairMetadata extends BaseContract {
     token(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    updateReward(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -281,12 +445,30 @@ export class SeacowsPairMetadata extends BaseContract {
   };
 
   estimateGas: {
+    ACC_REWARD_PER_SHARE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    collect(
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     collection(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getPendingReward(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lastRewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC3525Received(
       _operator: string,
@@ -310,7 +492,14 @@ export class SeacowsPairMetadata extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    positionInfos(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     positionManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    rewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     slot(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -322,15 +511,37 @@ export class SeacowsPairMetadata extends BaseContract {
     token(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    updateReward(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    ACC_REWARD_PER_SHARE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    accRewardPerShare(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    collect(
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     collection(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getPendingReward(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lastRewardBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     onERC3525Received(
       _operator: string,
@@ -354,7 +565,14 @@ export class SeacowsPairMetadata extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    positionInfos(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    rewardBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     slot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -366,5 +584,9 @@ export class SeacowsPairMetadata extends BaseContract {
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    updateReward(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
   };
 }

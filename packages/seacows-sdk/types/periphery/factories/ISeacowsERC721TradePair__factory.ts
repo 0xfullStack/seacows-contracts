@@ -22,14 +22,32 @@ const _abi = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount0",
+        name: "cTokenOut",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount1",
+        name: "cNftOut",
         type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "tokenAmountIn",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "tokenAmountOut",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256[]",
+        name: "idsOut",
+        type: "uint256[]",
       },
       {
         indexed: true,
@@ -53,13 +71,13 @@ const _abi = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount0",
+        name: "tokenAmount",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount1",
+        name: "nftAmount",
         type: "uint256",
       },
     ],
@@ -143,6 +161,32 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "MAX_PROTOCOL_FEE_PERCENT",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "ONE_PERCENT",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "PERCENTAGE_PRECISION",
     outputs: [
       {
@@ -155,7 +199,25 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "POINT_FIVE_PERCENT",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
+      {
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
       {
         internalType: "address",
         name: "to",
@@ -171,13 +233,28 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "amount0",
+        name: "cTokenOut",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "amount1",
+        name: "cNftOut",
         type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "idsOut",
+        type: "uint256[]",
       },
     ],
     stateMutability: "nonpayable",
@@ -198,11 +275,29 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "fee",
+    name: "feePercent",
     outputs: [
       {
         internalType: "uint256",
         name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getComplementedBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "tokenBalance",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "nftBalance",
         type: "uint256",
       },
     ],
@@ -275,6 +370,32 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "protocolFeePercent",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_percent",
+        type: "uint256",
+      },
+    ],
+    name: "setProtocolFeePercent",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -305,6 +426,19 @@ const _abi = [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalSupply",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
