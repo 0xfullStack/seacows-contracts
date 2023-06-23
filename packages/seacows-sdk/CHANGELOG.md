@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.13.2 (2023-06-23)
+
+
+### Features
+
+* update nft renderer ([#11](https://github.com/yolominds/seacows-contracts/issues/11)) ([a204ba1](https://github.com/yolominds/seacows-contracts/commit/a204ba14d15f1c3776d7d30366241f2fd1648769))
+
 ### 1.13.1 (2023-06-21)
 
 ## 1.13.0 (2023-06-21)
