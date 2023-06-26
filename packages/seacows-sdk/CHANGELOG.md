@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.15.0 (2023-06-26)
+
+
+### Features
+
+* add deployed router ([76ece96](https://github.com/yolominds/seacows-contracts/commit/76ece965a5a56570d438091bd1469d5f4c2bffcf))
+
 ## 1.14.0 (2023-06-26)
 
 
