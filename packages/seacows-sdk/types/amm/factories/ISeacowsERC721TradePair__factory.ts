@@ -64,6 +64,25 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
+    ],
+    name: "CollectFee",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
         name: "sender",
         type: "address",
@@ -545,6 +564,39 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "updatePositionFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "updatePositionFeeDebt",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "updateSwapFee",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];

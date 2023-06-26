@@ -26,19 +26,21 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     "balanceOf(uint256)": FunctionFragment;
     "collect(uint256)": FunctionFragment;
     "collection()": FunctionFragment;
-    "getPendingReward(uint256)": FunctionFragment;
-    "lastRewardBalance()": FunctionFragment;
+    "feeBalance()": FunctionFragment;
+    "getPendingFee(uint256)": FunctionFragment;
+    "lastFeeBalance()": FunctionFragment;
     "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "positionInfos(uint256)": FunctionFragment;
     "positionManager()": FunctionFragment;
-    "rewardBalance()": FunctionFragment;
     "slot()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "token()": FunctionFragment;
     "totalSupply()": FunctionFragment;
-    "updateReward()": FunctionFragment;
+    "updatePositionFee(uint256)": FunctionFragment;
+    "updatePositionFeeDebt(uint256)": FunctionFragment;
+    "updateSwapFee()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -62,11 +64,15 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getPendingReward",
+    functionFragment: "feeBalance",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPendingFee",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "lastRewardBalance",
+    functionFragment: "lastFeeBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -89,10 +95,6 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     functionFragment: "positionManager",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "rewardBalance",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "slot", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -104,7 +106,15 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "updateReward",
+    functionFragment: "updatePositionFee",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updatePositionFeeDebt",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateSwapFee",
     values?: undefined
   ): string;
 
@@ -119,12 +129,13 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collect", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "feeBalance", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getPendingReward",
+    functionFragment: "getPendingFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "lastRewardBalance",
+    functionFragment: "lastFeeBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -144,10 +155,6 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     functionFragment: "positionManager",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "rewardBalance",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "slot", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
@@ -159,16 +166,30 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "updateReward",
+    functionFragment: "updatePositionFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePositionFeeDebt",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateSwapFee",
     data: BytesLike
   ): Result;
 
   events: {
+    "CollectFee(uint256,uint256)": EventFragment;
     "Initialized(uint8)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "CollectFee"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
 }
+
+export type CollectFeeEvent = TypedEvent<
+  [BigNumber, BigNumber] & { tokenId: BigNumber; fee: BigNumber }
+>;
 
 export type InitializedEvent = TypedEvent<[number] & { version: number }>;
 
@@ -234,12 +255,14 @@ export class SeacowsRewarder extends BaseContract {
 
     collection(overrides?: CallOverrides): Promise<[string]>;
 
-    getPendingReward(
+    feeBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getPendingFee(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    lastRewardBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
+    lastFeeBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     onERC3525Received(
       _operator: string,
@@ -267,15 +290,10 @@ export class SeacowsRewarder extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & {
-        rewardDebt: BigNumber;
-        unclaimedReward: BigNumber;
-      }
+      [BigNumber, BigNumber] & { feeDebt: BigNumber; unclaimedFee: BigNumber }
     >;
 
     positionManager(overrides?: CallOverrides): Promise<[string]>;
-
-    rewardBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     slot(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -288,7 +306,17 @@ export class SeacowsRewarder extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    updateReward(
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateSwapFee(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -309,12 +337,14 @@ export class SeacowsRewarder extends BaseContract {
 
   collection(overrides?: CallOverrides): Promise<string>;
 
-  getPendingReward(
+  feeBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getPendingFee(
     _tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  lastRewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
+  lastFeeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   onERC3525Received(
     _operator: string,
@@ -339,15 +369,10 @@ export class SeacowsRewarder extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber] & {
-      rewardDebt: BigNumber;
-      unclaimedReward: BigNumber;
-    }
+    [BigNumber, BigNumber] & { feeDebt: BigNumber; unclaimedFee: BigNumber }
   >;
 
   positionManager(overrides?: CallOverrides): Promise<string>;
-
-  rewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   slot(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -360,7 +385,17 @@ export class SeacowsRewarder extends BaseContract {
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-  updateReward(
+  updatePositionFee(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updatePositionFeeDebt(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateSwapFee(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -376,16 +411,21 @@ export class SeacowsRewarder extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    collect(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    collection(overrides?: CallOverrides): Promise<string>;
-
-    getPendingReward(
+    collect(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    lastRewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
+    collection(overrides?: CallOverrides): Promise<string>;
+
+    feeBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getPendingFee(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lastFeeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC3525Received(
       _operator: string,
@@ -410,15 +450,10 @@ export class SeacowsRewarder extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & {
-        rewardDebt: BigNumber;
-        unclaimedReward: BigNumber;
-      }
+      [BigNumber, BigNumber] & { feeDebt: BigNumber; unclaimedFee: BigNumber }
     >;
 
     positionManager(overrides?: CallOverrides): Promise<string>;
-
-    rewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     slot(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -431,10 +466,36 @@ export class SeacowsRewarder extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    updateReward(overrides?: CallOverrides): Promise<void>;
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateSwapFee(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
+    "CollectFee(uint256,uint256)"(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
+    >;
+
+    CollectFee(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
+    >;
+
     "Initialized(uint8)"(
       version?: null
     ): TypedEventFilter<[number], { version: number }>;
@@ -463,12 +524,14 @@ export class SeacowsRewarder extends BaseContract {
 
     collection(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getPendingReward(
+    feeBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getPendingFee(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    lastRewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
+    lastFeeBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC3525Received(
       _operator: string,
@@ -499,8 +562,6 @@ export class SeacowsRewarder extends BaseContract {
 
     positionManager(overrides?: CallOverrides): Promise<BigNumber>;
 
-    rewardBalance(overrides?: CallOverrides): Promise<BigNumber>;
-
     slot(overrides?: CallOverrides): Promise<BigNumber>;
 
     supportsInterface(
@@ -512,7 +573,17 @@ export class SeacowsRewarder extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    updateReward(
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateSwapFee(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -536,12 +607,14 @@ export class SeacowsRewarder extends BaseContract {
 
     collection(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getPendingReward(
+    feeBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getPendingFee(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    lastRewardBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    lastFeeBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     onERC3525Received(
       _operator: string,
@@ -572,8 +645,6 @@ export class SeacowsRewarder extends BaseContract {
 
     positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    rewardBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     slot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     supportsInterface(
@@ -585,7 +656,17 @@ export class SeacowsRewarder extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    updateReward(
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateSwapFee(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

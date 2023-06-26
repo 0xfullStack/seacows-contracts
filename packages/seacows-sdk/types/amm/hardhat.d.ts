@@ -205,6 +205,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISeacowsPositionManager__factory>;
     getContractFactory(
+      name: "ISeacowsRewarder",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ISeacowsRewarder__factory>;
+    getContractFactory(
       name: "IWETH",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IWETH__factory>;
@@ -481,6 +485,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ISeacowsPositionManager>;
+    getContractAt(
+      name: "ISeacowsRewarder",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ISeacowsRewarder>;
     getContractAt(
       name: "IWETH",
       address: string,

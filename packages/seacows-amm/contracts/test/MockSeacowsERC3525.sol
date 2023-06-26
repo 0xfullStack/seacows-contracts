@@ -18,4 +18,10 @@ contract MockSeacowsERC3525 is SeacowsERC3525 {
   function burnValue(uint _tokenId, uint _value) public {
     _burnValue(_tokenId, _value);
   }
+
+  function setSlotPair(uint _slot, address _pair) public {
+    pairSlots[_pair] = _slot;
+    slotPairs[_slot] = _pair;
+    pairTokenIds[_pair] = 0;
+  }
 }

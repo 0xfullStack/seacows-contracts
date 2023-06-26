@@ -35,9 +35,13 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "pairSlots(address)": FunctionFragment;
+    "pairTokenIds(address)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setSlotPair(uint256,address)": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
+    "slotPairs(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -96,6 +100,11 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "pairSlots", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "pairTokenIds",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish]
@@ -105,7 +114,15 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "setSlotPair",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "slotOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "slotPairs",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -174,6 +191,11 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pairSlots", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pairTokenIds",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
@@ -182,7 +204,12 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setSlotPair",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "slotPairs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
@@ -409,6 +436,10 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { owner_: string }>;
 
+    pairSlots(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -430,10 +461,18 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setSlotPair(
+      _slot: BigNumberish,
+      _pair: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     slotOf(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
@@ -567,6 +606,10 @@ export class MockSeacowsERC3525 extends BaseContract {
 
   ownerOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
   "safeTransferFrom(address,address,uint256)"(
     from_: string,
     to_: string,
@@ -588,7 +631,15 @@ export class MockSeacowsERC3525 extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setSlotPair(
+    _slot: BigNumberish,
+    _pair: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   slotOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+  slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -719,6 +770,10 @@ export class MockSeacowsERC3525 extends BaseContract {
 
     ownerOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+    pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -740,10 +795,18 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setSlotPair(
+      _slot: BigNumberish,
+      _pair: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     slotOf(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -999,6 +1062,10 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -1020,8 +1087,19 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setSlotPair(
+      _slot: BigNumberish,
+      _pair: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     slotOf(
       tokenId_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    slotPairs(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1163,6 +1241,16 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    pairSlots(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    pairTokenIds(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -1184,8 +1272,19 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    setSlotPair(
+      _slot: BigNumberish,
+      _pair: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     slotOf(
       tokenId_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    slotPairs(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

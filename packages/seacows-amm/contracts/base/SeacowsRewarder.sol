@@ -15,8 +15,8 @@ import { SeacowsPairMetadata } from "./SeacowsPairMetadata.sol";
 contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
   uint256 public accRewardPerShare;
 
-  uint256 public rewardBalance;
-  uint256 public lastRewardBalance;
+  uint256 public feeBalance;
+  uint256 public lastFeeBalance;
 
   // Position NFT ID => PositionInfo
   mapping(uint256 => PositionInfo) public positionInfos;
@@ -28,12 +28,12 @@ contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
     uint256 unclaimedFee;
   }
 
-  function getPendingReward(uint _tokenId) public virtual view returns (uint256) {
+  function getPendingFee(uint _tokenId) public virtual view returns (uint256) {
     PositionInfo storage _info = positionInfos[_tokenId];
 
     uint _accRewardTokenPerShare = accRewardPerShare;
-    if (rewardBalance != lastRewardBalance) {
-      _accRewardTokenPerShare += (rewardBalance - lastRewardBalance) * ACC_REWARD_PER_SHARE_PRECISION / totalSupply();
+    if (feeBalance != lastFeeBalance) {
+      _accRewardTokenPerShare += (feeBalance - lastFeeBalance) * ACC_REWARD_PER_SHARE_PRECISION / totalSupply();
     }
     return _info.unclaimedFee + balanceOf(_tokenId) * _accRewardTokenPerShare / ACC_REWARD_PER_SHARE_PRECISION - _info.feeDebt;
   }
@@ -42,12 +42,12 @@ contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
     uint256 _totalLiquidity = totalSupply();
 
     // Any swap fee accured
-    if (rewardBalance == lastRewardBalance || _totalLiquidity == 0) {
+    if (feeBalance == lastFeeBalance || _totalLiquidity == 0) {
       return;
     }
 
-    accRewardPerShare += (rewardBalance - lastRewardBalance) * ACC_REWARD_PER_SHARE_PRECISION / _totalLiquidity;
-    lastRewardBalance = rewardBalance;
+    accRewardPerShare += (feeBalance - lastFeeBalance) * ACC_REWARD_PER_SHARE_PRECISION / _totalLiquidity;
+    lastFeeBalance = feeBalance;
   }
 
   function updatePositionFee(uint tokenId) public onlyPositionManager {
@@ -57,10 +57,9 @@ contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
     if (liquidity != 0) {
       uint256 _pending = liquidity * accRewardPerShare / ACC_REWARD_PER_SHARE_PRECISION - info.feeDebt;
       if (_pending != 0) {
-        info.unclaimedFee = info.unclaimedFee + _pending;
+        info.unclaimedFee += _pending;
       }
     }
-    info.feeDebt = (liquidity) * accRewardPerShare / ACC_REWARD_PER_SHARE_PRECISION;
   }
 
   function updatePositionFeeDebt(uint tokenId) public onlyPositionManager {
@@ -69,22 +68,24 @@ contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
     info.feeDebt = liquidity * accRewardPerShare / ACC_REWARD_PER_SHARE_PRECISION;
   }
 
-  function collect(uint256 _tokenId) public {
+  /**
+    @notice Collect Swap fee for Position NFT
+    @param _tokenId The Position NFT ID t contract address
+    */
+  function collect(uint256 _tokenId) public returns (uint _fee){
     updateSwapFee();
-    uint256 _rewardAmount = getPendingReward(_tokenId);
+    uint256 _feeAmount = getPendingFee(_tokenId);
     positionInfos[_tokenId].unclaimedFee = 0;
 
     PositionInfo storage _info = positionInfos[_tokenId];
 
     _info.feeDebt = balanceOf(_tokenId) * accRewardPerShare / ACC_REWARD_PER_SHARE_PRECISION;
 
-    uint _reward = _rewardAmount > rewardBalance
-      ? lastRewardBalance - rewardBalance
-      : lastRewardBalance - _rewardAmount;
-    lastRewardBalance -= _reward;
-    rewardBalance -= _reward;
-    IERC20(token).transfer(ownerOf(_tokenId), _rewardAmount);
+    _fee = _feeAmount > feeBalance ? feeBalance : _feeAmount;
+    lastFeeBalance -= _fee;
+    feeBalance -= _fee;
+    IERC20(token).transfer(ownerOf(_tokenId), _fee);
 
-    // emit ClaimReward(_msgSender(), address(_rewardToken), _rewardAmount);
+    emit CollectFee(_tokenId, _fee);
   }
 }

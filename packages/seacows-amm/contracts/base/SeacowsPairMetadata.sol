@@ -21,7 +21,7 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
   address private _positionManager;
 
   modifier onlyPositionManager() {
-    require(_positionManager == msg.sender, "SeacowsPairMetadata");
+    require(_positionManager == msg.sender, "SeacowsPairMetadata: ONLY_POSITION_MANAGER");
     _;
   }
 

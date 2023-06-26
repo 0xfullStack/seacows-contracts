@@ -3,6 +3,25 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fee",
+        "type": "uint256"
+      }
+    ],
+    "name": "CollectFee",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "uint8",
         "name": "version",
@@ -66,7 +85,13 @@
       }
     ],
     "name": "collect",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fee",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -84,6 +109,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "feeBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -91,7 +129,7 @@
         "type": "uint256"
       }
     ],
-    "name": "getPendingReward",
+    "name": "getPendingFee",
     "outputs": [
       {
         "internalType": "uint256",
@@ -104,7 +142,7 @@
   },
   {
     "inputs": [],
-    "name": "lastRewardBalance",
+    "name": "lastFeeBalance",
     "outputs": [
       {
         "internalType": "uint256",
@@ -219,12 +257,12 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "rewardDebt",
+        "name": "feeDebt",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "unclaimedReward",
+        "name": "unclaimedFee",
         "type": "uint256"
       }
     ],
@@ -239,19 +277,6 @@
         "internalType": "contract ISeacowsPositionManager",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "rewardBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -316,8 +341,34 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "updatePositionFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "updatePositionFeeDebt",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "updateReward",
+    "name": "updateSwapFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

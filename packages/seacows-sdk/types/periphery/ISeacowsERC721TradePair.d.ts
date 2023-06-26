@@ -26,18 +26,26 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "ONE_PERCENT()": FunctionFragment;
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "POINT_FIVE_PERCENT()": FunctionFragment;
+    "balanceOf(uint256)": FunctionFragment;
     "burn(address,address,uint256[])": FunctionFragment;
     "collection()": FunctionFragment;
     "feePercent()": FunctionFragment;
+    "getComplemenetedAssetsOut(int256,int256)": FunctionFragment;
     "getComplementedBalance()": FunctionFragment;
     "getReserves()": FunctionFragment;
     "initialize(address,address,uint112)": FunctionFragment;
     "mint(uint256)": FunctionFragment;
+    "nftComplement()": FunctionFragment;
+    "ownerOf(uint256)": FunctionFragment;
     "protocolFeePercent()": FunctionFragment;
     "setProtocolFeePercent(uint256)": FunctionFragment;
     "swap(uint256,uint256[],address)": FunctionFragment;
     "token()": FunctionFragment;
+    "tokenComplement()": FunctionFragment;
     "totalSupply()": FunctionFragment;
+    "updatePositionFee(uint256)": FunctionFragment;
+    "updatePositionFeeDebt(uint256)": FunctionFragment;
+    "updateSwapFee()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -61,6 +69,10 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "balanceOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "burn",
     values: [string, string, BigNumberish[]]
   ): string;
@@ -71,6 +83,10 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "feePercent",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getComplemenetedAssetsOut",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getComplementedBalance",
@@ -86,6 +102,14 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
   encodeFunctionData(
+    functionFragment: "nftComplement",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ownerOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "protocolFeePercent",
     values?: undefined
   ): string;
@@ -99,7 +123,23 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "tokenComplement",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "totalSupply",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updatePositionFee",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updatePositionFeeDebt",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateSwapFee",
     values?: undefined
   ): string;
 
@@ -123,9 +163,14 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     functionFragment: "POINT_FIVE_PERCENT",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feePercent", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getComplemenetedAssetsOut",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getComplementedBalance",
     data: BytesLike
@@ -137,6 +182,11 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "nftComplement",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "protocolFeePercent",
     data: BytesLike
   ): Result;
@@ -147,7 +197,23 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "tokenComplement",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePositionFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePositionFeeDebt",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateSwapFee",
     data: BytesLike
   ): Result;
 
@@ -253,6 +319,11 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     burn(
       from: string,
       to: string,
@@ -263,6 +334,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
     collection(overrides?: CallOverrides): Promise<[string]>;
 
     feePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
+      }
+    >;
 
     getComplementedBalance(
       overrides?: CallOverrides
@@ -295,10 +379,17 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    nftComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    ownerOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     protocolFeePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     setProtocolFeePercent(
-      _percent: BigNumberish,
+      _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -311,7 +402,23 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     token(overrides?: CallOverrides): Promise<[string]>;
 
+    tokenComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateSwapFee(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -324,6 +431,11 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
   POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+  balanceOf(
+    _tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   burn(
     from: string,
     to: string,
@@ -334,6 +446,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
   collection(overrides?: CallOverrides): Promise<string>;
 
   feePercent(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getComplemenetedAssetsOut(
+    _tokenAmountOut: BigNumberish,
+    _nftAmountOut: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      tokenAmountOut: BigNumber;
+      nftAmountOut: BigNumber;
+      newTokenComplement: BigNumber;
+      newNftComplement: BigNumber;
+    }
+  >;
 
   getComplementedBalance(
     overrides?: CallOverrides
@@ -363,10 +488,14 @@ export class ISeacowsERC721TradePair extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+  ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
   protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
   setProtocolFeePercent(
-    _percent: BigNumberish,
+    _protocolFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -379,7 +508,23 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
   token(overrides?: CallOverrides): Promise<string>;
 
+  tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+  updatePositionFee(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updatePositionFeeDebt(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateSwapFee(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -391,6 +536,11 @@ export class ISeacowsERC721TradePair extends BaseContract {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     burn(
       from: string,
@@ -410,6 +560,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
     collection(overrides?: CallOverrides): Promise<string>;
 
     feePercent(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        tokenAmountOut: BigNumber;
+        nftAmountOut: BigNumber;
+        newTokenComplement: BigNumber;
+        newNftComplement: BigNumber;
+      }
+    >;
 
     getComplementedBalance(
       overrides?: CallOverrides
@@ -442,10 +605,14 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
     protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
     setProtocolFeePercent(
-      _percent: BigNumberish,
+      _protocolFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -458,7 +625,21 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     token(overrides?: CallOverrides): Promise<string>;
 
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateSwapFee(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -588,6 +769,11 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     burn(
       from: string,
       to: string,
@@ -598,6 +784,12 @@ export class ISeacowsERC721TradePair extends BaseContract {
     collection(overrides?: CallOverrides): Promise<BigNumber>;
 
     feePercent(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getComplementedBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -615,10 +807,17 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    nftComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ownerOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
     setProtocolFeePercent(
-      _percent: BigNumberish,
+      _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -631,7 +830,23 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     token(overrides?: CallOverrides): Promise<BigNumber>;
 
+    tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
+
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateSwapFee(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -653,6 +868,11 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     burn(
       from: string,
       to: string,
@@ -663,6 +883,12 @@ export class ISeacowsERC721TradePair extends BaseContract {
     collection(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     feePercent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getComplemenetedAssetsOut(
+      _tokenAmountOut: BigNumberish,
+      _nftAmountOut: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getComplementedBalance(
       overrides?: CallOverrides
@@ -682,12 +908,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    nftComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    ownerOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     protocolFeePercent(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     setProtocolFeePercent(
-      _percent: BigNumberish,
+      _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -700,6 +933,22 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    tokenComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateSwapFee(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
   };
 }

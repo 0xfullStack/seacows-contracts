@@ -57,6 +57,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISeacowsERC721TradePair__factory>;
     getContractFactory(
+      name: "ISeacowsPairMetadata",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ISeacowsPairMetadata__factory>;
+    getContractFactory(
+      name: "ISeacowsRewarder",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ISeacowsRewarder__factory>;
+    getContractFactory(
       name: "ISeacowsRouter",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISeacowsRouter__factory>;
@@ -136,6 +144,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ISeacowsERC721TradePair>;
+    getContractAt(
+      name: "ISeacowsPairMetadata",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ISeacowsPairMetadata>;
+    getContractAt(
+      name: "ISeacowsRewarder",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ISeacowsRewarder>;
     getContractAt(
       name: "ISeacowsRouter",
       address: string,

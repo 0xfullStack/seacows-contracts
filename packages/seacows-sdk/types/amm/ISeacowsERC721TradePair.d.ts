@@ -43,6 +43,9 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "token()": FunctionFragment;
     "tokenComplement()": FunctionFragment;
     "totalSupply()": FunctionFragment;
+    "updatePositionFee(uint256)": FunctionFragment;
+    "updatePositionFeeDebt(uint256)": FunctionFragment;
+    "updateSwapFee()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -127,6 +130,18 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     functionFragment: "totalSupply",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "updatePositionFee",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updatePositionFeeDebt",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateSwapFee",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "COMPLEMENT_PRECISION",
@@ -189,15 +204,29 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePositionFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePositionFeeDebt",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateSwapFee",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Burn(address,uint256,uint256,uint256,uint256,uint256[],address)": EventFragment;
+    "CollectFee(uint256,uint256)": EventFragment;
     "Mint(address,uint256,uint256)": EventFragment;
     "Swap(address,uint256,uint256,uint256,uint256,address)": EventFragment;
     "Sync(uint112,uint112)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Burn"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CollectFee"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Swap"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Sync"): EventFragment;
@@ -213,6 +242,10 @@ export type BurnEvent = TypedEvent<
     idsOut: BigNumber[];
     to: string;
   }
+>;
+
+export type CollectFeeEvent = TypedEvent<
+  [BigNumber, BigNumber] & { tokenId: BigNumber; fee: BigNumber }
 >;
 
 export type MintEvent = TypedEvent<
@@ -378,6 +411,20 @@ export class ISeacowsERC721TradePair extends BaseContract {
     tokenComplement(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateSwapFee(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -470,6 +517,20 @@ export class ISeacowsERC721TradePair extends BaseContract {
   tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+  updatePositionFee(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updatePositionFeeDebt(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateSwapFee(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
     COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -573,6 +634,18 @@ export class ISeacowsERC721TradePair extends BaseContract {
     tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateSwapFee(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -616,6 +689,22 @@ export class ISeacowsERC721TradePair extends BaseContract {
         idsOut: BigNumber[];
         to: string;
       }
+    >;
+
+    "CollectFee(uint256,uint256)"(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
+    >;
+
+    CollectFee(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
     >;
 
     "Mint(address,uint256,uint256)"(
@@ -766,6 +855,20 @@ export class ISeacowsERC721TradePair extends BaseContract {
     tokenComplement(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateSwapFee(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -855,5 +958,19 @@ export class ISeacowsERC721TradePair extends BaseContract {
     tokenComplement(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    updatePositionFee(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updatePositionFeeDebt(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateSwapFee(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
   };
 }

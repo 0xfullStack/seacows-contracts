@@ -3,7 +3,7 @@ import { type Environment, type SupportedChain, addresses } from '@yolominds/sea
 // import { addresses } from '../deployed';
 import { save } from './utils';
 
-export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers, network }) => {
+export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers, network, run }) => {
   const chainId = network.config.chainId as SupportedChain;
   const { weth } = addresses[env][chainId];
 
@@ -27,6 +27,25 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     const manager = await SeacowsPositionManagerFC.deploy(template.address, weth);
     await manager.deployed();
     await save(env, network.name, 'SeacowsPositionManager', manager.address);
+
+    console.log('Start verifying contracts...');
+
+    await run('verify:verify', {
+      address: lib.address,
+      constructorArguments: [],
+    });
+
+    await run('verify:verify', {
+      address: template.address,
+      constructorArguments: [],
+    });
+
+    await run('verify:verify', {
+      address: manager.address,
+      constructorArguments: [template.address, weth],
+    });
+
+    console.log('All contracts Verified!!!');
   } catch (error) {
     console.error('Error meesage:', error.message);
   }

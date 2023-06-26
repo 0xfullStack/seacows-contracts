@@ -46,6 +46,8 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "pairOfSlot(uint256)": FunctionFragment;
+    "pairSlots(address)": FunctionFragment;
+    "pairTokenIds(address)": FunctionFragment;
     "removeLiquidity(address,address,uint112,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
     "removeLiquidityETH(address,uint112,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -55,6 +57,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "setFeeTo(address)": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotOfPair(address)": FunctionFragment;
+    "slotPairs(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -174,6 +177,11 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "pairOfSlot",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "pairSlots", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "pairTokenIds",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "removeLiquidity",
     values: [
@@ -231,6 +239,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "slotOfPair", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "slotPairs",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "slotURI",
     values: [BigNumberish]
@@ -322,6 +334,11 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pairOfSlot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pairSlots", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pairTokenIds",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "removeLiquidity",
     data: BytesLike
@@ -349,6 +366,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "setFeeTo", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOfPair", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "slotPairs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
@@ -655,6 +673,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    pairSlots(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
     removeLiquidity(
       token: string,
       collection: string,
@@ -732,6 +754,8 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<[BigNumber]>;
 
     slotOfPair(_pair: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
@@ -932,6 +956,10 @@ export class SeacowsPositionManager extends BaseContract {
 
   pairOfSlot(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
   removeLiquidity(
     token: string,
     collection: string,
@@ -1006,6 +1034,8 @@ export class SeacowsPositionManager extends BaseContract {
   slotOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
   slotOfPair(_pair: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -1224,6 +1254,10 @@ export class SeacowsPositionManager extends BaseContract {
 
     pairOfSlot(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+    pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     removeLiquidity(
       token: string,
       collection: string,
@@ -1311,6 +1345,8 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<BigNumber>;
 
     slotOfPair(_pair: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -1667,6 +1703,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     removeLiquidity(
       token: string,
       collection: string,
@@ -1744,6 +1784,11 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<BigNumber>;
 
     slotOfPair(_pair: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    slotPairs(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1955,6 +2000,16 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    pairSlots(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    pairTokenIds(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     removeLiquidity(
       token: string,
       collection: string,
@@ -2033,6 +2088,11 @@ export class SeacowsPositionManager extends BaseContract {
 
     slotOfPair(
       _pair: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    slotPairs(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

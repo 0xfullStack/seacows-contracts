@@ -214,6 +214,25 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "balanceOf",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "from",
         type: "address",
@@ -281,6 +300,45 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "int256",
+        name: "_tokenAmountOut",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "_nftAmountOut",
+        type: "int256",
+      },
+    ],
+    name: "getComplemenetedAssetsOut",
+    outputs: [
+      {
+        internalType: "int256",
+        name: "tokenAmountOut",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "nftAmountOut",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "newTokenComplement",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "newNftComplement",
+        type: "int256",
       },
     ],
     stateMutability: "view",
@@ -371,6 +429,38 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "nftComplement",
+    outputs: [
+      {
+        internalType: "int256",
+        name: "",
+        type: "int256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "ownerOf",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "protocolFeePercent",
     outputs: [
       {
@@ -386,7 +476,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_percent",
+        name: "_protocolFee",
         type: "uint256",
       },
     ],
@@ -433,6 +523,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "tokenComplement",
+    outputs: [
+      {
+        internalType: "int256",
+        name: "",
+        type: "int256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "totalSupply",
     outputs: [
       {
@@ -442,6 +545,39 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "updatePositionFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "updatePositionFeeDebt",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "updateSwapFee",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];

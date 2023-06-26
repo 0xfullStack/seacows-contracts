@@ -46,6 +46,7 @@ export type { ISeacowsERC721TradePair } from "./ISeacowsERC721TradePair";
 export type { ISeacowsERC721TradePairFactory } from "./ISeacowsERC721TradePairFactory";
 export type { ISeacowsPairMetadata } from "./ISeacowsPairMetadata";
 export type { ISeacowsPositionManager } from "./ISeacowsPositionManager";
+export type { ISeacowsRewarder } from "./ISeacowsRewarder";
 export type { IWETH } from "./IWETH";
 export type { NFTRenderer } from "./NFTRenderer";
 export type { SeacowsERC721TradePair } from "./SeacowsERC721TradePair";
@@ -101,6 +102,7 @@ export { ISeacowsERC721TradePair__factory } from "./factories/ISeacowsERC721Trad
 export { ISeacowsERC721TradePairFactory__factory } from "./factories/ISeacowsERC721TradePairFactory__factory";
 export { ISeacowsPairMetadata__factory } from "./factories/ISeacowsPairMetadata__factory";
 export { ISeacowsPositionManager__factory } from "./factories/ISeacowsPositionManager__factory";
+export { ISeacowsRewarder__factory } from "./factories/ISeacowsRewarder__factory";
 export { IWETH__factory } from "./factories/IWETH__factory";
 export { NFTRenderer__factory } from "./factories/NFTRenderer__factory";
 export { SeacowsERC721TradePair__factory } from "./factories/SeacowsERC721TradePair__factory";

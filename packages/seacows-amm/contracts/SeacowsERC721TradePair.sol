@@ -59,7 +59,7 @@ contract SeacowsERC721TradePair is
     }
 
     function getComplementedBalance() public view returns (uint256 tokenBalance, uint256 nftBalance) {
-        tokenBalance = uint256(int256(IERC20(token).balanceOf(address(this))) + tokenComplement()) - rewardBalance;
+        tokenBalance = uint256(int256(IERC20(token).balanceOf(address(this))) + tokenComplement()) - feeBalance;
         nftBalance = uint256(
             int256(IERC721(collection).balanceOf(address(this)) * uint256(COMPLEMENT_PRECISION)) + nftComplement()
         );
@@ -157,7 +157,7 @@ contract SeacowsERC721TradePair is
 
     // this low-level function should be called from a contract which performs important safety checks
     function swap(uint tokenAmountOut, uint[] memory idsOut, address to) external nonReentrant {
-        require(tokenAmountOut > 0 || idsOut.length > 0, 'Seacows: INSUFFICIENT_OUTPUT_AMOUNT');
+        require(tokenAmountOut > 0 || idsOut.length > 0, 'SeacowsERC721TradePair: INSUFFICIENT_OUTPUT_AMOUNT');
         (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
         require(tokenAmountOut < _reserve0 && idsOut.length < _reserve1, 'Seacows: INSUFFICIENT_LIQUIDITY');
 
@@ -167,7 +167,7 @@ contract SeacowsERC721TradePair is
             // scope for _token{0,1}, avoids stack too deep errors
             address _token = token;
             address _collection = collection;
-            require(to != _token && to != _collection, 'Seacows: INVALID_TO');
+            require(to != _token && to != _collection, 'SeacowsERC721TradePair: INVALID_TO');
             if (tokenAmountOut > 0) IERC20(_token).transfer(to, tokenAmountOut); // optimistically transfer tokens
             if (idsOut.length > 0) {
                 for (uint i = 0; i < idsOut.length; i++) {
@@ -235,7 +235,7 @@ contract SeacowsERC721TradePair is
                 tokenInAfterFee = tokenAmountIn * PERCENTAGE_PRECISION / (PERCENTAGE_PRECISION + protocolFeePercent + feePercent);
                 IERC20(token).transfer(_feeTo, tokenInAfterFee * protocolFeePercent / PERCENTAGE_PRECISION);
             }
-            rewardBalance += tokenInAfterFee * feePercent / PERCENTAGE_PRECISION;
+            feeBalance += tokenInAfterFee * feePercent / PERCENTAGE_PRECISION;
         }
         if (tokenAmountOut > 0) {
             uint tokenOutBeforeFee;
@@ -245,7 +245,7 @@ contract SeacowsERC721TradePair is
             } else {
                 tokenOutBeforeFee = tokenAmountOut / (PERCENTAGE_PRECISION - feePercent);
             }
-            rewardBalance += tokenOutBeforeFee * feePercent / PERCENTAGE_PRECISION;
+            feeBalance += tokenOutBeforeFee * feePercent / PERCENTAGE_PRECISION;
         }
     }
 
