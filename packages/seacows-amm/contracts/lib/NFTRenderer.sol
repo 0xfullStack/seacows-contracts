@@ -20,8 +20,7 @@ library NFTRenderer {
     function render(RenderParams memory params) public pure returns (string memory) {
         string memory image = string.concat(
             '<svg width="800" height="1066" viewBox="0 0 800 1066" fill="none" xmlns="http://www.w3.org/2000/svg" >',
-            '<style> .text-quantico { font-family: "Quantico"; font-weight: bold; } .text-lg { font-size: 48px; } .text-md { font-size: 32px; } .text-sm { font-size: 18px; } .text-addr { letter-spacing: .3rem; }</style>',
-            '<defs> <style type="text/css"> @import url("https://fonts.googleapis.com/css?family=Quantico:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic"); </style> </defs>',
+            '<style> .text-quantico { font-family: Arial, sans-serif; font-weight: bold; } .text-lg { font-size: 48px; } .text-md { font-size: 32px; } .text-sm { font-size: 18px; } .text-addr { letter-spacing: .3rem; }</style>',
             renderForeground(),
             renderSnow(),
             renderCurve(),
@@ -186,7 +185,7 @@ library NFTRenderer {
 
     function renderId(uint256 _id) internal pure returns (string memory id) {
         id = string.concat(
-            '<text x="516.632" y="158.72" fill="black" class="text-quantico text-md">',
+            '<text x="41.36" y="158.72" fill="black" class="text-quantico text-md">',
             '#',
             Strings.toString(_id),
             '</text>'
@@ -198,7 +197,7 @@ library NFTRenderer {
         string memory nftSymbol
     ) internal pure returns (string memory symbol) {
         symbol = string.concat(
-            '<text x="516.632" y="200.4" fill="black" class="text-quantico text-lg">',
+            '<text x="41.36" y="200.4" fill="black" class="text-quantico text-lg">',
             nftSymbol,
             '/',
             tokenSymbol,
@@ -208,7 +207,7 @@ library NFTRenderer {
 
     function renderPoolShare(uint256 _poolShare) internal pure returns (string memory poolShare) {
         poolShare = string.concat(
-            '<text x="260.08" y="874" fill="black" class="text-quantico text-lg">',
+            '<text x="41.36" y="874" fill="black" class="text-quantico text-lg">',
             'Pool Share: ',
             convertToFloatString(_poolShare),
             '%',
@@ -218,7 +217,7 @@ library NFTRenderer {
 
     function renderSwapFee(uint256 _swapFee) internal pure returns (string memory swapFee) {
         swapFee = string.concat(
-            '<text x="260.08" y="803.96" fill="black" class="text-quantico text-lg">',
+            '<text x="41.36" y="803.96" fill="black" class="text-quantico text-lg">',
             'Swap Fee: ',
             convertToFloatString(_swapFee),
             '%',

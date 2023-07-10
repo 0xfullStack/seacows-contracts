@@ -16,7 +16,12 @@ import {ISeacowsERC721TradePair} from './interfaces/ISeacowsERC721TradePair.sol'
 import {IWETH} from './interfaces/IWETH.sol';
 import {NFTRenderer} from './lib/NFTRenderer.sol';
 
-contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory, FeeManagement, ISeacowsPositionManager {
+contract SeacowsPositionManager is
+    SeacowsERC3525,
+    SeacowsERC721TradePairFactory,
+    FeeManagement,
+    ISeacowsPositionManager
+{
     using Counters for Counters.Counter;
 
     uint256 public constant PERCENTAGE_PRECISION = 10 ** 4;
@@ -88,7 +93,9 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         } else {
             require(idsDesired.length > 0, 'SeacowsPositionManager: INSUFFICIENT_AMOUNT');
             require(tokenReserve > 0 && nftReserve > 0, 'SeacowsPositionManager: INSUFFICIENT_LIQUIDITY');
-            uint tokenOptimal = (idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION() * tokenReserve) / nftReserve;
+            uint tokenOptimal = (idsDesired.length *
+                ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION() *
+                tokenReserve) / nftReserve;
             require(
                 tokenOptimal <= tokenDesired && tokenOptimal >= tokenMin,
                 'SeacowsPositionManager: INSUFFICIENT_B_AMOUNT'
@@ -384,7 +391,7 @@ contract SeacowsPositionManager is SeacowsERC3525, SeacowsERC721TradePairFactory
         string memory tokenSymbol = ERC20(pair.token()).symbol();
         string memory collectionSymbol = ERC721(pair.collection()).symbol();
         uint256 fee = pair.feePercent();
-        uint256 poolShare = (balanceOf(tokenId) * PERCENTAGE_PRECISION) / totalSupply();
+        uint256 poolShare = (balanceOf(tokenId) * PERCENTAGE_PRECISION * 100) / totalValueSupplyOf(slotId);
 
         return
             NFTRenderer.render(
