@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.16.0 (2023-07-12)
+
+
+### Features
+
+* added royalty fee ([#14](https://github.com/yolominds/seacows-contracts/issues/14)) ([493abab](https://github.com/yolominds/seacows-contracts/commit/493abab3bec2180b06d6727ecbbcb61cce24b076))
+
 ### 1.15.1 (2023-07-10)
 
 ## 1.15.0 (2023-06-26)
