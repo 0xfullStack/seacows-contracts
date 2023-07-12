@@ -23,9 +23,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "_fee",
-        "type": "uint112"
+        "type": "uint256"
       }
     ],
     "name": "getPair",

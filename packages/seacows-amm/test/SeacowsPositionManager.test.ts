@@ -6,6 +6,7 @@ import {
   getSwapTokenOutMin,
   getDepositTokenInMax,
   getWithdrawAssetsOutMin,
+  BI_ZERO,
 } from '@yolominds/seacows-sdk';
 import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
 import SeacowsRouterArtifact from '@yolominds/seacows-periphery/artifacts/contracts/SeacowsRouter.sol/SeacowsRouter.json';
@@ -42,7 +43,6 @@ describe('SeacowsPositionManager', () => {
 
     weth = await WETHFC.deploy();
     template = await SeacowsERC721TradePairFC.deploy();
-    router = (await deployContract(owner, SeacowsRouterArtifact, [weth.address])) as SeacowsRouter;
   });
 
   describe('Create Pair', () => {
@@ -60,6 +60,7 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
     });
 
     it('Should have correct initial configuration after create pair', async () => {
@@ -118,6 +119,8 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -229,6 +232,8 @@ describe('SeacowsPositionManager', () => {
       });
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+
       /**
        * @notes Prepare assets for Alice
        * ERC721: [1, 2, 3, 4, 5]
@@ -323,6 +328,8 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -515,6 +522,7 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -680,7 +688,7 @@ describe('SeacowsPositionManager', () => {
       await erc20.connect(bob).approve(router.address, ethers.utils.parseEther('49.42'));
       await router
         .connect(bob)
-        .swapTokensForExactNFTs(pair.address, [3, 5, 6, 7, 8, 9], MaxUint256, bob.address, MaxUint256);
+        .swapTokensForExactNFTs(pair.address, [3, 5, 6, 7, 8, 9], MaxUint256, BI_ZERO, bob.address, MaxUint256);
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('49.42'));
       expect(await pair.nftComplement()).to.be.equal(0);
 
@@ -782,6 +790,7 @@ describe('SeacowsPositionManager', () => {
       });
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -907,6 +916,7 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers

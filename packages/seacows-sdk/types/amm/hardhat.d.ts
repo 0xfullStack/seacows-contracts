@@ -13,6 +13,18 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
+      name: "IAdminControl",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IAdminControl__factory>;
+    getContractFactory(
+      name: "IAccessControlUpgradeable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IAccessControlUpgradeable__factory>;
+    getContractFactory(
+      name: "OwnableUpgradeable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.OwnableUpgradeable__factory>;
+    getContractFactory(
       name: "Initializable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Initializable__factory>;
@@ -28,6 +40,14 @@ declare module "hardhat/types/runtime" {
       name: "IERC165Upgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165Upgradeable__factory>;
+    getContractFactory(
+      name: "IERC2981",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC2981__factory>;
+    getContractFactory(
+      name: "ERC2981",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC2981__factory>;
     getContractFactory(
       name: "ERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -141,6 +161,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC3525MetadataDescriptorUpgradeable__factory>;
     getContractFactory(
+      name: "ISeacowsSwapCallback",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ISeacowsSwapCallback__factory>;
+    getContractFactory(
       name: "FeeManagement",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FeeManagement__factory>;
@@ -172,6 +196,10 @@ declare module "hardhat/types/runtime" {
       name: "IFeeManagement",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IFeeManagement__factory>;
+    getContractFactory(
+      name: "IRoyaltyManagement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRoyaltyManagement__factory>;
     getContractFactory(
       name: "IRoyaltyRegistry",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -233,6 +261,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockERC721__factory>;
     getContractFactory(
+      name: "MockRoyaltyRegistry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockRoyaltyRegistry__factory>;
+    getContractFactory(
       name: "MockSeacowsComplement",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockSeacowsComplement__factory>;
@@ -241,10 +273,29 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockSeacowsERC3525__factory>;
     getContractFactory(
+      name: "MockSeacowsPairSwap",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockSeacowsPairSwap__factory>;
+    getContractFactory(
       name: "WETH",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.WETH__factory>;
 
+    getContractAt(
+      name: "IAdminControl",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IAdminControl>;
+    getContractAt(
+      name: "IAccessControlUpgradeable",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IAccessControlUpgradeable>;
+    getContractAt(
+      name: "OwnableUpgradeable",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.OwnableUpgradeable>;
     getContractAt(
       name: "Initializable",
       address: string,
@@ -265,6 +316,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165Upgradeable>;
+    getContractAt(
+      name: "IERC2981",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC2981>;
+    getContractAt(
+      name: "ERC2981",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC2981>;
     getContractAt(
       name: "ERC20",
       address: string,
@@ -406,6 +467,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC3525MetadataDescriptorUpgradeable>;
     getContractAt(
+      name: "ISeacowsSwapCallback",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ISeacowsSwapCallback>;
+    getContractAt(
       name: "FeeManagement",
       address: string,
       signer?: ethers.Signer
@@ -445,6 +511,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IFeeManagement>;
+    getContractAt(
+      name: "IRoyaltyManagement",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IRoyaltyManagement>;
     getContractAt(
       name: "IRoyaltyRegistry",
       address: string,
@@ -521,6 +592,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MockERC721>;
     getContractAt(
+      name: "MockRoyaltyRegistry",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MockRoyaltyRegistry>;
+    getContractAt(
       name: "MockSeacowsComplement",
       address: string,
       signer?: ethers.Signer
@@ -530,6 +606,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MockSeacowsERC3525>;
+    getContractAt(
+      name: "MockSeacowsPairSwap",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MockSeacowsPairSwap>;
     getContractAt(
       name: "WETH",
       address: string,

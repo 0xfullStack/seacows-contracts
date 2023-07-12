@@ -64,7 +64,7 @@ contract SeacowsPositionManager is
         @param _collection The ERC721 contract address
         @param _fee The fee tier. Please check TradePair for the fee tiers.
      */
-    function createPair(address _token, address _collection, uint112 _fee) public returns (address _pair) {
+    function createPair(address _token, address _collection, uint256 _fee) public returns (address _pair) {
         _pair = _createPair(_token, _collection, _fee);
         uint256 _slot = _createSlot(_pair);
         uint256 tokenId = _mint(_pair, _slot, 0);
@@ -79,7 +79,7 @@ contract SeacowsPositionManager is
     function _addLiquidity(
         address token,
         address collection,
-        uint112 fee,
+        uint256 fee,
         uint tokenDesired,
         uint[] memory idsDesired,
         uint tokenMin
@@ -87,7 +87,7 @@ contract SeacowsPositionManager is
         // create the pair if it doesn"t exist yet
         address pair = getPair(token, collection, fee);
         require(pair != address(0), 'SeacowsPositionManager: PAIR_DOES_NOT_EXIST');
-        (uint112 tokenReserve, uint112 nftReserve, ) = ISeacowsERC721TradePair(pair).getReserves();
+        (uint256 tokenReserve, uint256 nftReserve, ) = ISeacowsERC721TradePair(pair).getReserves();
         if (tokenReserve == 0 && nftReserve == 0) {
             (tokenAmount, ids) = (tokenDesired, idsDesired);
         } else {
@@ -118,7 +118,7 @@ contract SeacowsPositionManager is
     function addLiquidity(
         address token,
         address collection,
-        uint112 fee,
+        uint256 fee,
         uint tokenDesired,
         uint[] memory idsDesired,
         uint tokenMin,
@@ -152,7 +152,7 @@ contract SeacowsPositionManager is
      */
     function addLiquidityETH(
         address collection,
-        uint112 fee,
+        uint256 fee,
         uint[] memory idsDesired,
         uint tokenMin,
         uint256 toTokenId,
@@ -200,7 +200,7 @@ contract SeacowsPositionManager is
     function removeLiquidity(
         address token,
         address collection,
-        uint112 fee,
+        uint256 fee,
         uint liquidity,
         RemoveLiquidityConstraint memory constraint,
         uint256 fromTokenId,
@@ -238,7 +238,7 @@ contract SeacowsPositionManager is
      */
     function removeLiquidityETH(
         address collection,
-        uint112 fee,
+        uint256 fee,
         uint liquidity,
         RemoveLiquidityConstraint memory constraint,
         uint256 fromTokenId,
@@ -289,7 +289,7 @@ contract SeacowsPositionManager is
     function mint(
         address token,
         address collection,
-        uint112 fee,
+        uint256 fee,
         uint tokenDesired,
         uint[] memory idsDesired,
         uint tokenMin,
@@ -323,7 +323,7 @@ contract SeacowsPositionManager is
      */
     function mintWithETH(
         address collection,
-        uint112 fee,
+        uint256 fee,
         uint[] memory idsDesired,
         uint tokenMin,
         uint deadline

@@ -24,37 +24,41 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   functions: {
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "WETH()": FunctionFragment;
-    "addLiquidity(address,address,uint112,uint256,uint256[],uint256,uint256,uint256)": FunctionFragment;
-    "addLiquidityETH(address,uint112,uint256[],uint256,uint256,uint256)": FunctionFragment;
+    "addLiquidity(address,address,uint256,uint256,uint256[],uint256,uint256,uint256)": FunctionFragment;
+    "addLiquidityETH(address,uint256,uint256[],uint256,uint256,uint256)": FunctionFragment;
     "allowance(uint256,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "burnValue(uint256,uint256)": FunctionFragment;
     "contractURI()": FunctionFragment;
-    "createPair(address,address,uint112)": FunctionFragment;
+    "createPair(address,address,uint256)": FunctionFragment;
     "feeManager()": FunctionFragment;
     "feeTo()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "getPair(address,address,uint112)": FunctionFragment;
+    "getPair(address,address,uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "metadataDescriptor()": FunctionFragment;
-    "mint(address,address,uint112,uint256,uint256[],uint256,uint256)": FunctionFragment;
+    "mint(address,address,uint256,uint256,uint256[],uint256,uint256)": FunctionFragment;
     "mintValue(uint256,uint256)": FunctionFragment;
-    "mintWithETH(address,uint112,uint256[],uint256,uint256)": FunctionFragment;
+    "mintWithETH(address,uint256,uint256[],uint256,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "pairOfSlot(uint256)": FunctionFragment;
     "pairSlots(address)": FunctionFragment;
     "pairTokenIds(address)": FunctionFragment;
-    "removeLiquidity(address,address,uint112,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
-    "removeLiquidityETH(address,uint112,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
+    "removeLiquidity(address,address,uint256,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
+    "removeLiquidityETH(address,uint256,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
+    "royaltyFeeManager()": FunctionFragment;
+    "royaltyRegistry()": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "seacowsBurnCallback(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setFeeManager(address)": FunctionFragment;
     "setFeeTo(address)": FunctionFragment;
+    "setRoyaltyFeeManager(address)": FunctionFragment;
+    "setRoyaltyRegistry(address)": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotOfPair(address)": FunctionFragment;
     "slotPairs(uint256)": FunctionFragment;
@@ -218,6 +222,14 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "royaltyFeeManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyRegistry",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish]
   ): string;
@@ -234,6 +246,14 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "setFeeTo", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "setRoyaltyFeeManager",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setRoyaltyRegistry",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "slotOf",
     values: [BigNumberish]
@@ -348,6 +368,14 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "royaltyFeeManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "royaltyRegistry",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
@@ -364,6 +392,14 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setFeeTo", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setRoyaltyFeeManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setRoyaltyRegistry",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOfPair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotPairs", data: BytesLike): Result;
@@ -405,7 +441,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "ApprovalValue(uint256,address,uint256)": EventFragment;
-    "PairCreated(address,address,uint112,uint256,address)": EventFragment;
+    "PairCreated(address,address,uint256,uint256,address)": EventFragment;
     "SetMetadataDescriptor(address)": EventFragment;
     "SlotChanged(uint256,uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
@@ -710,6 +746,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<[string]>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<[string]>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -744,6 +784,16 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<ContractTransaction>;
 
     setFeeTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setRoyaltyFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setRoyaltyRegistry(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -993,6 +1043,10 @@ export class SeacowsPositionManager extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
+
+  royaltyRegistry(overrides?: CallOverrides): Promise<string>;
+
   "safeTransferFrom(address,address,uint256)"(
     from_: string,
     to_: string,
@@ -1027,6 +1081,16 @@ export class SeacowsPositionManager extends BaseContract {
   ): Promise<ContractTransaction>;
 
   setFeeTo(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setRoyaltyFeeManager(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setRoyaltyRegistry(
     _to: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1307,6 +1371,10 @@ export class SeacowsPositionManager extends BaseContract {
       }
     >;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<string>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -1338,6 +1406,10 @@ export class SeacowsPositionManager extends BaseContract {
     setFeeManager(_to: string, overrides?: CallOverrides): Promise<void>;
 
     setFeeTo(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    setRoyaltyFeeManager(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    setRoyaltyRegistry(_to: string, overrides?: CallOverrides): Promise<void>;
 
     slotOf(
       tokenId_: BigNumberish,
@@ -1460,7 +1532,7 @@ export class SeacowsPositionManager extends BaseContract {
       { _tokenId: BigNumber; _operator: string; _value: BigNumber }
     >;
 
-    "PairCreated(address,address,uint112,uint256,address)"(
+    "PairCreated(address,address,uint256,uint256,address)"(
       token?: string | null,
       collection?: string | null,
       fee?: BigNumberish | null,
@@ -1740,6 +1812,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<BigNumber>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -1774,6 +1850,16 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<BigNumber>;
 
     setFeeTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setRoyaltyFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setRoyaltyRegistry(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2043,6 +2129,10 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
       to_: string,
@@ -2077,6 +2167,16 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     setFeeTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setRoyaltyFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setRoyaltyRegistry(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

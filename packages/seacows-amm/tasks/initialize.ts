@@ -1,5 +1,12 @@
 import { type ActionType } from 'hardhat/types';
-import { Environment, SupportedChain, addresses, getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
+import {
+  Environment,
+  SupportedChain,
+  addresses,
+  getSwapTokenInMax,
+  getSwapTokenOutMin,
+  BI_ZERO,
+} from '@yolominds/seacows-sdk';
 import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
 import ROUTER_ABI from '@yolominds/seacows-sdk/abis/periphery/SeacowsRouter.json';
 // import { addresses } from '../deployed';
@@ -85,7 +92,7 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
     console.log('Pair address: ', pair);
     const pairContract = await ethers.getContractAt('SeacowsERC721TradePair', pair);
 
-    const { tokenInMax: amountIn } = await getSwapTokenInMax(pair, ids.slice(0, 1), 0, 100, owner);
+    const { tokenInMax: amountIn } = await getSwapTokenInMax(pair, ids.slice(0, 1), BI_ZERO, 0, 100, owner);
     console.log('Approving Manager to spend ERC20');
     await (await ERC20Contract.connect(owner).approve(RouterContract.address, amountIn)).wait();
     await RouterContract.connect(owner).swapTokensForExactNFTs(
@@ -96,7 +103,7 @@ export const initialize: ActionType<{ env: Environment }> = async ({ env }, { et
       MaxUint256,
     );
 
-    const { tokenOutMin: amountOut } = await getSwapTokenOutMin(pair, ids.slice(0, 1), 0, 100, owner);
+    const { tokenOutMin: amountOut } = await getSwapTokenOutMin(pair, ids.slice(0, 1), BI_ZERO, 0, 100, owner);
     await RouterContract.connect(owner).swapExactNFTsForTokens(
       pair,
       ids.slice(0, 1),

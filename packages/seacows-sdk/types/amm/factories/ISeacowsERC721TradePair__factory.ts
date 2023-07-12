@@ -151,15 +151,15 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "uint112",
+        internalType: "uint256",
         name: "reserve0",
-        type: "uint112",
+        type: "uint256",
       },
       {
         indexed: false,
-        internalType: "uint112",
+        internalType: "uint256",
         name: "reserve1",
-        type: "uint112",
+        type: "uint256",
       },
     ],
     name: "Sync",
@@ -183,9 +183,9 @@ const _abi = [
     name: "MAX_PROTOCOL_FEE_PERCENT",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "uint64",
         name: "",
-        type: "uint256",
+        type: "uint64",
       },
     ],
     stateMutability: "view",
@@ -196,9 +196,9 @@ const _abi = [
     name: "ONE_PERCENT",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "uint64",
         name: "",
-        type: "uint256",
+        type: "uint64",
       },
     ],
     stateMutability: "view",
@@ -209,9 +209,9 @@ const _abi = [
     name: "PERCENTAGE_PRECISION",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "uint64",
         name: "",
-        type: "uint256",
+        type: "uint64",
       },
     ],
     stateMutability: "view",
@@ -222,9 +222,9 @@ const _abi = [
     name: "POINT_FIVE_PERCENT",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "uint64",
         name: "",
-        type: "uint256",
+        type: "uint64",
       },
     ],
     stateMutability: "view",
@@ -386,19 +386,38 @@ const _abi = [
     name: "getReserves",
     outputs: [
       {
-        internalType: "uint112",
+        internalType: "uint256",
         name: "_reserve0",
-        type: "uint112",
+        type: "uint256",
       },
       {
-        internalType: "uint112",
+        internalType: "uint256",
         name: "_reserve1",
-        type: "uint112",
+        type: "uint256",
       },
       {
         internalType: "uint32",
         name: "_blockTimestampLast",
         type: "uint32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getRoyaltyRecipient",
+    outputs: [
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -417,14 +436,40 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "uint112",
+        internalType: "uint256",
         name: "_fee",
-        type: "uint112",
+        type: "uint256",
       },
     ],
     name: "initialize",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "isRoyaltySupported",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "minRoyaltyFeePercent",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -492,6 +537,45 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "royaltyFeeManager",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "royaltyRegistry",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_percent",
+        type: "uint256",
+      },
+    ],
+    name: "setMinRoyaltyFeePercent",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -502,6 +586,25 @@ const _abi = [
     name: "setProtocolFeePercent",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes4",
+        name: "interfaceId",
+        type: "bytes4",
+      },
+    ],
+    name: "supportsInterface",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -520,6 +623,11 @@ const _abi = [
         internalType: "address",
         name: "to",
         type: "address",
+      },
+      {
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
       },
     ],
     name: "swap",

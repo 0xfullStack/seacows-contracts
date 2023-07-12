@@ -21,6 +21,10 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
   functions: {
+    "MAX_PROTOCOL_FEE_PERCENT()": FunctionFragment;
+    "ONE_PERCENT()": FunctionFragment;
+    "PERCENTAGE_PRECISION()": FunctionFragment;
+    "POINT_FIVE_PERCENT()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
     "collection()": FunctionFragment;
     "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
@@ -33,6 +37,22 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     "totalSupply()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "MAX_PROTOCOL_FEE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ONE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PERCENTAGE_PRECISION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "POINT_FIVE_PERCENT",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [BigNumberish]
@@ -68,6 +88,22 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "MAX_PROTOCOL_FEE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ONE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PERCENTAGE_PRECISION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "POINT_FIVE_PERCENT",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
   decodeFunctionResult(
@@ -147,6 +183,14 @@ export class SeacowsPairMetadata extends BaseContract {
   interface: SeacowsPairMetadataInterface;
 
   functions: {
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -190,6 +234,14 @@ export class SeacowsPairMetadata extends BaseContract {
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
+  MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
   balanceOf(
     _tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -230,6 +282,14 @@ export class SeacowsPairMetadata extends BaseContract {
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -281,6 +341,14 @@ export class SeacowsPairMetadata extends BaseContract {
   };
 
   estimateGas: {
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -325,6 +393,20 @@ export class SeacowsPairMetadata extends BaseContract {
   };
 
   populateTransaction: {
+    MAX_PROTOCOL_FEE_PERCENT(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    PERCENTAGE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    POINT_FIVE_PERCENT(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides

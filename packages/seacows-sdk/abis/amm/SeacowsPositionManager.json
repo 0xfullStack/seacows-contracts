@@ -107,9 +107,9 @@
       },
       {
         "indexed": true,
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint112"
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -254,9 +254,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint112"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -313,9 +313,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint112"
+        "type": "uint256"
       },
       {
         "internalType": "uint256[]",
@@ -519,9 +519,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "_fee",
-        "type": "uint112"
+        "type": "uint256"
       }
     ],
     "name": "createPair",
@@ -593,9 +593,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "_fee",
-        "type": "uint112"
+        "type": "uint256"
       }
     ],
     "name": "getPair",
@@ -659,9 +659,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint112"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -731,9 +731,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint112"
+        "type": "uint256"
       },
       {
         "internalType": "uint256[]",
@@ -908,9 +908,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint112"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -999,9 +999,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint256",
         "name": "fee",
-        "type": "uint112"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -1080,6 +1080,32 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "royaltyFeeManager",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "royaltyRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1196,6 +1222,32 @@
       }
     ],
     "name": "setFeeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
+    "name": "setRoyaltyFeeManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
+    "name": "setRoyaltyRegistry",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

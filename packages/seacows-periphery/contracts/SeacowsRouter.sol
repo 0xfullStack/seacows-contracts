@@ -3,18 +3,15 @@ pragma solidity ^0.8.13;
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import '@yolominds/seacows-amm/contracts/interfaces/ISeacowsERC721TradePair.sol';
+import './base/SeacowsSwapCallback.sol';
+import './base/PeripheryImmutableState.sol';
 import './interfaces/ISeacowsRouter.sol';
 import './interfaces/IWETH.sol';
 import './lib/SeacowsLibrary.sol';
 
-contract SeacowsRouter is ISeacowsRouter {
-    address public weth;
+contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacowsRouter {
 
-    constructor(address _weth) {
-        require(_weth != address(0), 'Invalid WETH address');
-
-        weth = _weth;
-    }
+    constructor(address _manager, address _weth) SeacowsSwapCallback(_manager, _weth) {}
 
     modifier checkDeadline(uint deadline) {
         require(deadline >= block.timestamp, 'SeacowsRouter: EXPIRED');
@@ -26,6 +23,7 @@ contract SeacowsRouter is ISeacowsRouter {
         @param _pair The pair to swap with
         @param idsOut The NFT ids to swap out
         @param amountInMax The max amount of ERC20 to input
+        @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
      */
@@ -33,6 +31,7 @@ contract SeacowsRouter is ISeacowsRouter {
         address _pair,
         uint[] memory idsOut,
         uint amountInMax,
+        uint royaltyPercent,
         address to,
         uint deadline
     ) public checkDeadline(deadline) returns (uint amountIn) {
@@ -42,12 +41,12 @@ contract SeacowsRouter is ISeacowsRouter {
             idsOut.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,
             nftReserve,
-            pair.feePercent() + pair.protocolFeePercent(),
+            pair.feePercent() + pair.protocolFeePercent() + royaltyPercent,
             pair.PERCENTAGE_PRECISION()
         );
         require(amountIn <= amountInMax, 'SeacowsRouter: EXCESSIVE_INPUT_AMOUNT');
-        IERC20(pair.token()).transferFrom(msg.sender, _pair, amountIn);
-        pair.swap(0, idsOut, to);
+        SwapCallbackData memory _data = SwapCallbackData({ payer: msg.sender, idsIn: new uint[](0), tokenAmountIn: amountIn });
+        pair.swap(0, idsOut, to, abi.encode(_data));
     }
 
     /**
@@ -55,6 +54,7 @@ contract SeacowsRouter is ISeacowsRouter {
         @param _pair The pair to swap with
         @param idsOut The NFT ids to swap out
         @param amountInMax The max amount of ETH to input
+        @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
      */
@@ -62,6 +62,7 @@ contract SeacowsRouter is ISeacowsRouter {
         address _pair,
         uint[] memory idsOut,
         uint amountInMax,
+        uint royaltyPercent,
         address to,
         uint deadline
     ) external payable checkDeadline(deadline) returns (uint amountIn) {
@@ -69,7 +70,7 @@ contract SeacowsRouter is ISeacowsRouter {
         IWETH(weth).deposit{value: amountIn}();
         IWETH(weth).transfer(_pair, amountIn);
 
-        amountIn = this.swapTokensForExactNFTs(_pair, idsOut, amountInMax, to, deadline);
+        amountIn = this.swapTokensForExactNFTs(_pair, idsOut, amountInMax, royaltyPercent, to, deadline);
 
         // refund remaining eth
         _sendETH(msg.sender, msg.value - amountIn);
@@ -80,6 +81,7 @@ contract SeacowsRouter is ISeacowsRouter {
         @param _pair The pair to swap with
         @param idsIn The NFT ids to swap in
         @param amountOutMin The min amount of ERC20 to swap out
+        @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the ERC20 swapped out
         @param deadline The timestamp of deadline in seconds
      */
@@ -87,6 +89,7 @@ contract SeacowsRouter is ISeacowsRouter {
         address _pair,
         uint[] memory idsIn,
         uint amountOutMin,
+        uint royaltyPercent,
         address to,
         uint deadline
     ) public checkDeadline(deadline) returns (uint amountOut) {
@@ -96,14 +99,12 @@ contract SeacowsRouter is ISeacowsRouter {
             idsIn.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,
             nftReserve,
-            pair.feePercent() + pair.protocolFeePercent(),
+            pair.feePercent() + pair.protocolFeePercent() + royaltyPercent,
             pair.PERCENTAGE_PRECISION()
         );
         require(amountOut >= amountOutMin, 'SeacowsRouter: INSUFFICIENT_OUTPUT_AMOUNT');
-        for (uint i = 0; i < idsIn.length; i++) {
-            IERC721(pair.collection()).safeTransferFrom(msg.sender, _pair, idsIn[i]);
-        }
-        pair.swap(amountOut, new uint[](0), to);
+        SwapCallbackData memory _data = SwapCallbackData({ payer: msg.sender, idsIn: idsIn, tokenAmountIn: 0 });
+        pair.swap(amountOut, new uint[](0), to, abi.encode(_data));
     }
 
     /**
@@ -111,6 +112,7 @@ contract SeacowsRouter is ISeacowsRouter {
         @param _pair The pair to swap with
         @param idsIn The NFT ids to swap in
         @param amountOutMin The min amount of ETH to swap out
+        @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the ETH swapped out
         @param deadline The timestamp of deadline in seconds
      */
@@ -118,10 +120,11 @@ contract SeacowsRouter is ISeacowsRouter {
         address _pair,
         uint[] memory idsIn,
         uint amountOutMin,
+        uint royaltyPercent,
         address to,
         uint deadline
     ) external checkDeadline(deadline) returns (uint amountOut) {
-        amountOut = swapExactNFTsForTokens(_pair, idsIn, amountOutMin, address(this), deadline);
+        amountOut = swapExactNFTsForTokens(_pair, idsIn, amountOutMin, royaltyPercent, address(this), deadline);
         // withdraw eth
         IWETH(weth).withdraw(amountOut);
         // send to user
@@ -133,6 +136,7 @@ contract SeacowsRouter is ISeacowsRouter {
         @param _pairs The pairs to swap with
         @param idsOuts The array of NFT ids to swap out
         @param amountInMaxs The array of max amount of ERC20 to input
+        @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
      */
@@ -140,6 +144,7 @@ contract SeacowsRouter is ISeacowsRouter {
         address[] calldata _pairs,
         uint[][] calldata idsOuts,
         uint[] calldata amountInMaxs,
+        uint royaltyPercent,
         address to,
         uint deadline
     ) external virtual checkDeadline(deadline) returns (uint amountIn) {
@@ -148,7 +153,7 @@ contract SeacowsRouter is ISeacowsRouter {
             'SeacowsRouter: INVALID_PARAMS_LENGTH'
         );
         for (uint256 i = 0; i < _pairs.length; i++) {
-            amountIn += swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], to, deadline);
+            amountIn += swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], royaltyPercent, to, deadline);
         }
     }
 
@@ -157,6 +162,7 @@ contract SeacowsRouter is ISeacowsRouter {
         @param _pairs The pairs to swap with
         @param idsIns The array of NFT ids to swap in for each pair
         @param amountOutMins The array of min amount of ERC20 to swap out
+        @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the ERC20 swapped out
         @param deadline The timestamp of deadline in seconds
      */
@@ -164,6 +170,7 @@ contract SeacowsRouter is ISeacowsRouter {
         address[] calldata _pairs,
         uint[][] calldata idsIns,
         uint[] calldata amountOutMins,
+        uint royaltyPercent,
         address to,
         uint deadline
     ) external virtual checkDeadline(deadline) returns (uint amountOut) {
@@ -172,7 +179,7 @@ contract SeacowsRouter is ISeacowsRouter {
             'SeacowsRouter: INVALID_PARAMS_LENGTH'
         );
         for (uint256 i = 0; i < _pairs.length; i++) {
-            amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], to, deadline);
+            amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], royaltyPercent, to, deadline);
         }
     }
 
@@ -181,6 +188,7 @@ contract SeacowsRouter is ISeacowsRouter {
         @param _pairs The pairs to swap with
         @param idsOuts The array of NFT ids to swap out
         @param amountInMaxs The array of max amount of ETH to input
+        @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
      */
@@ -188,6 +196,7 @@ contract SeacowsRouter is ISeacowsRouter {
         address[] calldata _pairs,
         uint[][] calldata idsOuts,
         uint[] calldata amountInMaxs,
+        uint royaltyPercent,
         address to,
         uint deadline
     ) external payable virtual checkDeadline(deadline) returns (uint amountIn) {
@@ -200,7 +209,7 @@ contract SeacowsRouter is ISeacowsRouter {
         IWETH(weth).deposit{value: msg.value}();
 
         for (uint256 i = 0; i < _pairs.length; i++) {
-            amountIn += this.swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], to, deadline);
+            amountIn += this.swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], royaltyPercent, to, deadline);
         }
 
         // refund remaining eth
@@ -221,6 +230,7 @@ contract SeacowsRouter is ISeacowsRouter {
         address[] calldata _pairs,
         uint[][] calldata idsIns,
         uint[] calldata amountOutMins,
+        uint[] calldata royaltyPercent,
         address to,
         uint deadline
     ) external virtual checkDeadline(deadline) returns (uint amountOut) {
@@ -229,7 +239,7 @@ contract SeacowsRouter is ISeacowsRouter {
             'SeacowsRouter: INVALID_PARAMS_LENGTH'
         );
         for (uint256 i = 0; i < _pairs.length; i++) {
-            amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], address(this), deadline);
+            amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], royaltyPercent[i], address(this), deadline);
         }
 
         // withdraw eth

@@ -16,6 +16,7 @@
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@ethersproject/constants": "^5.7.0",
+    "@manifoldxyz/libraries-solidity": "^1.0.4",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
@@ -69,8 +70,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@yolominds/seacows-sdk": "*",
-    "@yolominds/seacows-periphery": "*"
+    "@yolominds/seacows-periphery": "*",
+    "@yolominds/seacows-sdk": "*"
   },
   "files": [
     "dist/*"

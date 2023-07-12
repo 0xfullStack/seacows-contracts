@@ -5,22 +5,38 @@ import { IFeeManagement } from '../interfaces/IFeeManagement.sol';
  
 contract FeeManagement is IFeeManagement {
 
+  address private _royaltyRegistry;
   address private _feeManager;
+  address private _royaltyFeeManager;
 
   address private _feeTo;
 
   constructor() {
     _feeManager = msg.sender;
+    _royaltyFeeManager = msg.sender;
     _feeTo = msg.sender;
   }
 
   modifier onlyManager() {
-    require(msg.sender == feeManager(), 'FeeManagement: FORBIDDEN');
+    require(msg.sender == feeManager(), 'FeeManagement: NON_FEE_MANAGER');
+    _;
+  }
+
+  modifier onlyRoyaltyFeeManager() {
+    require(msg.sender == feeManager(), 'FeeManagement: NON_ROYALTY_FEE_MANAGER');
     _;
   }
 
   function feeManager() public view returns (address) {
     return _feeManager;
+  }
+
+  function royaltyRegistry() public view returns (address) {
+    return _royaltyRegistry;
+  }
+
+  function royaltyFeeManager() public view returns (address) {
+    return _royaltyFeeManager;
   }
 
   function feeTo() public view returns (address) {
@@ -29,6 +45,14 @@ contract FeeManagement is IFeeManagement {
 
   function setFeeManager(address _to) public onlyManager {
     _feeManager = _to;
+  }
+
+  function setRoyaltyFeeManager(address _to) public onlyRoyaltyFeeManager {
+    _feeManager = _to;
+  }
+
+  function setRoyaltyRegistry(address _to) public onlyRoyaltyFeeManager {
+    _royaltyRegistry = _to;
   }
 
   function setFeeTo(address _to) public onlyManager {

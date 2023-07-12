@@ -52,8 +52,16 @@ interface ISeacowsRewarderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {};
+  events: {
+    "CollectFee(uint256,uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "CollectFee"): EventFragment;
 }
+
+export type CollectFeeEvent = TypedEvent<
+  [BigNumber, BigNumber] & { tokenId: BigNumber; fee: BigNumber }
+>;
 
 export class ISeacowsRewarder extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -142,7 +150,23 @@ export class ISeacowsRewarder extends BaseContract {
     updateSwapFee(overrides?: CallOverrides): Promise<void>;
   };
 
-  filters: {};
+  filters: {
+    "CollectFee(uint256,uint256)"(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
+    >;
+
+    CollectFee(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
+    >;
+  };
 
   estimateGas: {
     updatePositionFee(

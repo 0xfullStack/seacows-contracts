@@ -22,6 +22,10 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface SeacowsRewarderInterface extends ethers.utils.Interface {
   functions: {
     "ACC_REWARD_PER_SHARE_PRECISION()": FunctionFragment;
+    "MAX_PROTOCOL_FEE_PERCENT()": FunctionFragment;
+    "ONE_PERCENT()": FunctionFragment;
+    "PERCENTAGE_PRECISION()": FunctionFragment;
+    "POINT_FIVE_PERCENT()": FunctionFragment;
     "accRewardPerShare()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
     "collect(uint256)": FunctionFragment;
@@ -45,6 +49,22 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "ACC_REWARD_PER_SHARE_PRECISION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MAX_PROTOCOL_FEE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ONE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PERCENTAGE_PRECISION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "POINT_FIVE_PERCENT",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -120,6 +140,22 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "ACC_REWARD_PER_SHARE_PRECISION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MAX_PROTOCOL_FEE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ONE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PERCENTAGE_PRECISION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "POINT_FIVE_PERCENT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -241,6 +277,14 @@ export class SeacowsRewarder extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     accRewardPerShare(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     balanceOf(
@@ -323,6 +367,14 @@ export class SeacowsRewarder extends BaseContract {
 
   ACC_REWARD_PER_SHARE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+  MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
   accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
   balanceOf(
@@ -403,6 +455,14 @@ export class SeacowsRewarder extends BaseContract {
     ACC_REWARD_PER_SHARE_PRECISION(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
     accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -510,6 +570,14 @@ export class SeacowsRewarder extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
     accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
@@ -590,6 +658,20 @@ export class SeacowsRewarder extends BaseContract {
 
   populateTransaction: {
     ACC_REWARD_PER_SHARE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    MAX_PROTOCOL_FEE_PERCENT(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    PERCENTAGE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    POINT_FIVE_PERCENT(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

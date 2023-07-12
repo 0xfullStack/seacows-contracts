@@ -9,6 +9,7 @@ const getTokenInMax = (
   complement: BigNumber,
   tokenReserve: BigNumber,
   nftReserve: BigNumber,
+  royaltyFeePercent: BigNumber,
   protocolFeeNumerator: BigNumber,
   feeNumerator: BigNumber,
   feeDenominator: BigNumber,
@@ -19,7 +20,9 @@ const getTokenInMax = (
   const tokenIn = tokenReserve.mul(nftsOut).div(nftReserve.sub(nftsOut));
 
   // tokenInWithFee = tokenIn * (1 + Protocol Fee Percent + Fee Percent)
-  const tokenInWithFee = tokenIn.mul(feeDenominator.add(protocolFeeNumerator).add(feeNumerator)).div(feeDenominator);
+  const tokenInWithFee = tokenIn
+    .mul(feeDenominator.add(protocolFeeNumerator).add(feeNumerator).add(royaltyFeePercent))
+    .div(feeDenominator);
 
   return {
     tokenInMax: tokenInWithFee,
@@ -34,6 +37,7 @@ const getTokenOutMin = (
   complement: BigNumber,
   tokenReserve: BigNumber,
   nftReserve: BigNumber,
+  royaltyFeePercent: BigNumber,
   protocolFeeNumerator: BigNumber,
   feeNumerator: BigNumber,
   feeDenominator: BigNumber,
@@ -44,7 +48,9 @@ const getTokenOutMin = (
   const tokenOut = tokenReserve.mul(nftsIn).div(nftReserve.add(nftsIn));
 
   // tokenOutWithFee = tokenOut * (1 - Protocol Fee Percent - Fee Percent)
-  const tokenOutWithFee = tokenOut.mul(feeDenominator.sub(feeNumerator).sub(protocolFeeNumerator)).div(feeDenominator);
+  const tokenOutWithFee = tokenOut
+    .mul(feeDenominator.sub(feeNumerator).sub(protocolFeeNumerator).sub(royaltyFeePercent))
+    .div(feeDenominator);
 
   return {
     tokenOutMin: tokenOutWithFee,
@@ -65,6 +71,7 @@ const getTokenOutMin = (
 const getSwapTokenInMax = async (
   pair: string | SeacowsERC721TradePair,
   idsOut: number[],
+  royaltyFeePercent: BigNumber,
   slippageNumerator: number = 0,
   slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
@@ -82,6 +89,7 @@ const getSwapTokenInMax = async (
     complement,
     tokenReserve,
     nftReserve,
+    royaltyFeePercent,
     protocolFeeNumerator,
     feeNumerator,
     feeDenominator,
@@ -101,6 +109,7 @@ const getSwapTokenInMax = async (
 const getSwapTokenOutMin = async (
   pair: string | SeacowsERC721TradePair,
   idsIn: number[],
+  royaltyFeePercent: BigNumber,
   slippageNumerator: number = 0,
   slippageDenominator: number = 100,
   signerOrProvider?: Signer | Provider,
@@ -119,6 +128,7 @@ const getSwapTokenOutMin = async (
     complement,
     tokenReserve,
     nftReserve,
+    royaltyFeePercent,
     protocolFeeNumerator,
     feeNumerator,
     feeDenominator,

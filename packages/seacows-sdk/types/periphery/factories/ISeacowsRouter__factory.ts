@@ -28,6 +28,11 @@ const _abi = [
         type: "uint256[]",
       },
       {
+        internalType: "uint256",
+        name: "royaltyPercent",
+        type: "uint256",
+      },
+      {
         internalType: "address",
         name: "to",
         type: "address",
@@ -67,6 +72,11 @@ const _abi = [
         type: "uint256[]",
       },
       {
+        internalType: "uint256",
+        name: "royaltyPercent",
+        type: "uint256",
+      },
+      {
         internalType: "address",
         name: "to",
         type: "address",
@@ -91,6 +101,30 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
+      },
+    ],
+    name: "seacowsSwapCallback",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "tokenAmountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "idsIn",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "_pair",
         type: "address",
@@ -103,6 +137,11 @@ const _abi = [
       {
         internalType: "uint256",
         name: "amountInMax",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "royaltyPercent",
         type: "uint256",
       },
       {
@@ -145,6 +184,11 @@ const _abi = [
         type: "uint256",
       },
       {
+        internalType: "uint256",
+        name: "royaltyPercent",
+        type: "uint256",
+      },
+      {
         internalType: "address",
         name: "to",
         type: "address",
@@ -184,6 +228,11 @@ const _abi = [
         type: "uint256",
       },
       {
+        internalType: "uint256",
+        name: "royaltyPercent",
+        type: "uint256",
+      },
+      {
         internalType: "address",
         name: "to",
         type: "address",
@@ -220,6 +269,11 @@ const _abi = [
       {
         internalType: "uint256",
         name: "amountInMax",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "royaltyPercent",
         type: "uint256",
       },
       {

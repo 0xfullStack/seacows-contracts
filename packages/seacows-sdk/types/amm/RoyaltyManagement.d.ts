@@ -11,6 +11,7 @@ import {
   PopulatedTransaction,
   BaseContract,
   ContractTransaction,
+  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -20,21 +21,177 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface RoyaltyManagementInterface extends ethers.utils.Interface {
   functions: {
+    "MAX_PROTOCOL_FEE_PERCENT()": FunctionFragment;
+    "ONE_PERCENT()": FunctionFragment;
+    "PERCENTAGE_PRECISION()": FunctionFragment;
+    "POINT_FIVE_PERCENT()": FunctionFragment;
+    "balanceOf(uint256)": FunctionFragment;
+    "collection()": FunctionFragment;
+    "getRoyaltyRecipient(uint256)": FunctionFragment;
+    "isRoyaltySupported()": FunctionFragment;
+    "minRoyaltyFeePercent()": FunctionFragment;
+    "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
+    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
+    "ownerOf(uint256)": FunctionFragment;
+    "positionManager()": FunctionFragment;
+    "royaltyFeeManager()": FunctionFragment;
     "royaltyRegistry()": FunctionFragment;
+    "setMinRoyaltyFeePercent(uint256)": FunctionFragment;
+    "slot()": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
+    "token()": FunctionFragment;
+    "totalSupply()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "MAX_PROTOCOL_FEE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ONE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PERCENTAGE_PRECISION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "POINT_FIVE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "balanceOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collection",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoyaltyRecipient",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isRoyaltySupported",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "minRoyaltyFeePercent",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC3525Received",
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC721Received",
+    values: [string, string, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ownerOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "positionManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyFeeManager",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "royaltyRegistry",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "setMinRoyaltyFeePercent",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "slot", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
+    values?: undefined
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "MAX_PROTOCOL_FEE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ONE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PERCENTAGE_PRECISION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "POINT_FIVE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoyaltyRecipient",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isRoyaltySupported",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "minRoyaltyFeePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC3525Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC721Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "positionManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "royaltyFeeManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "royaltyRegistry",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMinRoyaltyFeePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "slot", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
 
-  events: {};
+  events: {
+    "Initialized(uint8)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
 }
+
+export type InitializedEvent = TypedEvent<[number] & { version: number }>;
 
 export class RoyaltyManagement extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -80,22 +237,364 @@ export class RoyaltyManagement extends BaseContract {
   interface: RoyaltyManagementInterface;
 
   functions: {
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    collection(overrides?: CallOverrides): Promise<[string]>;
+
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string] & { recipient: string }>;
+
+    isRoyaltySupported(overrides?: CallOverrides): Promise<[boolean]>;
+
+    minRoyaltyFeePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    onERC3525Received(
+      _operator: string,
+      _fromTokenId: BigNumberish,
+      _toTokenId: BigNumberish,
+      _value: BigNumberish,
+      _data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    ownerOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    positionManager(overrides?: CallOverrides): Promise<[string]>;
+
+    royaltyFeeManager(overrides?: CallOverrides): Promise<[string]>;
+
     royaltyRegistry(overrides?: CallOverrides): Promise<[string]>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    slot(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    token(overrides?: CallOverrides): Promise<[string]>;
+
+    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
+
+  MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  balanceOf(
+    _tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  collection(overrides?: CallOverrides): Promise<string>;
+
+  getRoyaltyRecipient(
+    _tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  isRoyaltySupported(overrides?: CallOverrides): Promise<boolean>;
+
+  minRoyaltyFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
+
+  onERC3525Received(
+    _operator: string,
+    _fromTokenId: BigNumberish,
+    _toTokenId: BigNumberish,
+    _value: BigNumberish,
+    _data: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  onERC721Received(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
+    arg3: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  positionManager(overrides?: CallOverrides): Promise<string>;
+
+  royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
 
   royaltyRegistry(overrides?: CallOverrides): Promise<string>;
 
+  setMinRoyaltyFeePercent(
+    _percent: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  slot(overrides?: CallOverrides): Promise<BigNumber>;
+
+  supportsInterface(
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  token(overrides?: CallOverrides): Promise<string>;
+
+  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
   callStatic: {
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    collection(overrides?: CallOverrides): Promise<string>;
+
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    isRoyaltySupported(overrides?: CallOverrides): Promise<boolean>;
+
+    minRoyaltyFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
+
+    onERC3525Received(
+      _operator: string,
+      _fromTokenId: BigNumberish,
+      _toTokenId: BigNumberish,
+      _value: BigNumberish,
+      _data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    positionManager(overrides?: CallOverrides): Promise<string>;
+
+    royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
+
     royaltyRegistry(overrides?: CallOverrides): Promise<string>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    slot(overrides?: CallOverrides): Promise<BigNumber>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    token(overrides?: CallOverrides): Promise<string>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
-  filters: {};
+  filters: {
+    "Initialized(uint8)"(
+      version?: null
+    ): TypedEventFilter<[number], { version: number }>;
+
+    Initialized(
+      version?: null
+    ): TypedEventFilter<[number], { version: number }>;
+  };
 
   estimateGas: {
+    MAX_PROTOCOL_FEE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    collection(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isRoyaltySupported(overrides?: CallOverrides): Promise<BigNumber>;
+
+    minRoyaltyFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
+
+    onERC3525Received(
+      _operator: string,
+      _fromTokenId: BigNumberish,
+      _toTokenId: BigNumberish,
+      _value: BigNumberish,
+      _data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    ownerOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    positionManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    royaltyFeeManager(overrides?: CallOverrides): Promise<BigNumber>;
+
     royaltyRegistry(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    slot(overrides?: CallOverrides): Promise<BigNumber>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    token(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    MAX_PROTOCOL_FEE_PERCENT(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    ONE_PERCENT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    PERCENTAGE_PRECISION(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    POINT_FIVE_PERCENT(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    balanceOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    collection(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isRoyaltySupported(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    minRoyaltyFeePercent(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    onERC3525Received(
+      _operator: string,
+      _fromTokenId: BigNumberish,
+      _toTokenId: BigNumberish,
+      _value: BigNumberish,
+      _data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    ownerOf(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    royaltyFeeManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     royaltyRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    slot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

@@ -22,37 +22,84 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface ISeacowsRouterInterface extends ethers.utils.Interface {
   functions: {
-    "batchSwapExactNFTsForTokens(address[],uint256[][],uint256[],address,uint256)": FunctionFragment;
-    "batchSwapTokensForExactNFTs(address[],uint256[][],uint256[],address,uint256)": FunctionFragment;
-    "swapETHForExactNFTs(address,uint256[],uint256,address,uint256)": FunctionFragment;
-    "swapExactNFTsForETH(address,uint256[],uint256,address,uint256)": FunctionFragment;
-    "swapExactNFTsForTokens(address,uint256[],uint256,address,uint256)": FunctionFragment;
-    "swapTokensForExactNFTs(address,uint256[],uint256,address,uint256)": FunctionFragment;
+    "batchSwapExactNFTsForTokens(address[],uint256[][],uint256[],uint256,address,uint256)": FunctionFragment;
+    "batchSwapTokensForExactNFTs(address[],uint256[][],uint256[],uint256,address,uint256)": FunctionFragment;
+    "seacowsSwapCallback(bytes)": FunctionFragment;
+    "swapETHForExactNFTs(address,uint256[],uint256,uint256,address,uint256)": FunctionFragment;
+    "swapExactNFTsForETH(address,uint256[],uint256,uint256,address,uint256)": FunctionFragment;
+    "swapExactNFTsForTokens(address,uint256[],uint256,uint256,address,uint256)": FunctionFragment;
+    "swapTokensForExactNFTs(address,uint256[],uint256,uint256,address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "batchSwapExactNFTsForTokens",
-    values: [string[], BigNumberish[][], BigNumberish[], string, BigNumberish]
+    values: [
+      string[],
+      BigNumberish[][],
+      BigNumberish[],
+      BigNumberish,
+      string,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "batchSwapTokensForExactNFTs",
-    values: [string[], BigNumberish[][], BigNumberish[], string, BigNumberish]
+    values: [
+      string[],
+      BigNumberish[][],
+      BigNumberish[],
+      BigNumberish,
+      string,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "seacowsSwapCallback",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "swapETHForExactNFTs",
-    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
+    values: [
+      string,
+      BigNumberish[],
+      BigNumberish,
+      BigNumberish,
+      string,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "swapExactNFTsForETH",
-    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
+    values: [
+      string,
+      BigNumberish[],
+      BigNumberish,
+      BigNumberish,
+      string,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "swapExactNFTsForTokens",
-    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
+    values: [
+      string,
+      BigNumberish[],
+      BigNumberish,
+      BigNumberish,
+      string,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "swapTokensForExactNFTs",
-    values: [string, BigNumberish[], BigNumberish, string, BigNumberish]
+    values: [
+      string,
+      BigNumberish[],
+      BigNumberish,
+      BigNumberish,
+      string,
+      BigNumberish
+    ]
   ): string;
 
   decodeFunctionResult(
@@ -61,6 +108,10 @@ interface ISeacowsRouterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "batchSwapTokensForExactNFTs",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "seacowsSwapCallback",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -131,6 +182,7 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsIns: BigNumberish[][],
       amountOutMins: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -140,8 +192,14 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOut: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    seacowsSwapCallback(
+      data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -149,6 +207,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -158,6 +217,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -167,6 +227,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -176,6 +237,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -186,6 +248,7 @@ export class ISeacowsRouter extends BaseContract {
     _pairs: string[],
     idsIns: BigNumberish[][],
     amountOutMins: BigNumberish[],
+    royaltyPercent: BigNumberish,
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -195,8 +258,14 @@ export class ISeacowsRouter extends BaseContract {
     _pairs: string[],
     idsOut: BigNumberish[][],
     amountInMaxs: BigNumberish[],
+    royaltyPercent: BigNumberish,
     to: string,
     deadline: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  seacowsSwapCallback(
+    data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -204,6 +273,7 @@ export class ISeacowsRouter extends BaseContract {
     _pair: string,
     idsOut: BigNumberish[],
     amountInMax: BigNumberish,
+    royaltyPercent: BigNumberish,
     to: string,
     deadline: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -213,6 +283,7 @@ export class ISeacowsRouter extends BaseContract {
     _pair: string,
     idsIn: BigNumberish[],
     amountOutMin: BigNumberish,
+    royaltyPercent: BigNumberish,
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -222,6 +293,7 @@ export class ISeacowsRouter extends BaseContract {
     _pair: string,
     idsIn: BigNumberish[],
     amountOutMin: BigNumberish,
+    royaltyPercent: BigNumberish,
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -231,6 +303,7 @@ export class ISeacowsRouter extends BaseContract {
     _pair: string,
     idsOut: BigNumberish[],
     amountInMax: BigNumberish,
+    royaltyPercent: BigNumberish,
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -241,6 +314,7 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsIns: BigNumberish[][],
       amountOutMins: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
@@ -250,15 +324,27 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOut: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    seacowsSwapCallback(
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber[]] & {
+        tokenAmountIn: BigNumber;
+        idsIn: BigNumber[];
+      }
+    >;
+
     swapETHForExactNFTs(
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
@@ -268,6 +354,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
@@ -277,6 +364,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
@@ -286,6 +374,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
@@ -299,6 +388,7 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsIns: BigNumberish[][],
       amountOutMins: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -308,8 +398,14 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOut: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    seacowsSwapCallback(
+      data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -317,6 +413,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -326,6 +423,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -335,6 +433,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -344,6 +443,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -355,6 +455,7 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsIns: BigNumberish[][],
       amountOutMins: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -364,8 +465,14 @@ export class ISeacowsRouter extends BaseContract {
       _pairs: string[],
       idsOut: BigNumberish[][],
       amountInMaxs: BigNumberish[],
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    seacowsSwapCallback(
+      data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -373,6 +480,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -382,6 +490,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -391,6 +500,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsIn: BigNumberish[],
       amountOutMin: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -400,6 +510,7 @@ export class ISeacowsRouter extends BaseContract {
       _pair: string,
       idsOut: BigNumberish[],
       amountInMax: BigNumberish,
+      royaltyPercent: BigNumberish,
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

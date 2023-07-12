@@ -33,13 +33,20 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "getComplemenetedAssetsOut(int256,int256)": FunctionFragment;
     "getComplementedBalance()": FunctionFragment;
     "getReserves()": FunctionFragment;
-    "initialize(address,address,uint112)": FunctionFragment;
+    "getRoyaltyRecipient(uint256)": FunctionFragment;
+    "initialize(address,address,uint256)": FunctionFragment;
+    "isRoyaltySupported()": FunctionFragment;
+    "minRoyaltyFeePercent()": FunctionFragment;
     "mint(uint256)": FunctionFragment;
     "nftComplement()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "protocolFeePercent()": FunctionFragment;
+    "royaltyFeeManager()": FunctionFragment;
+    "royaltyRegistry()": FunctionFragment;
+    "setMinRoyaltyFeePercent(uint256)": FunctionFragment;
     "setProtocolFeePercent(uint256)": FunctionFragment;
-    "swap(uint256,uint256[],address)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
+    "swap(uint256,uint256[],address,bytes)": FunctionFragment;
     "token()": FunctionFragment;
     "tokenComplement()": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -97,8 +104,20 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getRoyaltyRecipient",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "initialize",
     values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isRoyaltySupported",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "minRoyaltyFeePercent",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -114,12 +133,28 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "royaltyFeeManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyRegistry",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMinRoyaltyFeePercent",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setProtocolFeePercent",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "swap",
-    values: [BigNumberish, BigNumberish[], string]
+    values: [BigNumberish, BigNumberish[], string, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(
@@ -179,7 +214,19 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     functionFragment: "getReserves",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoyaltyRecipient",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isRoyaltySupported",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "minRoyaltyFeePercent",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "nftComplement",
@@ -191,7 +238,23 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "royaltyFeeManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "royaltyRegistry",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMinRoyaltyFeePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setProtocolFeePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
@@ -219,12 +282,14 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
 
   events: {
     "Burn(address,uint256,uint256,uint256,uint256,uint256[],address)": EventFragment;
+    "CollectFee(uint256,uint256)": EventFragment;
     "Mint(address,uint256,uint256)": EventFragment;
     "Swap(address,uint256,uint256,uint256,uint256,address)": EventFragment;
-    "Sync(uint112,uint112)": EventFragment;
+    "Sync(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Burn"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CollectFee"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Swap"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Sync"): EventFragment;
@@ -240,6 +305,10 @@ export type BurnEvent = TypedEvent<
     idsOut: BigNumber[];
     to: string;
   }
+>;
+
+export type CollectFeeEvent = TypedEvent<
+  [BigNumber, BigNumber] & { tokenId: BigNumber; fee: BigNumber }
 >;
 
 export type MintEvent = TypedEvent<
@@ -367,12 +436,21 @@ export class ISeacowsERC721TradePair extends BaseContract {
       }
     >;
 
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string] & { recipient: string }>;
+
     initialize(
       _collection: string,
       _token: string,
       _fee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    isRoyaltySupported(overrides?: CallOverrides): Promise<[boolean]>;
+
+    minRoyaltyFeePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     mint(
       toTokenId: BigNumberish,
@@ -388,15 +466,30 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     protocolFeePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<[string]>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<[string]>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setProtocolFeePercent(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
       to: string,
+      data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -476,12 +569,21 @@ export class ISeacowsERC721TradePair extends BaseContract {
     }
   >;
 
+  getRoyaltyRecipient(
+    _tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   initialize(
     _collection: string,
     _token: string,
     _fee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  isRoyaltySupported(overrides?: CallOverrides): Promise<boolean>;
+
+  minRoyaltyFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
   mint(
     toTokenId: BigNumberish,
@@ -494,15 +596,30 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
   protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
+  royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
+
+  royaltyRegistry(overrides?: CallOverrides): Promise<string>;
+
+  setMinRoyaltyFeePercent(
+    _percent: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setProtocolFeePercent(
     _protocolFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  supportsInterface(
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   swap(
     tokenAmountOut: BigNumberish,
     idsOut: BigNumberish[],
     to: string,
+    data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -593,12 +710,21 @@ export class ISeacowsERC721TradePair extends BaseContract {
       }
     >;
 
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     initialize(
       _collection: string,
       _token: string,
       _fee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    isRoyaltySupported(overrides?: CallOverrides): Promise<boolean>;
+
+    minRoyaltyFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       toTokenId: BigNumberish,
@@ -611,15 +737,30 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<string>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setProtocolFeePercent(
       _protocolFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
       to: string,
+      data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -685,6 +826,22 @@ export class ISeacowsERC721TradePair extends BaseContract {
       }
     >;
 
+    "CollectFee(uint256,uint256)"(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
+    >;
+
+    CollectFee(
+      tokenId?: BigNumberish | null,
+      fee?: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { tokenId: BigNumber; fee: BigNumber }
+    >;
+
     "Mint(address,uint256,uint256)"(
       sender?: string | null,
       tokenAmount?: null,
@@ -741,7 +898,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
       }
     >;
 
-    "Sync(uint112,uint112)"(
+    "Sync(uint256,uint256)"(
       reserve0?: null,
       reserve1?: null
     ): TypedEventFilter<
@@ -795,12 +952,21 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     getReserves(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     initialize(
       _collection: string,
       _token: string,
       _fee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    isRoyaltySupported(overrides?: CallOverrides): Promise<BigNumber>;
+
+    minRoyaltyFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       toTokenId: BigNumberish,
@@ -816,15 +982,30 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setProtocolFeePercent(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
       to: string,
+      data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -896,11 +1077,24 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     getReserves(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getRoyaltyRecipient(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     initialize(
       _collection: string,
       _token: string,
       _fee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    isRoyaltySupported(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    minRoyaltyFeePercent(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     mint(
@@ -919,15 +1113,30 @@ export class ISeacowsERC721TradePair extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setMinRoyaltyFeePercent(
+      _percent: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     setProtocolFeePercent(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     swap(
       tokenAmountOut: BigNumberish,
       idsOut: BigNumberish[],
       to: string,
+      data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

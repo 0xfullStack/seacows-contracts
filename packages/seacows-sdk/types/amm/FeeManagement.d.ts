@@ -23,8 +23,12 @@ interface FeeManagementInterface extends ethers.utils.Interface {
   functions: {
     "feeManager()": FunctionFragment;
     "feeTo()": FunctionFragment;
+    "royaltyFeeManager()": FunctionFragment;
+    "royaltyRegistry()": FunctionFragment;
     "setFeeManager(address)": FunctionFragment;
     "setFeeTo(address)": FunctionFragment;
+    "setRoyaltyFeeManager(address)": FunctionFragment;
+    "setRoyaltyRegistry(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -33,18 +37,50 @@ interface FeeManagementInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "feeTo", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "royaltyFeeManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyRegistry",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "setFeeManager",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "setFeeTo", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "setRoyaltyFeeManager",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setRoyaltyRegistry",
+    values: [string]
+  ): string;
 
   decodeFunctionResult(functionFragment: "feeManager", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feeTo", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "royaltyFeeManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "royaltyRegistry",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setFeeManager",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setFeeTo", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setRoyaltyFeeManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setRoyaltyRegistry",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
@@ -97,6 +133,10 @@ export class FeeManagement extends BaseContract {
 
     feeTo(overrides?: CallOverrides): Promise<[string]>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<[string]>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<[string]>;
+
     setFeeManager(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -106,11 +146,25 @@ export class FeeManagement extends BaseContract {
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    setRoyaltyFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setRoyaltyRegistry(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   feeManager(overrides?: CallOverrides): Promise<string>;
 
   feeTo(overrides?: CallOverrides): Promise<string>;
+
+  royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
+
+  royaltyRegistry(overrides?: CallOverrides): Promise<string>;
 
   setFeeManager(
     _to: string,
@@ -122,14 +176,32 @@ export class FeeManagement extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setRoyaltyFeeManager(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setRoyaltyRegistry(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     feeManager(overrides?: CallOverrides): Promise<string>;
 
     feeTo(overrides?: CallOverrides): Promise<string>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<string>;
+
     setFeeManager(_to: string, overrides?: CallOverrides): Promise<void>;
 
     setFeeTo(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    setRoyaltyFeeManager(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    setRoyaltyRegistry(_to: string, overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {};
@@ -139,12 +211,26 @@ export class FeeManagement extends BaseContract {
 
     feeTo(overrides?: CallOverrides): Promise<BigNumber>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<BigNumber>;
+
     setFeeManager(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setFeeTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setRoyaltyFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setRoyaltyRegistry(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -155,12 +241,26 @@ export class FeeManagement extends BaseContract {
 
     feeTo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    royaltyFeeManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    royaltyRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     setFeeManager(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setFeeTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setRoyaltyFeeManager(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setRoyaltyRegistry(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

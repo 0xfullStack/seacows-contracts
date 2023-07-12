@@ -18,6 +18,11 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
   address public collection;
   address public token;
 
+  uint64 public constant PERCENTAGE_PRECISION = 1e4;
+  uint64 public constant ONE_PERCENT = 1e2;
+  uint64 public constant POINT_FIVE_PERCENT = 50;
+  uint64 public constant MAX_PROTOCOL_FEE_PERCENT = 1e3;
+
   address private _positionManager;
 
   modifier onlyPositionManager() {

@@ -6,6 +6,7 @@ import {
   getSwapTokenOutMin,
   getDepositTokenInMax,
   getWithdrawAssetsOutMin,
+  BI_ZERO,
 } from '@yolominds/seacows-sdk';
 import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
 import SeacowsRouterArtifact from '@yolominds/seacows-periphery/artifacts/contracts/SeacowsRouter.sol/SeacowsRouter.json';
@@ -22,7 +23,7 @@ import {
 import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
 import { sqrt } from './utils';
 
-describe('SeacowsPositionManager', () => {
+describe('SeacowsRewarder', () => {
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
@@ -51,7 +52,6 @@ describe('SeacowsPositionManager', () => {
 
     weth = await WETHFC.deploy();
     template = await SeacowsERC721TradePairFC.deploy();
-    router = (await deployContract(owner, SeacowsRouterArtifact, [weth.address])) as SeacowsRouter;
 
     const erc721FC = await ethers.getContractFactory('MockERC721');
     const erc20FC = await ethers.getContractFactory('MockERC20');
@@ -64,6 +64,8 @@ describe('SeacowsPositionManager', () => {
     erc721 = await erc721FC.deploy();
     erc20 = await erc20FC.deploy();
     manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+    router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+
     await manager.setFeeTo(feeTo.address);
 
     ONE_PERCENT = await template.ONE_PERCENT();
@@ -149,13 +151,13 @@ describe('SeacowsPositionManager', () => {
   });
 
   it('should have fee calculated correctly', async () => {
-    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], 0, 100, owner);
+    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 0, 100, owner);
     expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.66'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router
       .connect(carol)
-      .swapTokensForExactNFTs(pair.address, [0, 1, 2], tokenInMaxWithSlippage, carol.address, MaxUint256);
+      .swapTokensForExactNFTs(pair.address, [0, 1, 2], tokenInMaxWithSlippage, BI_ZERO, carol.address, MaxUint256);
 
     expect(await pair.getPendingFee(1)).to.be.equal(0); // 0 fee for Pair's Position NFT
     expect(await pair.getPendingFee(2)).to.be.equal(ethers.utils.parseEther('0.03'));
@@ -211,13 +213,13 @@ describe('SeacowsPositionManager', () => {
   });
 
   it('should have fee calculated after previous added liquidity', async () => {
-    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], 0, 100, owner);
+    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 0, 100, owner);
     expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('26.64'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router
       .connect(carol)
-      .swapTokensForExactNFTs(pair.address, [0, 1, 2], tokenInMaxWithSlippage, carol.address, MaxUint256);
+      .swapTokensForExactNFTs(pair.address, [0, 1, 2], tokenInMaxWithSlippage, BI_ZERO, carol.address, MaxUint256);
 
     expect(await pair.getPendingFee(1)).to.be.equal(0); // 0 fee for Pair's Position NFT
     expect(await pair.getPendingFee(2)).to.be.equal(ethers.utils.parseEther('0.09'));
@@ -245,13 +247,13 @@ describe('SeacowsPositionManager', () => {
   });
 
   it('should have correct fee state after user selling NFTs', async () => {
-    const { tokenOutMinWithSlippage } = await getSwapTokenOutMin(pair.address, [4], 0, 100, owner);
+    const { tokenOutMinWithSlippage } = await getSwapTokenOutMin(pair.address, [4], BI_ZERO, 0, 100, owner);
     expect(tokenOutMinWithSlippage).to.be.equal(ethers.utils.parseEther('10.68'));
 
     await erc721.connect(alice).setApprovalForAll(router.address, true);
     await router
       .connect(alice)
-      .swapExactNFTsForTokens(pair.address, [4], tokenOutMinWithSlippage, carol.address, MaxUint256);
+      .swapExactNFTsForTokens(pair.address, [4], tokenOutMinWithSlippage, BI_ZERO, carol.address, MaxUint256);
 
     expect(await pair.getPendingFee(1)).to.be.equal(0); // 0 fee for Pair's Position NFT
     expect(await pair.getPendingFee(2)).to.be.equal(ethers.utils.parseEther('0.03'));

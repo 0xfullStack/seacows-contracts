@@ -21,7 +21,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface SeacowsERC721TradePairFactoryInterface
   extends ethers.utils.Interface {
   functions: {
-    "getPair(address,address,uint112)": FunctionFragment;
+    "getPair(address,address,uint256)": FunctionFragment;
     "template()": FunctionFragment;
   };
 

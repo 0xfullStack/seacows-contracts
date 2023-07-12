@@ -1,5 +1,5 @@
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
+import { BI_ZERO, getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { MaxUint256 } from '@ethersproject/constants';
@@ -10,9 +10,10 @@ import {
   type WETH,
   type MockERC721,
   type MockERC20,
+  type MockSeacowsPairSwap,
 } from 'types';
 import { ONE_PERCENT, COMPLEMENT_PRECISION } from './constants';
-import { calculateTokenChange, getTokenIn, getTokenOut, sqrt } from './utils';
+import { sqrt } from './utils';
 
 describe('SeacowsERC721TradePair', () => {
   let owner: SignerWithAddress;
@@ -248,7 +249,12 @@ describe('SeacowsERC721TradePair', () => {
     let feePercent: BigNumber;
     let protocolFeePercent: BigNumber;
     let precision: BigNumber;
+    let pairSwap: MockSeacowsPairSwap;
+
     before(async () => {
+      const MockSeacowsPairSwapFC = await ethers.getContractFactory('MockSeacowsPairSwap');
+      pairSwap = await MockSeacowsPairSwapFC.deploy();
+
       feePercent = await pair.feePercent();
       protocolFeePercent = await pair.protocolFeePercent();
       precision = await pair.PERCENTAGE_PRECISION();
@@ -280,8 +286,8 @@ describe('SeacowsERC721TradePair', () => {
        * Swap in ERC721: [4]
        * Swap out ERC20 (Including fee): 0.792 Ethers
        */
-      await erc721.connect(alice)['safeTransferFrom(address,address,uint256)'](alice.address, pair.address, 4);
-      const { tokenOutMin } = await getSwapTokenOutMin(pair, [4], 0, 100);
+      expect(await erc721.ownerOf(4)).to.be.equal(alice.address);
+      const { tokenOutMin } = await getSwapTokenOutMin(pair.address, [4], BI_ZERO, 0, 100, owner);
 
       // Expected ERC20 output after = 0.784 Ethers
       expect(tokenOutMin).to.be.equal(ethers.utils.parseEther('0.712'));
@@ -289,11 +295,12 @@ describe('SeacowsERC721TradePair', () => {
       /**
        * @notes Summary of Alice after swap
        * ERC721: []
-       * ERC20: 6.792 Ethers
+       * ERC20: 6.712 Ethers
        */
-      await expect(pair.connect(alice).swap(tokenOutMin, [], alice.address))
+      await erc721.connect(alice).setApprovalForAll(pairSwap.address, true);
+      await expect(pairSwap.connect(alice).swap(pair.address, tokenOutMin, [], alice.address, 0, [4]))
         .to.be.emit(pair, 'Swap')
-        .withArgs(alice.address, 0, ethers.utils.parseEther('1'), tokenOutMin, 0, alice.address);
+        .withArgs(pairSwap.address, 0, ethers.utils.parseEther('1'), ethers.utils.parseEther('0.8'), 0, alice.address);
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6.712'));
       expect(await erc20.balanceOf(feeTo.address)).to.be.equal(ethers.utils.parseEther('0.08'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(0);
@@ -323,9 +330,8 @@ describe('SeacowsERC721TradePair', () => {
        * Swap in ERC20 (including fee): 0.81002 ether
        * Swap out ERC721: [6]
        */
-      const { tokenInMax } = await getSwapTokenInMax(pair, [4], 0, 100);
+      const { tokenInMax } = await getSwapTokenInMax(pair.address, [4], BI_ZERO, 0, 100, owner);
 
-      await erc20.connect(bob).transfer(pair.address, tokenInMax);
       expect(tokenInMax).to.be.equal(ethers.utils.parseEther('0.888'));
 
       /**
@@ -333,9 +339,10 @@ describe('SeacowsERC721TradePair', () => {
        * ERC721: [1, 4, 6]
        * ERC20: 6.792 Ethers
        */
-      await expect(pair.connect(bob).swap(0, [4], bob.address))
+      await erc20.connect(bob).approve(pairSwap.address, tokenInMax);
+      await expect(pairSwap.connect(bob).swap(pair.address, 0, [4], bob.address, tokenInMax, []))
         .to.be.emit(pair, 'Swap')
-        .withArgs(bob.address, tokenInMax, 0, 0, ethers.utils.parseEther('1'), bob.address);
+        .withArgs(pairSwap.address, ethers.utils.parseEther('0.8'), 0, 0, ethers.utils.parseEther('1'), bob.address);
       expect(await erc20.balanceOf(bob.address)).to.be.equal(prevBobBalance.sub(tokenInMax));
       expect(await erc721.balanceOf(bob.address)).to.be.equal(3);
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);

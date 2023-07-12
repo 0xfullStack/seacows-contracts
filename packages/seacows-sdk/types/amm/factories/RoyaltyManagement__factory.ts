@@ -11,13 +11,344 @@ import type {
 
 const _abi = [
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "version",
+        type: "uint8",
+      },
+    ],
+    name: "Initialized",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "MAX_PROTOCOL_FEE_PERCENT",
+    outputs: [
+      {
+        internalType: "uint64",
+        name: "",
+        type: "uint64",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "ONE_PERCENT",
+    outputs: [
+      {
+        internalType: "uint64",
+        name: "",
+        type: "uint64",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "PERCENTAGE_PRECISION",
+    outputs: [
+      {
+        internalType: "uint64",
+        name: "",
+        type: "uint64",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "POINT_FIVE_PERCENT",
+    outputs: [
+      {
+        internalType: "uint64",
+        name: "",
+        type: "uint64",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "balanceOf",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "collection",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getRoyaltyRecipient",
+    outputs: [
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "isRoyaltySupported",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "minRoyaltyFeePercent",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_operator",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_fromTokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_toTokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_value",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "_data",
+        type: "bytes",
+      },
+    ],
+    name: "onERC3525Received",
+    outputs: [
+      {
+        internalType: "bytes4",
+        name: "",
+        type: "bytes4",
+      },
+    ],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "",
+        type: "bytes",
+      },
+    ],
+    name: "onERC721Received",
+    outputs: [
+      {
+        internalType: "bytes4",
+        name: "",
+        type: "bytes4",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "ownerOf",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "positionManager",
+    outputs: [
+      {
+        internalType: "contract ISeacowsPositionManager",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "royaltyFeeManager",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "royaltyRegistry",
     outputs: [
       {
-        internalType: "contract IRoyaltyRegistry",
+        internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_percent",
+        type: "uint256",
+      },
+    ],
+    name: "setMinRoyaltyFeePercent",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "slot",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes4",
+        name: "interfaceId",
+        type: "bytes4",
+      },
+    ],
+    name: "supportsInterface",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "token",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalSupply",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -26,7 +357,7 @@ const _abi = [
 ];
 
 const _bytecode =
-  "0x6080604052348015600f57600080fd5b5060918061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063a11b071214602d575b600080fd5b600054603f906001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f3fea2646970667358221220e031063c56dfb59685042108006135f617a055020f61dde1208ec9ddcd8d9aa864736f6c63430008120033";
+  "0x608060405234801561001057600080fd5b50610b40806100206000396000f3fe608060405234801561001057600080fd5b506004361061012b5760003560e01c806387e4401f116100ad578063bb2eb4d211610071578063bb2eb4d214610296578063e256888f1461029e578063e5f9e83b146102a7578063f78db9b8146102b0578063fc0c546a146102b857600080fd5b806387e4401f1461023e5780639cc7f70814610246578063a015a3d814610259578063a11b07121461026c578063a74d5f301461027457600080fd5b80631a88bc66116100f45780631a88bc66146101d95780631da8afb3146101e15780636352211e146101e9578063791b98bc146102145780637de1e5361461022557600080fd5b80629ce20b1461013057806301ffc9a71461016d5780630c6bc62b14610190578063150b7a02146101a557806318160ddd146101c3575b600080fd5b61014f61013e3660046108a3565b629ce20b60e01b9695505050505050565b6040516001600160e01b031990911681526020015b60405180910390f35b61018061017b366004610944565b6102cb565b6040519015158152602001610164565b6101a361019e366004610975565b61031c565b005b61014f6101b33660046109a4565b630a85bd0160e11b949350505050565b6101cb61038d565b604051908152602001610164565b6101cb61041b565b61018061045d565b6101fc6101f7366004610975565b610553565b6040516001600160a01b039091168152602001610164565b6002546001600160a01b03166101fc565b6000546101fc906201000090046001600160a01b031681565b6101fc6105d5565b6101cb610254366004610975565b61064a565b6101fc610267366004610975565b6106cc565b6101fc61083a565b61027d6103e881565b60405167ffffffffffffffff9091168152602001610164565b61027d606481565b61027d61271081565b6101cb60035481565b61027d603281565b6001546101fc906001600160a01b031681565b60006301ffc9a760e01b6001600160e01b0319831614806102fc57506001600160e01b03198216630a85bd0160e11b145b8061031657506001600160e01b03198216629ce20b60e01b145b92915050565b6103246105d5565b6001600160a01b0316336001600160a01b0316146103885760405162461bcd60e51b815260206004820152601c60248201527f526f79616c74794d616e6167656d656e743a20464f5242494444454e00000000604482015260640160405180910390fd5b600355565b60006103a16002546001600160a01b031690565b6001600160a01b03166388200bb96103b761041b565b6040518263ffffffff1660e01b81526004016103d591815260200190565b602060405180830381865afa1580156103f2573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104169190610a84565b905090565b600061042f6002546001600160a01b031690565b60405163add21d2560e01b81523060048201526001600160a01b03919091169063add21d25906024016103d5565b60008061046861083a565b60005460405163de5488af60e01b81526001600160a01b03620100009092048216600482015291169063de5488af90602401602060405180830381865afa1580156104b7573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104db9190610a9d565b6040516301ffc9a760e01b815263152a902d60e11b60048201529091506001600160a01b038216906301ffc9a790602401602060405180830381865afa158015610529573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061054d9190610aba565b91505090565b60006105676002546001600160a01b031690565b6001600160a01b0316636352211e836040518263ffffffff1660e01b815260040161059491815260200190565b602060405180830381865afa1580156105b1573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103169190610a9d565b60006105e96002546001600160a01b031690565b6001600160a01b03166387e4401f6040518163ffffffff1660e01b8152600401602060405180830381865afa158015610626573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104169190610a9d565b600061065e6002546001600160a01b031690565b6001600160a01b0316639cc7f708836040518263ffffffff1660e01b815260040161068b91815260200190565b602060405180830381865afa1580156106a8573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103169190610a84565b6000806106d761083a565b60005460405163de5488af60e01b81526001600160a01b03620100009092048216600482015291169063de5488af90602401602060405180830381865afa158015610726573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061074a9190610a9d565b6040516301ffc9a760e01b815263152a902d60e11b60048201529091506001600160a01b038216906301ffc9a790602401602060405180830381865afa158015610798573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906107bc9190610aba565b156108345760405163152a902d60e11b815260048101849052600060248201526001600160a01b03821690632a55205a906044016040805180830381865afa15801561080c573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108309190610adc565b5091505b50919050565b600061084e6002546001600160a01b031690565b6001600160a01b031663a11b07126040518163ffffffff1660e01b8152600401602060405180830381865afa158015610626573d6000803e3d6000fd5b6001600160a01b03811681146108a057600080fd5b50565b60008060008060008060a087890312156108bc57600080fd5b86356108c78161088b565b9550602087013594506040870135935060608701359250608087013567ffffffffffffffff808211156108f957600080fd5b818901915089601f83011261090d57600080fd5b81358181111561091c57600080fd5b8a602082850101111561092e57600080fd5b6020830194508093505050509295509295509295565b60006020828403121561095657600080fd5b81356001600160e01b03198116811461096e57600080fd5b9392505050565b60006020828403121561098757600080fd5b5035919050565b634e487b7160e01b600052604160045260246000fd5b600080600080608085870312156109ba57600080fd5b84356109c58161088b565b935060208501356109d58161088b565b925060408501359150606085013567ffffffffffffffff808211156109f957600080fd5b818701915087601f830112610a0d57600080fd5b813581811115610a1f57610a1f61098e565b604051601f8201601f19908116603f01168101908382118183101715610a4757610a4761098e565b816040528281528a6020848701011115610a6057600080fd5b82602086016020830137600060208483010152809550505050505092959194509250565b600060208284031215610a9657600080fd5b5051919050565b600060208284031215610aaf57600080fd5b815161096e8161088b565b600060208284031215610acc57600080fd5b8151801515811461096e57600080fd5b60008060408385031215610aef57600080fd5b8251610afa8161088b565b602093909301519294929350505056fea26469706673582212205e8b87c9f268ecf498bc2ef91722c043c79362a534b9437c0a9d31ea8f2002b064736f6c63430008120033";
 
 export class RoyaltyManagement__factory extends ContractFactory {
   constructor(

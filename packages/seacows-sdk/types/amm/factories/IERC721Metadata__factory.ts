@@ -16,19 +16,19 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_owner",
+        name: "owner",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "_approved",
+        name: "approved",
         type: "address",
       },
       {
         indexed: true,
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
@@ -41,19 +41,19 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_owner",
+        name: "owner",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "_operator",
+        name: "operator",
         type: "address",
       },
       {
         indexed: false,
         internalType: "bool",
-        name: "_approved",
+        name: "approved",
         type: "bool",
       },
     ],
@@ -66,19 +66,19 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_from",
+        name: "from",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "_to",
+        name: "to",
         type: "address",
       },
       {
         indexed: true,
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
@@ -89,25 +89,25 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_approved",
+        name: "to",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
     name: "approve",
     outputs: [],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
     inputs: [
       {
         internalType: "address",
-        name: "_owner",
+        name: "owner",
         type: "address",
       },
     ],
@@ -115,7 +115,7 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "",
+        name: "balance",
         type: "uint256",
       },
     ],
@@ -126,7 +126,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
@@ -134,7 +134,7 @@ const _abi = [
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "operator",
         type: "address",
       },
     ],
@@ -145,12 +145,12 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_owner",
+        name: "owner",
         type: "address",
       },
       {
         internalType: "address",
-        name: "_operator",
+        name: "operator",
         type: "address",
       },
     ],
@@ -182,7 +182,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
@@ -190,7 +190,7 @@ const _abi = [
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "owner",
         type: "address",
       },
     ],
@@ -201,40 +201,40 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_from",
+        name: "from",
         type: "address",
       },
       {
         internalType: "address",
-        name: "_to",
+        name: "to",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
     name: "safeTransferFrom",
     outputs: [],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
     inputs: [
       {
         internalType: "address",
-        name: "_from",
+        name: "from",
         type: "address",
       },
       {
         internalType: "address",
-        name: "_to",
+        name: "to",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
       {
@@ -245,14 +245,14 @@ const _abi = [
     ],
     name: "safeTransferFrom",
     outputs: [],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
     inputs: [
       {
         internalType: "address",
-        name: "_operator",
+        name: "operator",
         type: "address",
       },
       {
@@ -302,7 +302,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
@@ -321,23 +321,23 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_from",
+        name: "from",
         type: "address",
       },
       {
         internalType: "address",
-        name: "_to",
+        name: "to",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "tokenId",
         type: "uint256",
       },
     ],
     name: "transferFrom",
     outputs: [],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];

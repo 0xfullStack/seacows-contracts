@@ -67,12 +67,12 @@ contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
     uint liquidity = balanceOf(tokenId);
     info.feeDebt = liquidity * accRewardPerShare / ACC_REWARD_PER_SHARE_PRECISION;
   }
-
+  
   /**
     @notice Collect Swap fee for Position NFT
-    @param _tokenId The Position NFT ID t contract address
-    */
-  function collect(uint256 _tokenId) public returns (uint _fee){
+    @param _tokenId The Position NFT ID contract address
+   */
+  function collect(uint256 _tokenId) public returns (uint _fee) {
     updateSwapFee();
     uint256 _feeAmount = getPendingFee(_tokenId);
     positionInfos[_tokenId].unclaimedFee = 0;
