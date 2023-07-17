@@ -584,13 +584,18 @@ describe('SeacowsPositionManager', () => {
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
 
-      const { cTokenOutMin, cNftOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
+      const { cTokenOutMin, cNftOutMin, tokenInRange, nftOutRange } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
         0,
         100,
         alice,
       );
+      expect(tokenInRange[0]).to.be.equal(0);
+      expect(tokenInRange[1]).to.be.equal(0);
+      expect(nftOutRange[0]).to.be.equal(1);
+      expect(nftOutRange[1]).to.be.equal(2);
+
       await manager
         .connect(alice)
         .removeLiquidity(
