@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.16.2 (2023-07-17)
+
+
+### Bug Fixes
+
+* try both signer and provider ([5d36ebf](https://github.com/yolominds/seacows-contracts/commit/5d36ebf170f9599c2689d547b57406fc5f578f92))
+
 ### 1.16.1 (2023-07-17)
 
 ## 1.16.0 (2023-07-12)
