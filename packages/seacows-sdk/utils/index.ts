@@ -193,9 +193,9 @@ const getWithdrawAssetsOutMin = async (
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
   const collection = await pairContract.collection();
 
-  const collectionRealBalance = await (new Contract(collection, ERC721_ABI, pairContract.signer) as ERC721).balanceOf(
-    pairContract.address,
-  );
+  const collectionRealBalance = await (
+    new Contract(collection, ERC721_ABI, pairContract.signer || pairContract.provider) as ERC721
+  ).balanceOf(pairContract.address);
 
   const [tokenBalance, nftBalance] = await pairContract.getComplementedBalance();
 
