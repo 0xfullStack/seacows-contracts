@@ -168,7 +168,7 @@ describe('SeacowsRouter', () => {
           [pair.address],
           [[2]],
           [tokenInWithFee],
-          [minRoyaltyFeePercent],
+          minRoyaltyFeePercent,
           bob.address,
           MaxUint256,
         );
@@ -310,7 +310,7 @@ describe('SeacowsRouter', () => {
       // Approve token cost
       await router
         .connect(alice)
-        .batchSwapExactNFTsForTokens([pair.address], [[5]], [0], [minRoyaltyFeePercent], alice.address, MaxUint256);
+        .batchSwapExactNFTsForTokens([pair.address], [[5]], [0], minRoyaltyFeePercent, alice.address, MaxUint256);
 
       expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.add(tokenOutWithFee));
       expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.sub(tokenOutWithFee));

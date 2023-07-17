@@ -1,8 +1,10 @@
 import { BigNumber, Contract, type Signer } from 'ethers';
 import { type Provider } from '@ethersproject/abstract-provider';
 import PAIR_ABI from '../abis/amm/ISeacowsERC721TradePair.json';
+import ERC721_ABI from '../abis/common/ERC721.json';
 import { type SeacowsERC721TradePair } from '../types/amm';
 import { BI_ZERO } from '../constants';
+import { type ERC721 } from '../types/periphery';
 
 const getTokenInMax = (
   idsOut: number[],
@@ -189,7 +191,14 @@ const getWithdrawAssetsOutMin = async (
 }> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
+  const collection = await pairContract.collection();
+
+  const collectionRealBalance = await (new Contract(collection, ERC721_ABI, pairContract.signer) as ERC721).balanceOf(
+    pairContract.address,
+  );
+
   const [tokenBalance, nftBalance] = await pairContract.getComplementedBalance();
+
   const totalSupply = await pairContract.totalSupply();
   const complement = await pairContract.COMPLEMENT_PRECISION();
 
@@ -203,7 +212,9 @@ const getWithdrawAssetsOutMin = async (
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
 
-  const nftOutMax = cNftOut.div(complement).add(1);
+  let nftOutMax = cNftOut.div(complement).add(1);
+  nftOutMax = nftOutMax.gt(collectionRealBalance) ? collectionRealBalance : nftOutMax;
+
   const nftOutMin = cNftOutMin.div(complement);
 
   const tokenInMax = cNftOutMin.lt(complement.div(2))
