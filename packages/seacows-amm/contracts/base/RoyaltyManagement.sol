@@ -24,13 +24,15 @@ contract RoyaltyManagement is SeacowsPairMetadata, IRoyaltyManagement {
   }
 
   function getRoyaltyRecipient(uint256 _tokenId) public view returns (address recipient) {
-    // get royalty lookup address from the shared royalty registry
-    address lookupAddress = IRoyaltyRegistry(royaltyRegistry()).getRoyaltyLookupAddress(collection);
+    if (royaltyRegistry() != address(0)) {
+      // get royalty lookup address from the shared royalty registry
+      address lookupAddress = IRoyaltyRegistry(royaltyRegistry()).getRoyaltyLookupAddress(collection);
 
-    // calculates royalty payments for ERC2981 compatible lookup addresses
-    if (IERC2981(lookupAddress).supportsInterface(type(IERC2981).interfaceId)) {
-      // queries the default royalty (or specific for this router)
-      (recipient,) = IERC2981(lookupAddress).royaltyInfo(_tokenId, 0);
+      // calculates royalty payments for ERC2981 compatible lookup addresses
+      if (IERC2981(lookupAddress).supportsInterface(type(IERC2981).interfaceId)) {
+        // queries the default royalty (or specific for this router)
+        (recipient,) = IERC2981(lookupAddress).royaltyInfo(_tokenId, 0);
+      }
     }
   }
 

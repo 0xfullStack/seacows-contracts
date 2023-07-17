@@ -5,7 +5,7 @@ import { save } from './utils';
 
 export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers, network, run }) => {
   const chainId = network.config.chainId as SupportedChain;
-  const { weth } = addresses[env][chainId];
+  const { weth, royaltyRegistry } = addresses[env][chainId];
 
   try {
     const NFTRendererFC = await ethers.getContractFactory('NFTRenderer');
@@ -27,6 +27,9 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     const manager = await SeacowsPositionManagerFC.deploy(template.address, weth);
     await manager.deployed();
     await save(env, network.name, 'SeacowsPositionManager', manager.address);
+
+    const txn = await manager.setRoyaltyRegistry(royaltyRegistry);
+    await txn.wait();
 
     console.log('Start verifying contracts...');
 
