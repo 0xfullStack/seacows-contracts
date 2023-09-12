@@ -13,6 +13,7 @@ import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
 import * as tdly from '@tenderly/hardhat-tenderly';
 import './tasks';
+import 'solidity-coverage';
 
 tdly.setup();
 dotenv.config();

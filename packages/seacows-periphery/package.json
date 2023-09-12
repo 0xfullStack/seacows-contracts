@@ -59,7 +59,7 @@
     "rimraf": "^3.0.2",
     "solhint": "^3.6.2",
     "solhint-plugin-prettier": "^0.0.5",
-    "solidity-coverage": "^0.8.1",
+    "solidity-coverage": "^0.8.4",
     "solmate": "^6.6.1",
     "ts-node": "^10.7.0",
     "typechain": "^8.1.1",

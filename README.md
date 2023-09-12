@@ -28,6 +28,15 @@ cd seacows-periphery
 npx prettier --write --plugin=prettier-plugin-solidity 'contracts/**/*.sol'
 ```
 
+## Unit Test Coverage
+```
+cd seacows-amm
+npx hardhat coverage
+
+cd seacows-periphery
+npx hardhat coverage
+```
+
 ## Contract packages
 
 - [Seacows AMM](./packages/seacows-amm/)

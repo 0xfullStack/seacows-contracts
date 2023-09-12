@@ -12,6 +12,7 @@ import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
 import * as tdly from '@tenderly/hardhat-tenderly';
 import './tasks';
+import 'solidity-coverage';
 
 tdly.setup();
 dotenv.config();
