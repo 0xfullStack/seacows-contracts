@@ -23,6 +23,8 @@ contract SeacowsComplement is ISeacowsComplement {
         return _nftComplement;
     }
 
+    // _tokenAmountOut: Expected token out 
+    // _nftAmountOut: Expected nft out 
     function getComplemenetedAssetsOut(
         int256 _tokenAmountOut,
         int256 _nftAmountOut
@@ -33,20 +35,35 @@ contract SeacowsComplement is ISeacowsComplement {
     {
         int256 complement = int256(COMPLEMENT_PRECISION);
 
+        // 向下取整，保证quotient是complement的整数倍
+        // 200 =（257 / 100）* 100
         int256 quotient = (_nftAmountOut / complement) * complement;
+
+        // 
         int256 remainer = quotient - _nftAmountOut;
 
+        
+        // 根据文档里面的条件公式，向上取整。
         if (remainer + _nftComplement <= COMPLEMENT_THRESHOLD) {
             quotient = quotient + complement;
         }
 
         if (quotient >= complement) {
             nftAmountOut = quotient;
+
+            // Actual NFT Amount Out - Expected NFT Amount Out （实际的-预估的）
             int256 nftChange = nftAmountOut - _nftAmountOut;
+
+            // update complemented nft amount （更新本地 补足nft 的数量）
             newNftComplement = _nftComplement + nftChange;
 
+            
+            // Actual Token Amount Out
+            // Formula reference: https://github.com/yolominds/seacows-protocol-specification/blob/main/overview.md#seacows-complement
             int256 tokenChange = (nftChange * _tokenAmountOut) / _nftAmountOut;
             tokenAmountOut = _tokenAmountOut - tokenChange;
+
+            // update complemented token amount
             newTokenComplement = _tokenComplement - tokenChange;
         } else {
             newNftComplement = _nftComplement - _nftAmountOut;

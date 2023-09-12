@@ -10,6 +10,7 @@ library SeacowsLibrary {
     }
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
+    // 根据输入的nft数量，计算可以得到的token数量
     function getAmountOut(
         uint nftIn,
         uint tokenReserve,
@@ -25,6 +26,7 @@ library SeacowsLibrary {
     }
 
     // given an output amount of an asset and pair reserves, returns a required input amount of the other asset
+    // 根据想要的nft数量，计算需要的token数量
     function getAmountIn(
         uint amountOut,
         uint reserveIn,

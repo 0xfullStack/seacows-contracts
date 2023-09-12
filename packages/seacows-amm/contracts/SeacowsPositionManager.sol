@@ -215,6 +215,7 @@ contract SeacowsPositionManager is
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
         address pair = getPair(token, collection, fee);
 
+        // erc3525 使用value代表流动性
         transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
         (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(
             msg.sender,

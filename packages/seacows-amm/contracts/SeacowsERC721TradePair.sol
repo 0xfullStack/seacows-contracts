@@ -90,7 +90,17 @@ contract SeacowsERC721TradePair is
         emit Mint(msg.sender, amount0, amount1);
     }
 
-    // this low-level function should be called from a contract which performs important safety checks
+    /*
+    * @dev Compare the complemented reserves to the acutal complemented balance of assets and
+    *      mint the liquidty shares for the excess amount of the complemented balance.
+    * @param from The address that will need to deposit additional token for the withdrawal.
+    * @param to The address that receives the asset withdrew.
+    * @return cTokenOut The complemented token amount that is withdrawn.
+    * @return cNftOut The complemented NFT amount that is withdrawn.
+    * @return tokenIn The additional amount that is needed to be deposited for the withdrawal.
+    * @return tokenOut The finalized the amount of Token that is withdrawn.
+    * @return idsOut The NFT Token IDs that are withdrawn.
+    */
     function burn(
         address from,
         address to,
@@ -100,9 +110,11 @@ contract SeacowsERC721TradePair is
 
         ISeacowsPositionManager manager = positionManager();
 
+        // transfer erc20 token
         uint nftAmountOut;
         {
             // scope to avoid stack too deep errors
+            // liquidity 刚充值进来的，所以可以用balanceOf获取
             uint liquidity = manager.balanceOf(manager.tokenOf(address(this)));
             cTokenOut = (liquidity * balance0) / totalSupply(); // using balances ensures pro-rata distribution
             cNftOut = (liquidity * balance1) / totalSupply(); // using balances ensures pro-rata distribution
@@ -120,6 +132,7 @@ contract SeacowsERC721TradePair is
         require(_ids.length >= nftAmountOut, 'SeacowsERC721TradePair: EXCEED_NFT_OUT_MAX');
         IERC20(token).transfer(to, tokenOut);
 
+        // transfer erc721 nft
         {
             // scope to avoid stack too deep errors
             idsOut = new uint[](nftAmountOut);
@@ -136,6 +149,7 @@ contract SeacowsERC721TradePair is
             require(count == nftAmountOut, 'SeacowsERC721TradePair: INSUFFICIENT_NFT_TO_WITHDRAW');
         }
 
+        // 想要提现，必须先充值😂
         if (tokenIn > 0) {
             manager.seacowsBurnCallback(token, from, tokenIn);
         }
@@ -162,9 +176,12 @@ contract SeacowsERC721TradePair is
             (uint256 _reserve0, uint256 _reserve1, ) = getReserves(); // gas savings
             require(tokenAmountOut < _reserve0 && idsOut.length * COMPLEMENT_PRECISION < _reserve1, 'SeacowsERC721TradePair INSUFFICIENT_LIQUIDITY');
             uint tokenAmountIn;
+
+            // 负责将用户的token或者nft，转入池子（token/nft in）
             (tokenAmountIn, idsIn) = ISeacowsSwapCallback(msg.sender).seacowsSwapCallback(data);
             require(tokenAmountIn > 0 || idsIn.length > 0, 'SeacowsERC721TradePair: INSUFFICIENT_INPUT_AMOUNT');
 
+            // 负责将池子的token或者nft，转给用户（token/nft out）
             require(to != token && to != collection, 'SeacowsERC721TradePair: INVALID_TO');
             if (tokenAmountOut > 0) IERC20(token).transfer(to, tokenAmountOut); // optimistically transfer tokens
             if (idsOut.length > 0) {
@@ -175,6 +192,8 @@ contract SeacowsERC721TradePair is
 
             {
                 // scope avoids stack too deep errors
+
+                // 处理协议费，swap交易费，和版税费
                 (uint balance0, uint balance1) = getComplementedBalance();
                 uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
                 
@@ -189,6 +208,7 @@ contract SeacowsERC721TradePair is
                 }
                 _handleRoyaltyFee(_totalFees, idsIn, idsOut);
 
+                // 处理k常数平衡
                 (balance0, balance1) = getComplementedBalance();
                 require(balance0 * balance1 >= _reserve0 * _reserve1, 'SeacowsERC721TradePair K');
                 _update(balance0, balance1, _reserve0, _reserve1);
