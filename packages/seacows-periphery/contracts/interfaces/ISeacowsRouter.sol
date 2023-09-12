@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import { ISeacowsSwapCallback } from "./ISeacowsSwapCallback.sol";
+import {ISeacowsSwapCallback} from './ISeacowsSwapCallback.sol';
 
-interface ISeacowsRouter is ISeacowsSwapCallback{
+interface ISeacowsRouter is ISeacowsSwapCallback {
     function swapExactNFTsForTokens(
         address _pair,
         uint[] memory idsIn,

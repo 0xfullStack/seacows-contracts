@@ -10,7 +10,6 @@ import {ISeacowsSwapCallback} from '../interfaces/ISeacowsSwapCallback.sol';
 import './PeripheryImmutableState.sol';
 
 contract SeacowsSwapCallback is PeripheryImmutableState, ISeacowsSwapCallback {
-
     struct SwapCallbackData {
         address payer;
         uint[] idsIn;
@@ -25,11 +24,17 @@ contract SeacowsSwapCallback is PeripheryImmutableState, ISeacowsSwapCallback {
         idsIn = callback.idsIn;
 
         ISeacowsERC721TradePair _pair = ISeacowsERC721TradePair(msg.sender);
-        require(_pair.supportsInterface(type(ISeacowsERC721TradePair).interfaceId), "SeacowsSwapCallback: NOT_SEACOWS_PAIR");
+        require(
+            _pair.supportsInterface(type(ISeacowsERC721TradePair).interfaceId),
+            'SeacowsSwapCallback: NOT_SEACOWS_PAIR'
+        );
         address _token = _pair.token();
         address _collection = _pair.collection();
 
-        require(ISeacowsPositionManager(manager).getPair(_token, _collection, _pair.feePercent()) == msg.sender, "SeacowsSwapCallback: PAIR_MISMATCH");
+        require(
+            ISeacowsPositionManager(manager).getPair(_token, _collection, _pair.feePercent()) == msg.sender,
+            'SeacowsSwapCallback: PAIR_MISMATCH'
+        );
 
         if (tokenAmountIn > 0) IERC20(_token).transferFrom(callback.payer, msg.sender, tokenAmountIn);
         if (idsIn.length > 0) {

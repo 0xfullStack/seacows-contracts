@@ -4,14 +4,14 @@ pragma solidity ^0.8.0;
 
 /// @author: manifold.xyz
 
-import "@openzeppelin/contracts/utils/introspection/ERC165.sol"; 
-import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@manifoldxyz/libraries-solidity/contracts/access/IAdminControl.sol";
+import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
+import '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
+import '@manifoldxyz/libraries-solidity/contracts/access/IAdminControl.sol';
 
-import "../interfaces/IRoyaltyRegistry.sol";
+import '../interfaces/IRoyaltyRegistry.sol';
 
 /**
  * @dev Registry to lookup royalty configurations
@@ -45,7 +45,7 @@ contract MockRoyaltyRegistry is ERC165, OwnableUpgradeable, IRoyaltyRegistry {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override (ERC165, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
         return interfaceId == type(IRoyaltyRegistry).interfaceId || super.supportsInterface(interfaceId);
     }
 
@@ -63,16 +63,15 @@ contract MockRoyaltyRegistry is ERC165, OwnableUpgradeable, IRoyaltyRegistry {
     /**
      * @dev See {IRegistry-setRoyaltyLookupAddress}.
      */
-    function setRoyaltyLookupAddress(address tokenAddress, address royaltyLookupAddress)
-        public
-        override
-        returns (bool)
-    {
+    function setRoyaltyLookupAddress(
+        address tokenAddress,
+        address royaltyLookupAddress
+    ) public override returns (bool) {
         require(
             tokenAddress.isContract() && (royaltyLookupAddress.isContract() || royaltyLookupAddress == address(0)),
-            "Invalid input"
+            'Invalid input'
         );
-        require(overrideAllowed(tokenAddress), "Permission denied");
+        require(overrideAllowed(tokenAddress), 'Permission denied');
         // look up existing override, if any
         address existingOverride = _overrides[tokenAddress];
         // set new override and reverse-lookup
@@ -89,8 +88,8 @@ contract MockRoyaltyRegistry is ERC165, OwnableUpgradeable, IRoyaltyRegistry {
         if (owner() == _msgSender()) return true;
 
         if (
-            ERC165Checker.supportsInterface(tokenAddress, type(IAdminControl).interfaceId)
-                && IAdminControl(tokenAddress).isAdmin(_msgSender())
+            ERC165Checker.supportsInterface(tokenAddress, type(IAdminControl).interfaceId) &&
+            IAdminControl(tokenAddress).isAdmin(_msgSender())
         ) {
             return true;
         }
@@ -101,18 +100,18 @@ contract MockRoyaltyRegistry is ERC165, OwnableUpgradeable, IRoyaltyRegistry {
             if (owner.isContract()) {
                 try OwnableUpgradeable(owner).owner() returns (address passThroughOwner) {
                     if (passThroughOwner == _msgSender()) return true;
-                } catch { }
+                } catch {}
             }
-        } catch { }
+        } catch {}
 
         try IAccessControlUpgradeable(tokenAddress).hasRole(0x00, _msgSender()) returns (bool hasRole) {
             if (hasRole) return true;
-        } catch { }
+        } catch {}
 
         return false;
     }
 
-    function _msgSender() internal view virtual override (ContextUpgradeable) returns (address) {
+    function _msgSender() internal view virtual override(ContextUpgradeable) returns (address) {
         if (msg.sender == OVERRIDE_FACTORY) {
             address relayedSender;
             ///@solidity memory-safe-assembly
