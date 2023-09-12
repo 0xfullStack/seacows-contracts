@@ -6,8 +6,8 @@ This repository contains the smart contracts for the Seacows Protocol.
 
 ```
 yarn install
-yarn workspace seacows-periphery run compile
-yarn workspace seacows-amm run compile
+yarn workspace @yolominds/seacows-periphery run compile
+yarn workspace @yolominds/seacows-amm run compile
 ```
 
 ## Contract packages

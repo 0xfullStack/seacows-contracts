@@ -63,11 +63,11 @@
     "solmate": "^6.6.1",
     "ts-node": "^10.7.0",
     "typechain": "^8.1.1",
-    "typescript": "*"
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@yolominds/seacows-sdk": "*",
-    "@yolominds/seacows-amm": "*"
+    "@yolominds/seacows-amm": "*",
+    "@yolominds/seacows-sdk": "*"
   },
   "files": [
     "dist/*"
