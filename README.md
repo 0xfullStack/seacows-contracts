@@ -2,6 +2,7 @@
 
 This repository contains the smart contracts for the Seacows Protocol.
 
+<<<<<<< Updated upstream
 ## Get Started
 
 ```
@@ -15,3 +16,7 @@ yarn workspace seacows-amm run compile
 - [Seacows AMM](./packages/seacows-amm/)
 
 ## IMPORTANT NOTES
+=======
+# Usage
+https://www.notion.so/seacows/Smart-Contracts-1c053eab52b4428d82694d9382bff48a?pvs=4
+>>>>>>> Stashed changes

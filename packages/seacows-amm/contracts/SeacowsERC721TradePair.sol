@@ -130,6 +130,8 @@ contract SeacowsERC721TradePair is
             }
         }
         require(_ids.length >= nftAmountOut, 'SeacowsERC721TradePair: EXCEED_NFT_OUT_MAX');
+
+        // transfer erc20 token
         IERC20(token).transfer(to, tokenOut);
 
         // transfer erc721 nft

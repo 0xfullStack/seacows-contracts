@@ -96,8 +96,8 @@ const config: HardhatUserConfig = {
     pretty: false,
   },
   tenderly: {
-    username: 'seacows-tech',
-    project: 'seacows',
+    username: '0xfullstack',
+    project: 'project',
     privateVerification: false, // if true, contracts will be verified privately, if false, contracts will be verified publicly
   },
 };

@@ -118,6 +118,13 @@ describe('MockSeacowsComplement', () => {
    */
   it('should output more tokens when less NFTs are output', async () => {
     // Setup initial complement
+
+    // 设置初始值的逻辑：
+    // 这里表示，希望tokenAmountOut 和 nftAmountOut的值
+    // 根据补足规则，实际tokenOut为0.4，nftOut为0
+    // 所以：
+    // 给了用户的0.2的token，对应我们池子，token Complement为-0.2
+    // 用户留在池子的nft为0.2，对应我们池子，nft Complement为+0.2
     await (
       await MockSeacowsComplement.updateComplement(ethers.utils.parseEther('0.2'), ethers.utils.parseEther('0.2'))
     ).wait();

@@ -40,7 +40,7 @@ contract SeacowsComplement is ISeacowsComplement {
         int256 quotient = (_nftAmountOut / complement) * complement;
 
         // 
-        int256 remainer = quotient - _nftAmountOut;
+        int256 remainer = quotient - _nftAmountOut; // ？formula里面是 _nftAmountOut - quotient
 
         
         // 根据文档里面的条件公式，向上取整。
@@ -61,7 +61,7 @@ contract SeacowsComplement is ISeacowsComplement {
             // Actual Token Amount Out
             // Formula reference: https://github.com/yolominds/seacows-protocol-specification/blob/main/overview.md#seacows-complement
             int256 tokenChange = (nftChange * _tokenAmountOut) / _nftAmountOut;
-            tokenAmountOut = _tokenAmountOut - tokenChange;
+            tokenAmountOut = _tokenAmountOut - tokenChange; // 这段计算逻辑和github的formula一致
 
             // update complemented token amount
             newTokenComplement = _tokenComplement - tokenChange;

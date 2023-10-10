@@ -345,9 +345,9 @@ describe('SeacowsPositionManager', () => {
        * Input ETH: 3 Ethers
        * Input ERC721: [1, 2, 3]
        *
-       * Position NFT ID of Pair: 1
-       * Position NFT ID of Pair Lock Position: 2
-       * Position NFT ID of Alice: 3
+       * Position NFT ID of Pair: 1 => ID
+       * Position NFT ID of Pair Lock Position: 2 => SLOT
+       * Position NFT ID of Alice: 3 => VALUE
        */
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
       await erc721.connect(alice).setApprovalForAll(manager.address, true);
@@ -683,7 +683,7 @@ describe('SeacowsPositionManager', () => {
       }
 
       /**
-       * @notes Bob swap out tokens
+       * @notes Bob swap out nfts
        * Input ERC721: [5, 6, 7, 8, 9]
        *
        * Pair state:
@@ -701,7 +701,7 @@ describe('SeacowsPositionManager', () => {
        * @notes Bob withdraw - increase NFT complement
        * liquidty: 20% of total supply
        * NFT withdrawing: 0.2 NFT
-       * nftComplement: 0.2 NFT
+       * nftComplement: -0.2 NFT
        */
       {
         // Scope to allow same variable redeclare
@@ -735,7 +735,7 @@ describe('SeacowsPositionManager', () => {
        * NFT withdrawing: 0.3 NFT
        *
        * After that,
-       * nftComplement: 0 NFT
+       * nftComplement: 0.5 NFT。因为之前nftComplement = -0.2 NFT，意味着用户留下了0.2个nft，然后这里，需要池子补给用户0.7个，所以-0.2 + 0.7 = 0.5
        */
       {
         // Scope to allow same variable redeclare
