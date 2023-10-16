@@ -197,13 +197,27 @@ contract SeacowsERC721TradePair is
 
                 // 处理协议费，swap交易费，和版税费
                 (uint balance0, uint balance1) = getComplementedBalance();
+
+                // 103843324547321.4532132578 = 
+                // (218917703390134295 * 20703684550743374498 - 208731983895944047 * 21703684550743374498) / 20703684550743374498
+                // 计算了由于交易而累积在池子中的费用（代表了由于费用累积导致的 k 的增加。），并将其转换为资产0的单位。
                 uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
                 
+                // 10081876169642927
+                // 218917703390134295 - 208731983895944047 - 103843324547321.4532132578
                 absAmountIn = balance0 > reserve0 ? balance0 - reserve0 - _totalFees : 0;
                 absAmountOut = reserve0 > balance0 ? reserve0 - balance0 + _totalFees : 0;
                 {
                     // scope avoids stack too deep errors
+
+                    // 10081876169642927
                     uint absAmount = Math.max(absAmountIn, absAmountOut);
+
+                    // 不满足，所以报错
+                    // (10081876169642927 * 103 / 10000) = 103843324547322.1481 <= 103843324547321.4532132578
+
+                    // (10081876169642926.5467867422 * 103 / 10000)
+                    // 103843324547322.1434319034
                     require(absAmount * minTotalFeePercent() / PERCENTAGE_PRECISION <= _totalFees , "SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE");
                     _totalFees -= _handleProtocolFee(absAmount);
                     _totalFees -= _handleSwapFee(absAmount);
@@ -212,6 +226,8 @@ contract SeacowsERC721TradePair is
 
                 // 处理k常数平衡
                 (balance0, balance1) = getComplementedBalance();
+
+                // 因为交易费用会累积在池子中，相乘进行比较，代表了由于费用累积导致的 k 的增加。），所以肯定会 >=
                 require(balance0 * balance1 >= _reserve0 * _reserve1, 'SeacowsERC721TradePair K');
                 _update(balance0, balance1, _reserve0, _reserve1);
             }
