@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/yolominds/seacows-contracts/compare/@yolominds/seacows-sdk@1.17.1...@yolominds/seacows-sdk\@1.1.1) (2023-10-19)
+
 ## 1.1.0 (2023-05-08)
 
 
