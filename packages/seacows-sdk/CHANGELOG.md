@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/yolominds/seacows-contracts/compare/@yolominds/seacows-sdk@1.16.2...@yolominds/seacows-sdk@1.17.0) (2023-10-19)
+
+
+### Features
+
+* run linter and prettier ([4f7ddab](https://github.com/yolominds/seacows-contracts/commit/4f7ddab9bdaaf70f671a6dde0b5418f59fa461d4))
+* slither usage ([7365148](https://github.com/yolominds/seacows-contracts/commit/736514845809f133170d73d0356a2343727730ae))
+* solidity-coverage plugin ([987fd80](https://github.com/yolominds/seacows-contracts/commit/987fd80ac33ddc0b13a550af8877d0d64c934a63))
+
 ### 1.16.2 (2023-07-17)
 
 
