@@ -5,81 +5,81 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract SpeedBump is ReentrancyGuard {
-    struct Withdrawal {
-        address user;
+contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
+    struct TokenWithdrawal {
+        address token;
         uint256 amount;
         uint256 blockNumber;
     }
 
-    // Mapping from token ID to Withdrawal struct
-    mapping(uint256 => Withdrawal) public nftWithdrawals;
-
-    // Mapping from user address to Withdrawal struct for Ether
-    mapping(address => Withdrawal) public etherWithdrawals;
-
-    ERC721 public positionManager;
-
-    constructor(address _positionManager) {
-        positionManager = ERC721(_positionManager);
+    struct NFTWithdrawal {
+        uint256 id;
+        uint256 blockNumber;
     }
-    
-    // Modifier to check if the call is being made from the positionManager contract
+
+    // User addresss => NFT collection address => Withdrawal
+    mapping(address => mapping (address => NFTWithdrawal)) public userCollections;
+
+    // User address => collection address
+    mapping(address => address[]) public userToCollections;
+
+    // Token address => User address => Withdrawal
+    mapping(address => mapping (address => Withdrawal)) public tokenWithdrawals;
+
+    address public positionManager;
+
+    function initialize(address _positionManager) public initializer {
+        positionManager = _positionManager;
+    }
+
+    function registerNftWithdrawal(address collection, uint256 tokenId, address user) external onlyPositionManager {
+        nftWithdrawals[collection][tokenId] = Withdrawal(user, 1, block.number);
+    }
+
+    function withdrawNft(address collection, uint256 tokenId) external nonReentrant {
+        Withdrawal memory withdrawal = nftWithdrawals[collection][tokenId];
+
+        require(withdrawal.user == msg.sender, "SpeedBump: INVALID_MSG_SENDER");
+        require(withdrawal.amount != 0, "SpeedBump: INVALID_TOKEN_ID");
+        require(block.number > withdrawal.blockNumber, "SpeedBump: Please wait one more block");
+
+        delete nftWithdrawals[collection][tokenId];
+        IERC721(collection).safeTransferFrom(address(this), msg.sender, tokenId);
+    }
+
+    function registerTokenWithdrawal(address token, uint256 amount, address user) external onlyPositionManager nonReentrant {
+        require(amount > 0, "SpeedBump: Token amount must be great than zero");
+        tokenWithdrawals[token][user] = Withdrawal(user, amount, block.number);
+    }
+
+    function withdrawToken(address token) external nonReentrant {
+        Withdrawal memory withdrawal = tokenWithdrawals[token][msg.sender];
+
+        require(withdrawal.user == msg.sender, "SpeedBump: INVALID_MSG_SENDER");
+        require(block.number > withdrawal.blockNumber, "Speed bump: Please wait one more block");
+
+        delete tokenWithdrawals[token][msg.sender];
+        require(IERC20(token).transfer(msg.sender, withdrawal.amount), "Speed bump: Token transfer failed");
+    }
+
     modifier onlyPositionManager() {
-        require(msg.sender == address(positionManager), "Not authorized");
+        require(msg.sender == address(positionManager), "Speed bump: Not authorized");
         _;
     }
 
-    function registerNftWithdrawal(uint256 tokenId, address user) external onlyPositionManager {
-        // Register the NFT withdrawal
-        nftWithdrawals[tokenId] = Withdrawal(user, 1, block.number);
+    // User address => ()
+    mapping(address => mapping (address => Withdrawal)) public tokens;
+    mapping(address => mapping (address => Withdrawal)) public nfts;
+
+    function tokens() external returns(uint) {
+
     }
 
-    function withdrawNft(uint256 tokenId) external nonReentrant {
-        Withdrawal memory withdrawal = nftWithdrawals[tokenId];
-
-        // Check if the user is entitled to withdraw
-        require(withdrawal.user == msg.sender, "Not entitled to withdraw");
-
-        // Check if at least 1 blocks have passed
-        require(block.number > withdrawal.blockNumber, "Speed bump - please wait one more block");
-
-        // Reset withdrawal entry
-        delete nftWithdrawals[tokenId];
-
-        // Transfer the NFT to the user
-        nftContract.safeTransferFrom(address(this), msg.sender, tokenId);
-    }
-
-    // Function to deposit ERC20 tokens into the contract
-    function depositERC20(address user, address tokenAddress, uint256 amount) external onlyPositionManager nonReentrant {
-        require(amount > 0, "No tokens sent");
-
-        // Transfer the tokens from the user to this contract
-        IERC20 token = IERC20(tokenAddress);
-        require(token.transferFrom(msg.sender, address(this), amount), "Token transfer failed");
-
-        // Register the ERC20 withdrawal to the user
-        erc20Withdrawals[user][tokenAddress] = Withdrawal(user, amount, block.number);
-    }
-
-    // Function for the user to withdraw their ERC20 tokens
-    function withdrawERC20(address tokenAddress) external nonReentrant {
-        Withdrawal memory withdrawal = erc20Withdrawals[msg.sender][tokenAddress];
-
-        // Check if the user has deposited ERC20 tokens
-        require(withdrawal.user == msg.sender, "No deposit found");
-
-        // Check if at least 1 blocks have passed
-        require(block.number > withdrawal.blockNumber, "Speed bump - please wait one more block");
-
-        // Reset withdrawal entry
-        delete erc20Withdrawals[msg.sender][tokenAddress];
-
-        // Transfer the ERC20 tokens to the user
-        IERC20 token = IERC20(tokenAddress);
-        require(token.transfer(msg.sender, withdraw.amount), "Token transfer failed");
+    function nfts() external returns(uint) {
+        
     }
 }

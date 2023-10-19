@@ -9,7 +9,7 @@ import "./SpeedBump.sol";
 contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
     SpeedBump public speedBump;
 
-    constructor(address _speedBump) {
+    constructor(address template_, address _WETH, address _speedBump) SeacowsPositionManager(template_, _WETH) {
         speedBump = SpeedBump(_speedBump);
     }
 
@@ -36,14 +36,13 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
             liquidity,
             constraint,
             fromTokenId,
-            speedBump,  // transfers NFTS to speedBump
+            address(speedBump),  // transfers NFTS to speedBump
             deadline
         );
 
-        // Register NFTs withdrawal in SpeedBump contract
         for (uint i = 0; i < idsOut.length; i++) {
-            IERC721(collection).approve(address(speedBump), idsOut[i]);
-            speedBump.registerNftWithdrawal(idsOut[i], to);
+            // IERC721(collection).approve(address(speedBump), idsOut[i]);
+            speedBump.registerNftWithdrawal(collection, idsOut[i], to);
         }
 
         return (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut);
@@ -62,7 +61,6 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
         override
         returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut)
     {
-        // Call the overridden removeLiquidity function
         (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = removeLiquidity(
             WETH,
             collection,
@@ -70,13 +68,12 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
             liquidity,
             constraint,
             fromTokenId,
-            speedBump,
+            address(speedBump),
             deadline
         );
 
-        // Transfer WETH to SpeedBump and register the deposit
-        IERC20(WETH).approve(address(speedBump), tokenOut);
-        speedBump.depositERC20(WETH, tokenOut);
+        // IERC20(WETH).approve(address(speedBump), tokenOut);
+        speedBump.registerTokenWithdrawal(WETH, tokenOut, to);
 
         return (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut);
     }
