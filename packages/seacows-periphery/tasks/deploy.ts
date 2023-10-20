@@ -8,6 +8,7 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
 
   try {
     const SeacowsRouterFC = await ethers.getContractFactory('SeacowsRouter');
+    console.log('manager address: ', manager);
     const router = await SeacowsRouterFC.deploy(manager, weth);
     await router.deployed();
     await save(env, network.name, 'SeacowsRouter', router.address);
