@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.17.1 (2023-10-20)
+
+
+### Bug Fixes
+
+* redeploy periphery contract to solve using a old positionmanager address ([a218b0e](https://github.com/yolominds/seacows-contracts/commit/a218b0e91b10f9628f43117dc2beea6c5a066c2b))
+
 ## 1.17.0 (2023-10-20)
 
 
