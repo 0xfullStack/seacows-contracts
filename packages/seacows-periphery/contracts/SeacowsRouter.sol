@@ -10,7 +10,6 @@ import './interfaces/IWETH.sol';
 import './lib/SeacowsLibrary.sol';
 
 contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacowsRouter {
-
     constructor(address _manager, address _weth) SeacowsSwapCallback(_manager, _weth) {}
 
     modifier checkDeadline(uint deadline) {
@@ -45,7 +44,11 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             pair.PERCENTAGE_PRECISION()
         );
         require(amountIn <= amountInMax, 'SeacowsRouter: EXCESSIVE_INPUT_AMOUNT');
-        SwapCallbackData memory _data = SwapCallbackData({ payer: msg.sender, idsIn: new uint[](0), tokenAmountIn: amountIn });
+        SwapCallbackData memory _data = SwapCallbackData({
+            payer: msg.sender,
+            idsIn: new uint[](0),
+            tokenAmountIn: amountIn
+        });
         pair.swap(0, idsOut, to, abi.encode(_data));
     }
 
@@ -103,7 +106,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             pair.PERCENTAGE_PRECISION()
         );
         require(amountOut >= amountOutMin, 'SeacowsRouter: INSUFFICIENT_OUTPUT_AMOUNT');
-        SwapCallbackData memory _data = SwapCallbackData({ payer: msg.sender, idsIn: idsIn, tokenAmountIn: 0 });
+        SwapCallbackData memory _data = SwapCallbackData({payer: msg.sender, idsIn: idsIn, tokenAmountIn: 0});
         pair.swap(amountOut, new uint[](0), to, abi.encode(_data));
     }
 
@@ -209,7 +212,14 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         IWETH(weth).deposit{value: msg.value}();
 
         for (uint256 i = 0; i < _pairs.length; i++) {
-            amountIn += this.swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], royaltyPercent, to, deadline);
+            amountIn += this.swapTokensForExactNFTs(
+                _pairs[i],
+                idsOuts[i],
+                amountInMaxs[i],
+                royaltyPercent,
+                to,
+                deadline
+            );
         }
 
         // refund remaining eth
@@ -239,7 +249,14 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             'SeacowsRouter: INVALID_PARAMS_LENGTH'
         );
         for (uint256 i = 0; i < _pairs.length; i++) {
-            amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], royaltyPercent[i], address(this), deadline);
+            amountOut += swapExactNFTsForTokens(
+                _pairs[i],
+                idsIns[i],
+                amountOutMins[i],
+                royaltyPercent[i],
+                address(this),
+                deadline
+            );
         }
 
         // withdraw eth

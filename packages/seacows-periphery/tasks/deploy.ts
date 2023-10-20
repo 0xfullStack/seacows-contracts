@@ -12,6 +12,8 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     await router.deployed();
     await save(env, network.name, 'SeacowsRouter', router.address);
 
+    await delay(2 * 60 * 1000);
+
     await run('verify:verify', {
       address: router.address,
       constructorArguments: [manager, weth],
@@ -20,3 +22,7 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     console.error('Error meesage:', error.message);
   }
 };
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+async function delay(ms: number) {
+  return await new Promise((resolve) => setTimeout(resolve, ms));
+}
