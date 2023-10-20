@@ -179,7 +179,7 @@ contract SeacowsERC721TradePair is
                 uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
                 
                 absAmountIn = balance0 > reserve0 ? balance0 - reserve0 - _totalFees : 0;
-                absAmountOut = reserve0 > balance0 ? reserve0 - balance0 + _totalFees : 0;
+                absAmountOut =  reserve0 > balance0 ? reserve0 - balance0 + _totalFees : 0;
                 {
                     // scope avoids stack too deep errors
                     uint absAmount = Math.max(absAmountIn, absAmountOut);
