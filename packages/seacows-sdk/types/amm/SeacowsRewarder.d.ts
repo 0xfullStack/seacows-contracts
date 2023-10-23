@@ -26,6 +26,7 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     "ONE_PERCENT()": FunctionFragment;
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "POINT_FIVE_PERCENT()": FunctionFragment;
+    "SCALE_FACTOR()": FunctionFragment;
     "accRewardPerShare()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
     "collect(uint256)": FunctionFragment;
@@ -65,6 +66,10 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "POINT_FIVE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "SCALE_FACTOR",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -156,6 +161,10 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "POINT_FIVE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "SCALE_FACTOR",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -285,6 +294,8 @@ export class SeacowsRewarder extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     accRewardPerShare(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     balanceOf(
@@ -375,6 +386,8 @@ export class SeacowsRewarder extends BaseContract {
 
   POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+  SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
+
   accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
   balanceOf(
@@ -463,6 +476,8 @@ export class SeacowsRewarder extends BaseContract {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
 
     accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -578,6 +593,8 @@ export class SeacowsRewarder extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
+
     accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
@@ -674,6 +691,8 @@ export class SeacowsRewarder extends BaseContract {
     POINT_FIVE_PERCENT(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     accRewardPerShare(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

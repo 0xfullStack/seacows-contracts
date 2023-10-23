@@ -25,6 +25,7 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     "ONE_PERCENT()": FunctionFragment;
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "POINT_FIVE_PERCENT()": FunctionFragment;
+    "SCALE_FACTOR()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
     "collection()": FunctionFragment;
     "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
@@ -51,6 +52,10 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "POINT_FIVE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "SCALE_FACTOR",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -102,6 +107,10 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "POINT_FIVE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "SCALE_FACTOR",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -191,6 +200,8 @@ export class SeacowsPairMetadata extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -242,6 +253,8 @@ export class SeacowsPairMetadata extends BaseContract {
 
   POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+  SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
+
   balanceOf(
     _tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -289,6 +302,8 @@ export class SeacowsPairMetadata extends BaseContract {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
       _tokenId: BigNumberish,
@@ -349,6 +364,8 @@ export class SeacowsPairMetadata extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -406,6 +423,8 @@ export class SeacowsPairMetadata extends BaseContract {
     POINT_FIVE_PERCENT(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     balanceOf(
       _tokenId: BigNumberish,

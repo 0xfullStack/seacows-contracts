@@ -25,6 +25,7 @@ interface RoyaltyManagementInterface extends ethers.utils.Interface {
     "ONE_PERCENT()": FunctionFragment;
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "POINT_FIVE_PERCENT()": FunctionFragment;
+    "SCALE_FACTOR()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
     "collection()": FunctionFragment;
     "getRoyaltyRecipient(uint256)": FunctionFragment;
@@ -57,6 +58,10 @@ interface RoyaltyManagementInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "POINT_FIVE_PERCENT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "SCALE_FACTOR",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -132,6 +137,10 @@ interface RoyaltyManagementInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "POINT_FIVE_PERCENT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "SCALE_FACTOR",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -245,6 +254,8 @@ export class RoyaltyManagement extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -314,6 +325,8 @@ export class RoyaltyManagement extends BaseContract {
 
   POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+  SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
+
   balanceOf(
     _tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -379,6 +392,8 @@ export class RoyaltyManagement extends BaseContract {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
       _tokenId: BigNumberish,
@@ -457,6 +472,8 @@ export class RoyaltyManagement extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -532,6 +549,8 @@ export class RoyaltyManagement extends BaseContract {
     POINT_FIVE_PERCENT(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    SCALE_FACTOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     balanceOf(
       _tokenId: BigNumberish,
