@@ -22,7 +22,7 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
     uint64 public constant POINT_FIVE_PERCENT = 50;
     uint64 public constant MAX_PROTOCOL_FEE_PERCENT = 1e3;
 
-    uint public constant SCALE_FACTOR = 10 ** 4;
+    uint public SCALE_FACTOR;
 
     address private _positionManager;
 
@@ -39,6 +39,7 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
         token = token_;
         collection = collection_;
         _positionManager = positionManager_;
+        SCALE_FACTOR = 10 ** 4;
     }
 
     function positionManager() public view returns (ISeacowsPositionManager) {

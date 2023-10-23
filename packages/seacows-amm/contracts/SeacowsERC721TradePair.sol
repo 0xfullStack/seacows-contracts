@@ -181,7 +181,7 @@ contract SeacowsERC721TradePair is
             {
                 // scope avoids stack too deep errors
                 (uint balance0, uint balance1) = getComplementedBalance();
-                uint _totalFees = ((balance0 * balance1 - _reserve0 * _reserve1) * SCALE_FACTOR) / balance1;
+                uint _totalFees = calculate(balance0, balance1, _reserve0, _reserve1);
 
                 absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * SCALE_FACTOR - _totalFees : 0;
                 absAmountOut = reserve0 > balance0 ? (reserve0 - balance0) * SCALE_FACTOR + _totalFees : 0;
@@ -212,6 +212,14 @@ contract SeacowsERC721TradePair is
             idsOut.length * COMPLEMENT_PRECISION,
             to
         );
+    }
+
+    function calculate(uint256 balance0, uint256 balance1, uint256 reserve0_, uint256 reserve1_) public view returns (uint256) {
+        return ((balance0 * balance1 - reserve0_ * reserve1_) * SCALE_FACTOR) / balance1;
+    }
+
+    function setScaleFactor(uint new_scale_factor) public {
+        SCALE_FACTOR = new_scale_factor;
     }
 
     function setProtocolFeePercent(uint256 _protocolFee) public {
