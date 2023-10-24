@@ -181,23 +181,30 @@ contract SeacowsERC721TradePair is
             {
                 // scope avoids stack too deep errors
                 (uint balance0, uint balance1) = getComplementedBalance();
-                uint _totalFees = calculate(balance0, balance1, _reserve0, _reserve1);
 
-                absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * SCALE_FACTOR - _totalFees : 0;
-                absAmountOut = reserve0 > balance0 ? (reserve0 - balance0) * SCALE_FACTOR + _totalFees : 0;
+                // NOTE: Aim to fix loss of significance in solidity when math division
+                // Original formula is: 
+                // uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
+                // absAmountIn = balance0 > reserve0 ? ((balance0 - reserve0) - _totalFees) : 0;
+                // bool enoughMinFee = (absAmount * minTotalFeePercent()) / PERCENTAGE_PRECISION <= totalFees 
+
+                // Fixed formula
+                uint kChange = (balance0 * balance1 - _reserve0 * _reserve1);
+                absAmountIn = balance0 > reserve0 ? (((balance0 - reserve0) * balance1 - kChange) / balance1) : 0;
+                absAmountOut = reserve0 > balance0 ? (((reserve0 - balance0) * balance1 + kChange) / balance1) : 0;
+
                 {
                     // scope avoids stack too deep errors
                     uint absAmount = Math.max(absAmountIn, absAmountOut);
 
-                    require(
-                        (absAmount * minTotalFeePercent()) / PERCENTAGE_PRECISION <= _totalFees,
-                        'SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE'
-                    );
+                    bool enoughMinFee = ((absAmount * minTotalFeePercent()) * balance1) <= (kChange * PERCENTAGE_PRECISION);
 
-                    _totalFees -= _handleProtocolFee(absAmount);
-                    _totalFees -= _handleSwapFee(absAmount);
+                    require(enoughMinFee, 'SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE');
+
+                    kChange -= _handleProtocolFee(absAmount) * balance1;
+                    kChange -= _handleSwapFee(absAmount) * balance1;
                 }
-                _handleRoyaltyFee(_totalFees, idsIn, idsOut);
+                _handleRoyaltyFee(kChange / balance1, idsIn, idsOut);
 
                 (balance0, balance1) = getComplementedBalance();
                 require(balance0 * balance1 >= _reserve0 * _reserve1, 'SeacowsERC721TradePair K');
@@ -206,20 +213,12 @@ contract SeacowsERC721TradePair is
         }
         emit Swap(
             msg.sender,
-            absAmountIn / SCALE_FACTOR,
+            absAmountIn,
             idsIn.length * COMPLEMENT_PRECISION,
-            absAmountOut / SCALE_FACTOR,
+            absAmountOut,
             idsOut.length * COMPLEMENT_PRECISION,
             to
         );
-    }
-
-    function calculate(uint256 balance0, uint256 balance1, uint256 reserve0_, uint256 reserve1_) public view returns (uint256) {
-        return ((balance0 * balance1 - reserve0_ * reserve1_) * SCALE_FACTOR) / balance1;
-    }
-
-    function setScaleFactor(uint new_scale_factor) public {
-        SCALE_FACTOR = new_scale_factor;
     }
 
     function setProtocolFeePercent(uint256 _protocolFee) public {
@@ -274,18 +273,18 @@ contract SeacowsERC721TradePair is
         address _feeTo = positionManager().feeTo();
         protocolFee = (_amount * protocolFeePercent) / PERCENTAGE_PRECISION;
         if (_feeTo != address(0)) {
-            IERC20(token).transfer(_feeTo, protocolFee / SCALE_FACTOR);
+            IERC20(token).transfer(_feeTo, protocolFee);
         }
     }
 
     function _handleSwapFee(uint _amount) private returns (uint swapFee) {
         swapFee = (_amount * feePercent) / PERCENTAGE_PRECISION;
-        feeBalance = feeBalance + swapFee / SCALE_FACTOR;
+        feeBalance = feeBalance + swapFee;
     }
 
     function _handleRoyaltyFee(uint _amount, uint[] memory idsIn, uint[] memory idsOut) private {
         if (_amount != 0 && isRoyaltySupported()) {
-            uint feePerToken = (_amount / (idsOut.length + idsIn.length)) / SCALE_FACTOR;
+            uint feePerToken = _amount / (idsOut.length + idsIn.length);
             for (uint i = 0; i < idsOut.length; i++) {
                 IERC20(token).transfer(getRoyaltyRecipient(idsOut[i]), feePerToken);
             }
