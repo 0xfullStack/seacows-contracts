@@ -260,19 +260,6 @@
   },
   {
     "inputs": [],
-    "name": "SCALE_FACTOR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "accRewardPerShare",
     "outputs": [
       {
@@ -350,40 +337,6 @@
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "balance0",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "balance1",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "reserve0_",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "reserve1_",
-        "type": "uint256"
-      }
-    ],
-    "name": "calculate",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -885,19 +838,6 @@
       }
     ],
     "name": "setProtocolFeePercent",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "new_scale_factor",
-        "type": "uint256"
-      }
-    ],
-    "name": "setScaleFactor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

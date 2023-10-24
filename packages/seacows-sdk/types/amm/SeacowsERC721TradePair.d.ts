@@ -28,11 +28,9 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "ONE_PERCENT()": FunctionFragment;
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "POINT_FIVE_PERCENT()": FunctionFragment;
-    "SCALE_FACTOR()": FunctionFragment;
     "accRewardPerShare()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
     "burn(address,address,uint256[])": FunctionFragment;
-    "calculate(uint256,uint256,uint256,uint256)": FunctionFragment;
     "collect(uint256)": FunctionFragment;
     "collection()": FunctionFragment;
     "feeBalance()": FunctionFragment;
@@ -61,7 +59,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "royaltyRegistry()": FunctionFragment;
     "setMinRoyaltyFeePercent(uint256)": FunctionFragment;
     "setProtocolFeePercent(uint256)": FunctionFragment;
-    "setScaleFactor(uint256)": FunctionFragment;
     "skim(address,uint256[])": FunctionFragment;
     "slot()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -104,10 +101,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "SCALE_FACTOR",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "accRewardPerShare",
     values?: undefined
   ): string;
@@ -118,10 +111,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "burn",
     values: [string, string, BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "calculate",
-    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "collect",
@@ -233,10 +222,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setScaleFactor",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "skim",
     values: [string, BigNumberish[]]
   ): string;
@@ -301,16 +286,11 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "SCALE_FACTOR",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "accRewardPerShare",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "calculate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collect", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feeBalance", data: BytesLike): Result;
@@ -400,10 +380,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setProtocolFeePercent",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setScaleFactor",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "skim", data: BytesLike): Result;
@@ -554,8 +530,6 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    SCALE_FACTOR(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     accRewardPerShare(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     balanceOf(
@@ -569,14 +543,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       _ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    calculate(
-      balance0: BigNumberish,
-      balance1: BigNumberish,
-      reserve0_: BigNumberish,
-      reserve1_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     collect(
       _tokenId: BigNumberish,
@@ -704,11 +670,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setScaleFactor(
-      new_scale_factor: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     skim(
       to: string,
       ids: BigNumberish[],
@@ -769,8 +730,6 @@ export class SeacowsERC721TradePair extends BaseContract {
 
   POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
-  SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
-
   accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
   balanceOf(
@@ -784,14 +743,6 @@ export class SeacowsERC721TradePair extends BaseContract {
     _ids: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  calculate(
-    balance0: BigNumberish,
-    balance1: BigNumberish,
-    reserve0_: BigNumberish,
-    reserve1_: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   collect(
     _tokenId: BigNumberish,
@@ -913,11 +864,6 @@ export class SeacowsERC721TradePair extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setScaleFactor(
-    new_scale_factor: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   skim(
     to: string,
     ids: BigNumberish[],
@@ -980,8 +926,6 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
-    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
-
     accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
@@ -1003,14 +947,6 @@ export class SeacowsERC721TradePair extends BaseContract {
         idsOut: BigNumber[];
       }
     >;
-
-    calculate(
-      balance0: BigNumberish,
-      balance1: BigNumberish,
-      reserve0_: BigNumberish,
-      reserve1_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     collect(
       _tokenId: BigNumberish,
@@ -1132,11 +1068,6 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     setProtocolFeePercent(
       _protocolFee: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setScaleFactor(
-      new_scale_factor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1339,8 +1270,6 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     POINT_FIVE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
-    SCALE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
-
     accRewardPerShare(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
@@ -1353,14 +1282,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       to: string,
       _ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    calculate(
-      balance0: BigNumberish,
-      balance1: BigNumberish,
-      reserve0_: BigNumberish,
-      reserve1_: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     collect(
@@ -1465,11 +1386,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setScaleFactor(
-      new_scale_factor: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     skim(
       to: string,
       ids: BigNumberish[],
@@ -1543,8 +1459,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    SCALE_FACTOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     accRewardPerShare(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     balanceOf(
@@ -1557,14 +1471,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       to: string,
       _ids: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    calculate(
-      balance0: BigNumberish,
-      balance1: BigNumberish,
-      reserve0_: BigNumberish,
-      reserve1_: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     collect(
@@ -1680,11 +1586,6 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     setProtocolFeePercent(
       _protocolFee: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setScaleFactor(
-      new_scale_factor: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
