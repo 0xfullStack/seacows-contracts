@@ -182,29 +182,36 @@ contract SeacowsERC721TradePair is
                 // scope avoids stack too deep errors
                 (uint balance0, uint balance1) = getComplementedBalance();
 
-                // NOTE: Aim to fix loss of significance in solidity when math division
-                // Original formula is: 
+                // NOTE: Aim to fix loss of precision in solidity when math division
+                // Original Formula: 
                 // uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
                 // absAmountIn = balance0 > reserve0 ? ((balance0 - reserve0) - _totalFees) : 0;
-                // bool enoughMinFee = (absAmount * minTotalFeePercent()) / PERCENTAGE_PRECISION <= totalFees 
-
-                // Fixed formula
-                uint kChange = (balance0 * balance1 - _reserve0 * _reserve1);
-                absAmountIn = balance0 > reserve0 ? (((balance0 - reserve0) * balance1 - kChange) / balance1) : 0;
-                absAmountOut = reserve0 > balance0 ? (((reserve0 - balance0) * balance1 + kChange) / balance1) : 0;
+                // require (absAmount * minTotalFeePercent() / PERCENTAGE_PRECISION <= totalFees, "INSUFFICIENT_MIN_FEE"); 
+                
+                // Fixed Formula
+                // In order to reduce precision effect, we make math division happened in the end
+                uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1);
+                absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * balance1 - _totalFees : 0; // 
+                absAmountOut = reserve0 > balance0 ? (reserve0 - balance0) * balance1 + _totalFees : 0;
 
                 {
                     // scope avoids stack too deep errors
                     uint absAmount = Math.max(absAmountIn, absAmountOut);
+                    require(
+                        (absAmount * minTotalFeePercent()) <= (_totalFees * PERCENTAGE_PRECISION), 
+                        'SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE'
+                    );
 
-                    bool enoughMinFee = ((absAmount * minTotalFeePercent()) * balance1) <= (kChange * PERCENTAGE_PRECISION);
+                    // Make math division here
+                    _totalFees /= balance1;
+                    absAmountIn /= balance1;
+                    absAmountOut /= balance1;
+                    absAmount = Math.max(absAmountIn, absAmountOut);
 
-                    require(enoughMinFee, 'SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE');
-
-                    kChange -= _handleProtocolFee(absAmount) * balance1;
-                    kChange -= _handleSwapFee(absAmount) * balance1;
+                    _totalFees -= _handleProtocolFee(absAmount);
+                    _totalFees -= _handleSwapFee(absAmount);
                 }
-                _handleRoyaltyFee(kChange / balance1, idsIn, idsOut);
+                _handleRoyaltyFee(_totalFees, idsIn, idsOut);
 
                 (balance0, balance1) = getComplementedBalance();
                 require(balance0 * balance1 >= _reserve0 * _reserve1, 'SeacowsERC721TradePair K');

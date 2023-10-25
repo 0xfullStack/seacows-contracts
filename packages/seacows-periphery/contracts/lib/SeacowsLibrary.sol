@@ -36,6 +36,6 @@ library SeacowsLibrary {
         require(reserveIn > 0 && reserveOut > 0, 'SeacowsLibrary: INSUFFICIENT_LIQUIDITY');
         uint numerator = reserveIn * amountOut * (feeDenominator + feeNumerator);
         uint denominator = (reserveOut - amountOut) * (feeDenominator);
-        tokenIn = numerator / denominator;
+        tokenIn = (numerator / denominator) + 1;
     }
 }
