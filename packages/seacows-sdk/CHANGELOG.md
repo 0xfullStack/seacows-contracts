@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.20.0 (2023-10-25)
+
+
+### Features
+
+* redeploy ([675e999](https://github.com/yolominds/seacows-contracts/commit/675e99969d2e37cb097b061303454edce2420686))
+
 ## 1.19.0 (2023-10-24)
 
 
