@@ -24,7 +24,8 @@ const getTokenInMax = (
   // tokenInWithFee = tokenIn * (1 + Protocol Fee Percent + Fee Percent)
   const tokenInWithFee = tokenIn
     .mul(feeDenominator.add(protocolFeeNumerator).add(feeNumerator).add(royaltyFeePercent))
-    .div(feeDenominator);
+    .div(feeDenominator)
+    .add(1);
 
   return {
     tokenInMax: tokenInWithFee,
