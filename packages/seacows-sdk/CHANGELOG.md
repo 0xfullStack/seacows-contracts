@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.2 (2023-11-01)
+
+
+### Bug Fixes
+
+* unit test error ([4952e21](https://github.com/yolominds/seacows-contracts/commit/4952e2128420fed0776f83d98ba9f53ef89a48d0))
+
 ### 1.20.1 (2023-10-25)
 
 ## 1.20.0 (2023-10-25)
