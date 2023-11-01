@@ -125,55 +125,67 @@ describe('SeacowsRouter', () => {
     });
 
     it('swapTokensForExactNFTs', async () => {
-      // bob balances before
-      const prevBobBalance = await erc20.balanceOf(bob.address);
-      const prevPairBalance = await erc20.balanceOf(pair.address);
       // Caculate how much need to be paid
-      const { tokenInMaxWithSlippage: tokenInWithFee } = await getSwapTokenInMax(
+      const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
         pair.address,
         [1],
         minRoyaltyFeePercent,
-        0,
+        1,
         100,
         owner,
       );
+
+      expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('1.545754500000000000'));
+
       // Approve token cost
-      await erc20.connect(bob).approve(router.address, tokenInWithFee);
+      await erc20.connect(bob).approve(router.address, tokenInMaxWithSlippage);
       await router
         .connect(bob)
-        .swapTokensForExactNFTs(pair.address, [1], tokenInWithFee, minRoyaltyFeePercent, bob.address, MaxUint256);
-      expect(await erc20.balanceOf(bob.address)).to.be.equal(prevBobBalance.sub(tokenInWithFee));
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.add(tokenInWithFee));
+        .swapTokensForExactNFTs(
+          pair.address,
+          [1],
+          tokenInMaxWithSlippage,
+          minRoyaltyFeePercent,
+          bob.address,
+          MaxUint256,
+        );
+
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4.530450000000000001'));
+      const [tokenBalance] = await pair.getComplementedBalance();
+      expect(tokenBalance).to.be.equal(ethers.utils.parseEther('4.515450000000000001'));
+
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('8.4695499999999999990'));
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
     });
 
     it('batchSwapTokensForExactNFTs', async () => {
-      // bob balances before
-      const prevBobBalance = await erc20.balanceOf(bob.address);
-      const prevPairBalance = await erc20.balanceOf(pair.address);
       // Caculate how much need to be paid
-      const { tokenInMaxWithSlippage: tokenInWithFee } = await getSwapTokenInMax(
+      const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
         pair.address,
         [2],
         minRoyaltyFeePercent,
-        0,
+        1,
         100,
         owner,
       );
       // Approve token cost
-      await erc20.connect(bob).approve(router.address, tokenInWithFee);
+      await erc20.connect(bob).approve(router.address, tokenInMaxWithSlippage);
       await router
         .connect(bob)
         .batchSwapTokensForExactNFTs(
           [pair.address],
           [[2]],
-          [tokenInWithFee],
+          [tokenInMaxWithSlippage],
           minRoyaltyFeePercent,
           bob.address,
           MaxUint256,
         );
-      expect(await erc20.balanceOf(bob.address)).to.be.equal(prevBobBalance.sub(tokenInWithFee));
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.add(tokenInWithFee));
+
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('9.137563635000000003'));
+      const [tokenBalance] = await pair.getComplementedBalance();
+      expect(tokenBalance).to.be.equal(ethers.utils.parseEther('9.077409135000000003'));
+
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('3.862436364999999997'));
       expect(await erc721.ownerOf(2)).to.be.equal(bob.address);
     });
   });

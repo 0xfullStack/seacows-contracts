@@ -19,6 +19,7 @@ import {
   type WETH,
   type MockERC721,
   type MockERC20,
+  type MockRoyaltyRegistry,
 } from 'types';
 import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
 import { sqrt } from './utils';
@@ -35,15 +36,22 @@ describe('SeacowsRewarder', () => {
 
   let ONE_PERCENT: BigNumber;
   let POINT_FIVE_PERCENT: BigNumber;
+  let minRoyaltyFeePercent: BigNumber;
 
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
   let rendererLib;
+  let registry: MockRoyaltyRegistry;
   let router: SeacowsRouter;
 
   let pair: SeacowsERC721TradePair;
   before(async () => {
     [owner, alice, bob, carol, feeTo] = await ethers.getSigners();
+
+    // Prepare Royalty Registry
+    const MockRoyaltyRegistryFC = await ethers.getContractFactory('MockRoyaltyRegistry');
+    registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
+
     const nftFactoryLibraryFactory = await ethers.getContractFactory('NFTRenderer');
     rendererLib = await nftFactoryLibraryFactory.deploy();
 
@@ -67,6 +75,7 @@ describe('SeacowsRewarder', () => {
     router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
 
     await manager.setFeeTo(feeTo.address);
+    await manager.setRoyaltyRegistry(registry.address);
 
     ONE_PERCENT = await template.ONE_PERCENT();
     POINT_FIVE_PERCENT = await template.POINT_FIVE_PERCENT();
@@ -151,8 +160,8 @@ describe('SeacowsRewarder', () => {
   });
 
   it('should have fee calculated correctly', async () => {
-    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 0, 100, owner);
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.66'));
+    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 1, 100, owner);
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.7266'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router
@@ -172,7 +181,7 @@ describe('SeacowsRewarder', () => {
 
   it('should keep fee remain the same after adding liquidity', async () => {
     const { tokenInMaxWithSlippage } = await getDepositTokenInMax(pair.address, [0, 1, 2], 0, 100, owner);
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('12'));
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('12.000000000000000001'));
 
     await erc20.connect(carol).approve(manager.address, tokenInMaxWithSlippage);
     await erc721.connect(carol).setApprovalForAll(manager.address, true);
@@ -199,9 +208,9 @@ describe('SeacowsRewarder', () => {
      * ERC20 Complemented: 24 Ethers (Fee excluded)
      * ERC721: [0, 1, 2, 5, 6, 7]
      */
-    expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('24.06'));
+    expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('24.060000000000000002'));
     const [tokenBalance] = await pair.getComplementedBalance();
-    expect(tokenBalance).to.be.equal(ethers.utils.parseEther('24'));
+    expect(tokenBalance).to.be.equal(ethers.utils.parseEther('24.000000000000000002'));
 
     expect(await erc721.balanceOf(pair.address)).to.be.equal(6);
     expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
@@ -213,8 +222,8 @@ describe('SeacowsRewarder', () => {
   });
 
   it('should have fee calculated after previous added liquidity', async () => {
-    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 0, 100, owner);
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('26.64'));
+    const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 1, 100, owner);
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('26.906400000000000002'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router

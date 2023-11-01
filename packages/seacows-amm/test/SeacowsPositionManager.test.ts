@@ -19,6 +19,7 @@ import {
   type WETH,
   type MockERC721,
   type MockERC20,
+  type MockRoyaltyRegistry,
 } from 'types';
 import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
 import { sqrt } from './utils';
@@ -32,6 +33,8 @@ describe('SeacowsPositionManager', () => {
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
   let rendererLib;
+
+  let registry: MockRoyaltyRegistry;
   let router: SeacowsRouter;
   before(async () => {
     [owner, alice, bob] = await ethers.getSigners();
@@ -49,6 +52,10 @@ describe('SeacowsPositionManager', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     beforeEach(async () => {
+      // Prepare Royalty Registry
+      const MockRoyaltyRegistryFC = await ethers.getContractFactory('MockRoyaltyRegistry');
+      registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
+
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
@@ -523,6 +530,9 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+
+      await manager.setRoyaltyRegistry(registry.address);
+
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -694,7 +704,7 @@ describe('SeacowsPositionManager', () => {
       await router
         .connect(bob)
         .swapTokensForExactNFTs(pair.address, [3, 5, 6, 7, 8, 9], MaxUint256, BI_ZERO, bob.address, MaxUint256);
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('49.42'));
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('49.420000000000000001'));
       expect(await pair.nftComplement()).to.be.equal(0);
 
       /**
