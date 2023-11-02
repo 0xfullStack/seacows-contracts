@@ -3,6 +3,8 @@ import SeacowsERC721TradePairAbi from '@yolominds/seacows-amm/abis/ISeacowsERC72
 import SeacowsERC721TradePairArtifact from '@yolominds/seacows-amm/artifacts/contracts/SeacowsERC721TradePair.sol/SeacowsERC721TradePair.json';
 import SeacowsPositionManagerArtifact from '@yolominds/seacows-amm/artifacts/contracts/SeacowsPositionManager.sol/SeacowsPositionManager.json';
 import NFTRendererArtifact from '@yolominds/seacows-amm/artifacts/contracts/lib/NFTRenderer.sol/NFTRenderer.json';
+import PricingKernelArtifact from '@yolominds/seacows-amm/artifacts/contracts/lib/PricingKernel.sol/PricingKernel.json';
+import FixidityLibArtifact from '@yolominds/seacows-amm/artifacts/contracts/lib/FixidityLib.sol/FixidityLib.json';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
 import { expect } from 'chai';
@@ -35,16 +37,16 @@ describe('SeacowsRouter', () => {
 
     rendererLib = (await deployContract(owner, NFTRendererArtifact)) as NFTRenderer;
 
-    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const FixidityLibFC = await ethers.getContractFactoryFromArtifact(FixidityLibArtifact);
     const fixidityLib = await FixidityLibFC.deploy();
 
-    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+    const PricingKernelLibraryFC = await ethers.getContractFactoryFromArtifact(PricingKernelArtifact, {
       libraries: {
         FixidityLib: fixidityLib.address,
       },
     });
     const pricingKernelLib = await PricingKernelLibraryFC.deploy();
-    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+    const SeacowsERC721TradePairFC = await ethers.getContractFactoryFromArtifact(SeacowsERC721TradePairArtifact, {
       libraries: {
         PricingKernel: pricingKernelLib.address,
       },
@@ -150,7 +152,7 @@ describe('SeacowsRouter', () => {
         owner,
       );
 
-      expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('1.545754500000000000'));
+      expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('1.545754500000000001'));
 
       // Approve token cost
       await erc20.connect(bob).approve(router.address, tokenInMaxWithSlippage);

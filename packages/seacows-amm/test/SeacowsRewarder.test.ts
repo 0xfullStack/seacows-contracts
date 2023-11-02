@@ -167,7 +167,7 @@ describe('SeacowsRewarder', () => {
 
   it('should have fee calculated correctly', async () => {
     const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 1, 100, owner);
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.7266'));
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.726600000000000001'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router
@@ -229,7 +229,7 @@ describe('SeacowsRewarder', () => {
 
   it('should have fee calculated after previous added liquidity', async () => {
     const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 1, 100, owner);
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('26.906400000000000002'));
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('26.906400000000000003'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router

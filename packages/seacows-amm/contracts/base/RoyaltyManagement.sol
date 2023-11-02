@@ -19,8 +19,12 @@ contract RoyaltyManagement is SeacowsPairMetadata, IRoyaltyManagement {
     }
 
     function isRoyaltySupported() public view returns (bool) {
-        address lookupAddress = IRoyaltyRegistry(royaltyRegistry()).getRoyaltyLookupAddress(collection);
-        return IERC2981(lookupAddress).supportsInterface(type(IERC2981).interfaceId);
+        if (royaltyRegistry() != address(0)) {
+            address lookupAddress = IRoyaltyRegistry(royaltyRegistry()).getRoyaltyLookupAddress(collection);
+            return IERC2981(lookupAddress).supportsInterface(type(IERC2981).interfaceId);
+        } else {
+            return false;
+        }
     }
 
     function getRoyaltyRecipient(uint256 _tokenId) public view returns (address recipient) {

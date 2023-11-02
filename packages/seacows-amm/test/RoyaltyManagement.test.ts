@@ -185,7 +185,7 @@ describe('RoyaltyManagement', () => {
       100,
       owner,
     );
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.7872'));
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.787200000000000001'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router
@@ -263,7 +263,7 @@ describe('RoyaltyManagement', () => {
       100,
       owner,
     );
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('27.148800000000000002'));
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('27.148800000000000003'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router

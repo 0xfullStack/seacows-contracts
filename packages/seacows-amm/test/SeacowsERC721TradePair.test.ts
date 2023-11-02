@@ -319,7 +319,6 @@ describe('SeacowsERC721TradePair', () => {
     });
 
     it('Should swap out NFT successfully', async () => {
-      const prevBobBalance = await erc20.balanceOf(bob.address);
       /**
        * @notes Summary of Bob before swap
        * ERC721: [1, 6]
@@ -342,20 +341,19 @@ describe('SeacowsERC721TradePair', () => {
        * Swap in ERC20 (including fee): 0.81002 ether
        * Swap out ERC721: [6]
        */
-      const { tokenInMax } = await getSwapTokenInMax(pair.address, [4], BI_ZERO, 0, 100, owner);
-
-      expect(tokenInMax).to.be.equal(ethers.utils.parseEther('0.888'));
+      const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [4], BI_ZERO, 1, 100, owner);
+      expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('0.896880000000000001'));
 
       /**
        * @notes Summary of Bob after swap
        * ERC721: [1, 4, 6]
        * ERC20: 6.792 Ethers
        */
-      await erc20.connect(bob).approve(pairSwap.address, tokenInMax);
-      await expect(pairSwap.connect(bob).swap(pair.address, 0, [4], bob.address, tokenInMax, []))
+      await erc20.connect(bob).approve(pairSwap.address, tokenInMaxWithSlippage);
+      await expect(pairSwap.connect(bob).swap(pair.address, 0, [4], bob.address, tokenInMaxWithSlippage, []))
         .to.be.emit(pair, 'Swap')
         .withArgs(pairSwap.address, ethers.utils.parseEther('0.8'), 0, 0, ethers.utils.parseEther('1'), bob.address);
-      expect(await erc20.balanceOf(bob.address)).to.be.equal(prevBobBalance.sub(tokenInMax));
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('9.103119999999999999'));
       expect(await erc721.balanceOf(bob.address)).to.be.equal(3);
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
       expect(await erc721.ownerOf(4)).to.be.equal(bob.address);

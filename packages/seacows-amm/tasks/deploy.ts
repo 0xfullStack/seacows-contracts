@@ -44,7 +44,7 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     const txn = await manager.setRoyaltyRegistry(royaltyRegistry);
     await txn.wait();
 
-    await delay(1 * 60 * 1000);
+    await delay(1 * 30 * 1000);
 
     console.log('Start verifying contracts...');
 

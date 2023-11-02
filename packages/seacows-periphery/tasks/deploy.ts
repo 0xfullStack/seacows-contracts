@@ -13,7 +13,7 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     await router.deployed();
     await save(env, network.name, 'SeacowsRouter', router.address);
 
-    await delay(1 * 60 * 1000);
+    await delay(1 * 30 * 1000);
 
     await run('verify:verify', {
       address: router.address,

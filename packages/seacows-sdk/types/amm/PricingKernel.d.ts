@@ -18,34 +18,40 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface ISeacowsComplementInterface extends ethers.utils.Interface {
+interface PricingKernelInterface extends ethers.utils.Interface {
   functions: {
-    "COMPLEMENT_PRECISION()": FunctionFragment;
-    "caculateAssetsOutAfterComplemented(uint256,uint256,uint256,uint256)": FunctionFragment;
+    "partialCompensated(uint256,uint256,uint256,uint256,uint8)": FunctionFragment;
+    "partialCompensation(int256,int256,int256,int256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "COMPLEMENT_PRECISION",
-    values?: undefined
+    functionFragment: "partialCompensated",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
-    functionFragment: "caculateAssetsOutAfterComplemented",
+    functionFragment: "partialCompensation",
     values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "COMPLEMENT_PRECISION",
+    functionFragment: "partialCompensated",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "caculateAssetsOutAfterComplemented",
+    functionFragment: "partialCompensation",
     data: BytesLike
   ): Result;
 
   events: {};
 }
 
-export class ISeacowsComplement extends BaseContract {
+export class PricingKernel extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -86,66 +92,99 @@ export class ISeacowsComplement extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: ISeacowsComplementInterface;
+  interface: PricingKernelInterface;
 
   functions: {
-    COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    caculateAssetsOutAfterComplemented(
-      _tokenBalance: BigNumberish,
-      _nftBalance: BigNumberish,
-      _tokenExpectedOut: BigNumberish,
-      _nftExpectedOut: BigNumberish,
+    partialCompensated(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
+      DIGITS: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber, BigNumber]>;
+
+    partialCompensation(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
   };
 
-  COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
-
-  caculateAssetsOutAfterComplemented(
-    _tokenBalance: BigNumberish,
-    _nftBalance: BigNumberish,
-    _tokenExpectedOut: BigNumberish,
-    _nftExpectedOut: BigNumberish,
+  partialCompensated(
+    X0: BigNumberish,
+    Y0: BigNumberish,
+    E: BigNumberish,
+    N: BigNumberish,
+    DIGITS: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[BigNumber, BigNumber]>;
 
-  callStatic: {
-    COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+  partialCompensation(
+    X0: BigNumberish,
+    Y0: BigNumberish,
+    E: BigNumberish,
+    N: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
-    caculateAssetsOutAfterComplemented(
-      _tokenBalance: BigNumberish,
-      _nftBalance: BigNumberish,
-      _tokenExpectedOut: BigNumberish,
-      _nftExpectedOut: BigNumberish,
+  callStatic: {
+    partialCompensated(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
+      DIGITS: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber, BigNumber]>;
+
+    partialCompensation(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {};
 
   estimateGas: {
-    COMPLEMENT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+    partialCompensated(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
+      DIGITS: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    caculateAssetsOutAfterComplemented(
-      _tokenBalance: BigNumberish,
-      _nftBalance: BigNumberish,
-      _tokenExpectedOut: BigNumberish,
-      _nftExpectedOut: BigNumberish,
+    partialCompensation(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    COMPLEMENT_PRECISION(
+    partialCompensated(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
+      DIGITS: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    caculateAssetsOutAfterComplemented(
-      _tokenBalance: BigNumberish,
-      _nftBalance: BigNumberish,
-      _tokenExpectedOut: BigNumberish,
-      _nftExpectedOut: BigNumberish,
+    partialCompensation(
+      X0: BigNumberish,
+      Y0: BigNumberish,
+      E: BigNumberish,
+      N: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
