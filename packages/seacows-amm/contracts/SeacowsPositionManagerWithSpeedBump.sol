@@ -1,6 +1,4 @@
-// SPDX-License-Identifier: MIT
-// Author: Rashad Haddad @rashadalh
-// NOTE: the following has NOT been tested or audited, and is for demonstration purposes only
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.0;
 
 import "./SeacowsPositionManager.sol";

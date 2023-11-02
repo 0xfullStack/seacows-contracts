@@ -1,7 +1,5 @@
-// SPDX-License-Identifier: MIT
-// Author: Rashad Haddad @rashadalh
-// NOTE: the following has NOT been tested or audited, and is for demonstration purposes only
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: AGPL-3.0
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -74,12 +72,4 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
     // User address => ()
     mapping(address => mapping (address => Withdrawal)) public tokens;
     mapping(address => mapping (address => Withdrawal)) public nfts;
-
-    function tokens() external returns(uint) {
-
-    }
-
-    function nfts() external returns(uint) {
-        
-    }
 }
