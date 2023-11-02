@@ -48,8 +48,8 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "pairOfSlot(uint256)": FunctionFragment;
     "pairSlots(address)": FunctionFragment;
     "pairTokenIds(address)": FunctionFragment;
-    "removeLiquidity(address,address,uint256,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
-    "removeLiquidityETH(address,uint256,uint256,(uint256,uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
+    "removeLiquidity(address,address,uint256,uint256,(uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
+    "removeLiquidityETH(address,uint256,uint256,(uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
     "royaltyFeeManager()": FunctionFragment;
     "royaltyRegistry()": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -196,7 +196,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
       {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       BigNumberish,
@@ -213,7 +212,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
       {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       BigNumberish,
@@ -721,7 +719,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,
@@ -737,7 +734,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,
@@ -1018,7 +1014,6 @@ export class SeacowsPositionManager extends BaseContract {
     constraint: {
       cTokenOutMin: BigNumberish;
       cNftOutMin: BigNumberish;
-      tokenInMax: BigNumberish;
       nftIds: BigNumberish[];
     },
     fromTokenId: BigNumberish,
@@ -1034,7 +1029,6 @@ export class SeacowsPositionManager extends BaseContract {
     constraint: {
       cTokenOutMin: BigNumberish;
       cNftOutMin: BigNumberish;
-      tokenInMax: BigNumberish;
       nftIds: BigNumberish[];
     },
     fromTokenId: BigNumberish,
@@ -1330,7 +1324,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,
@@ -1338,10 +1331,9 @@ export class SeacowsPositionManager extends BaseContract {
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[]] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber[]] & {
         cTokenOut: BigNumber;
         cNftOut: BigNumber;
-        tokenIn: BigNumber;
         tokenOut: BigNumber;
         idsOut: BigNumber[];
       }
@@ -1354,7 +1346,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,
@@ -1362,10 +1353,9 @@ export class SeacowsPositionManager extends BaseContract {
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber[]] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber[]] & {
         cTokenOut: BigNumber;
         cNftOut: BigNumber;
-        tokenIn: BigNumber;
         tokenOut: BigNumber;
         idsOut: BigNumber[];
       }
@@ -1787,7 +1777,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,
@@ -1803,7 +1792,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,
@@ -2104,7 +2092,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,
@@ -2120,7 +2107,6 @@ export class SeacowsPositionManager extends BaseContract {
       constraint: {
         cTokenOutMin: BigNumberish;
         cNftOutMin: BigNumberish;
-        tokenInMax: BigNumberish;
         nftIds: BigNumberish[];
       },
       fromTokenId: BigNumberish,

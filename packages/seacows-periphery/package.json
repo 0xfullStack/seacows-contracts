@@ -9,6 +9,7 @@
     "deploy:dev:goerli": "hardhat deploy --env dev --network goerli",
     "deploy:dev:mumbai": "hardhat deploy --env dev --network mumbai",
     "test": "hardhat test",
+    "size": "hardhat size-contracts",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
   "devDependencies": {
@@ -55,19 +56,19 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.0.3",
     "prettier": "^2.8.8",
-    "prettier-plugin-solidity": "^1.0.0-dev.24",
+    "prettier-plugin-solidity": "^1.1.3",
     "rimraf": "^3.0.2",
-    "solhint": "^3.3.7",
+    "solhint": "^3.6.2",
     "solhint-plugin-prettier": "^0.0.5",
-    "solidity-coverage": "^0.8.1",
+    "solidity-coverage": "^0.8.4",
     "solmate": "^6.6.1",
     "ts-node": "^10.7.0",
     "typechain": "^8.1.1",
-    "typescript": "*"
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@yolominds/seacows-sdk": "*",
-    "@yolominds/seacows-amm": "*"
+    "@yolominds/seacows-amm": "*",
+    "@yolominds/seacows-sdk": "*"
   },
   "files": [
     "dist/*"

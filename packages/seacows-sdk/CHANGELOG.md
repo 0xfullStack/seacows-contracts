@@ -2,6 +2,67 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.4 (2023-11-02)
+
+### 1.20.3 (2023-11-02)
+
+
+### Features
+
+* new complement algorithm ([#17](https://github.com/yolominds/seacows-contracts/issues/17)) ([782e9d4](https://github.com/yolominds/seacows-contracts/commit/782e9d421689c0dad4f8925acebc8eb0ed30f971))
+
+### 1.20.2 (2023-11-01)
+
+
+### Bug Fixes
+
+* unit test error ([4952e21](https://github.com/yolominds/seacows-contracts/commit/4952e2128420fed0776f83d98ba9f53ef89a48d0))
+
+### 1.20.1 (2023-10-25)
+
+## 1.20.0 (2023-10-25)
+
+
+### Features
+
+* redeploy ([675e999](https://github.com/yolominds/seacows-contracts/commit/675e99969d2e37cb097b061303454edce2420686))
+
+## 1.19.0 (2023-10-24)
+
+
+### Features
+
+* redeploy ([2547e4f](https://github.com/yolominds/seacows-contracts/commit/2547e4fce42c605f847009a4f7337de73b8a3912))
+
+### 1.18.1 (2023-10-23)
+
+## 1.18.0 (2023-10-23)
+
+
+### Features
+
+* redeploy ([03efded](https://github.com/yolominds/seacows-contracts/commit/03efded3af98f0a1fa5385c7d881203994c62ab2))
+
+### 1.17.3 (2023-10-23)
+
+### 1.17.2 (2023-10-20)
+
+### 1.17.1 (2023-10-20)
+
+
+### Bug Fixes
+
+* redeploy periphery contract to solve using a old positionmanager address ([a218b0e](https://github.com/yolominds/seacows-contracts/commit/a218b0e91b10f9628f43117dc2beea6c5a066c2b))
+
+## 1.17.0 (2023-10-20)
+
+
+### Features
+
+* contract enhancement ([#15](https://github.com/yolominds/seacows-contracts/issues/15)) ([dc5d7fc](https://github.com/yolominds/seacows-contracts/commit/dc5d7fc01ee071769dc9d7c43c75b8b5d74ccf17))
+
+### 1.16.3 (2023-10-20)
+
 ### 1.16.2 (2023-07-17)
 
 

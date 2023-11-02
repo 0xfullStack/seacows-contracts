@@ -1,13 +1,7 @@
-import { MaxUint256, Zero } from '@ethersproject/constants';
+import { MaxUint256 } from '@ethersproject/constants';
 import { deployContract } from 'ethereum-waffle';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import {
-  getSwapTokenInMax,
-  getSwapTokenOutMin,
-  getDepositTokenInMax,
-  getWithdrawAssetsOutMin,
-  BI_ZERO,
-} from '@yolominds/seacows-sdk';
+import { getSwapTokenInMax, getSwapTokenOutMin, getDepositTokenInMax } from '@yolominds/seacows-sdk';
 import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
 import SeacowsRouterArtifact from '@yolominds/seacows-periphery/artifacts/contracts/SeacowsRouter.sol/SeacowsRouter.json';
 import { expect } from 'chai';
@@ -21,8 +15,6 @@ import {
   type MockERC20,
   type MockRoyaltyRegistry,
 } from 'types';
-import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
-import { sqrt } from './utils';
 
 describe('RoyaltyManagement', () => {
   let owner: SignerWithAddress;
@@ -56,7 +48,21 @@ describe('RoyaltyManagement', () => {
     rendererLib = await nftFactoryLibraryFactory.deploy();
 
     const WETHFC = await ethers.getContractFactory('WETH');
-    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
+
+    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const fixidityLib = await FixidityLibFC.deploy();
+
+    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+      libraries: {
+        FixidityLib: fixidityLib.address,
+      },
+    });
+    const pricingKernelLib = await PricingKernelLibraryFC.deploy();
+    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+      libraries: {
+        PricingKernel: pricingKernelLib.address,
+      },
+    });
 
     weth = await WETHFC.deploy();
     template = await SeacowsERC721TradePairFC.deploy();
@@ -175,11 +181,11 @@ describe('RoyaltyManagement', () => {
       pair.address,
       [0, 1, 2],
       minRoyaltyFeePercent,
-      0,
+      1,
       100,
       owner,
     );
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.72'));
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.787200000000000001'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router
@@ -206,7 +212,9 @@ describe('RoyaltyManagement', () => {
 
   it('should keep fee remain the same after adding liquidity', async () => {
     const { tokenInMaxWithSlippage } = await getDepositTokenInMax(pair.address, [0, 1, 2], 0, 100, owner);
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('12'));
+
+    // Note: in order to solve precision problem(same as uniswap's solution), we had .add(1) to SeacowsLibrary.getAmountIn result. And in sdk we also .add(1) to getTokenInMax() result
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('12.000000000000000001'));
 
     await erc20.connect(carol).approve(manager.address, tokenInMaxWithSlippage);
     await erc721.connect(carol).setApprovalForAll(manager.address, true);
@@ -233,9 +241,9 @@ describe('RoyaltyManagement', () => {
      * ERC20 Complemented: 24 Ethers (Fee excluded)
      * ERC721: [0, 1, 2, 5, 6, 7]
      */
-    expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('24.06'));
+    expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('24.060000000000000002'));
     const [tokenBalance] = await pair.getComplementedBalance();
-    expect(tokenBalance).to.be.equal(ethers.utils.parseEther('24'));
+    expect(tokenBalance).to.be.equal(ethers.utils.parseEther('24.000000000000000002'));
 
     expect(await erc721.balanceOf(pair.address)).to.be.equal(6);
     expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
@@ -251,11 +259,11 @@ describe('RoyaltyManagement', () => {
       pair.address,
       [0, 1, 2],
       minRoyaltyFeePercent,
-      0,
+      1,
       100,
       owner,
     );
-    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('26.88'));
+    expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('27.148800000000000003'));
 
     await erc20.connect(carol).approve(router.address, tokenInMaxWithSlippage);
     await router

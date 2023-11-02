@@ -13,7 +13,20 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     await lib.deployed();
     await save(env, network.name, 'NFTRenderer', lib.address);
 
-    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
+    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const fixidityLib = await FixidityLibFC.deploy();
+
+    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+      libraries: {
+        FixidityLib: fixidityLib.address,
+      },
+    });
+    const pricingKernelLib = await PricingKernelLibraryFC.deploy();
+    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+      libraries: {
+        PricingKernel: pricingKernelLib.address,
+      },
+    });
     const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
       libraries: {
         NFTRenderer: lib.address,
@@ -30,6 +43,8 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
 
     const txn = await manager.setRoyaltyRegistry(royaltyRegistry);
     await txn.wait();
+
+    await delay(1 * 30 * 1000);
 
     console.log('Start verifying contracts...');
 
@@ -53,3 +68,8 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     console.error('Error meesage:', error.message);
   }
 };
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+async function delay(ms: number) {
+  return await new Promise((resolve) => setTimeout(resolve, ms));
+}

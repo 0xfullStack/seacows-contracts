@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import { ISeacowsSwapCallback } from "@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import {ISeacowsSwapCallback} from '@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol';
+import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import '@openzeppelin/contracts/utils/math/Math.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
@@ -43,16 +43,14 @@ contract SeacowsERC721TradePair is
         require(fee_ == ONE_PERCENT || fee_ == POINT_FIVE_PERCENT, 'Invalid _fee');
 
         feePercent = fee_;
-        protocolFeePercent = 3; // Initially, 0.3% 
+        protocolFeePercent = 3; // Initially, 0.3%
         __SeacowsPairMetadata_init(msg.sender, token_, collection_);
         __ReentrancyGuard_init();
     }
 
     function getComplementedBalance() public view returns (uint256 tokenBalance, uint256 nftBalance) {
-        tokenBalance = uint256(int256(IERC20(token).balanceOf(address(this))) + tokenComplement()) - feeBalance;
-        nftBalance = uint256(
-            int256(IERC721(collection).balanceOf(address(this)) * uint256(COMPLEMENT_PRECISION)) + nftComplement()
-        );
+        tokenBalance = uint256(int256(IERC20(token).balanceOf(address(this)))) - feeBalance;
+        nftBalance = IERC721(collection).balanceOf(address(this)) * COMPLEMENT_PRECISION;
     }
 
     function getReserves() public view returns (uint256 _reserve0, uint256 _reserve1, uint32 _blockTimestampLast) {
@@ -61,7 +59,9 @@ contract SeacowsERC721TradePair is
         _blockTimestampLast = blockTimestampLast;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, SeacowsPairMetadata) returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, SeacowsPairMetadata) returns (bool) {
         return super.supportsInterface(interfaceId) || type(ISeacowsERC721TradePair).interfaceId == interfaceId;
     }
 
@@ -81,7 +81,7 @@ contract SeacowsERC721TradePair is
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0 * amount1);
         } else {
-            liquidity = Math.min(amount0 * _totalSupply / _reserve0, amount1 * _totalSupply / _reserve1);
+            liquidity = Math.min((amount0 * _totalSupply) / _reserve0, (amount1 * _totalSupply) / _reserve1);
         }
         require(liquidity > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_MINTED');
         _mint(toTokenId, liquidity);
@@ -95,7 +95,8 @@ contract SeacowsERC721TradePair is
         address from,
         address to,
         uint256[] memory _ids
-    ) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
+    ) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
+        from; // silence unused warning
         (uint balance0, uint balance1) = getComplementedBalance();
 
         ISeacowsPositionManager manager = positionManager();
@@ -109,7 +110,7 @@ contract SeacowsERC721TradePair is
             require(cTokenOut > 0 && cNftOut > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_BURNED');
 
             uint nftOut;
-            (tokenIn, tokenOut, nftOut) = _updateComplement(cTokenOut, cNftOut);
+            (tokenOut, nftOut) = _caculateAssetsOutAfterComplemented(balance0, balance1, cTokenOut, cNftOut);
             _burn(manager.tokenOf(address(this)), liquidity);
             nftAmountOut = nftOut / COMPLEMENT_PRECISION;
 
@@ -136,10 +137,6 @@ contract SeacowsERC721TradePair is
             require(count == nftAmountOut, 'SeacowsERC721TradePair: INSUFFICIENT_NFT_TO_WITHDRAW');
         }
 
-        if (tokenIn > 0) {
-            manager.seacowsBurnCallback(token, from, tokenIn);
-        }
-
         (balance0, balance1) = getComplementedBalance();
 
         {
@@ -147,7 +144,7 @@ contract SeacowsERC721TradePair is
             (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
             _update(balance0, balance1, _reserve0, _reserve1);
         }
-        emit Burn(msg.sender, cTokenOut, cNftOut, tokenIn, tokenOut, idsOut, to);
+        emit Burn(msg.sender, cTokenOut, cNftOut, tokenOut, idsOut, to);
     }
 
     // this low-level function should be called from a contract which performs important safety checks
@@ -160,7 +157,10 @@ contract SeacowsERC721TradePair is
         {
             // scope avoids stack too deep errors
             (uint256 _reserve0, uint256 _reserve1, ) = getReserves(); // gas savings
-            require(tokenAmountOut < _reserve0 && idsOut.length * COMPLEMENT_PRECISION < _reserve1, 'SeacowsERC721TradePair INSUFFICIENT_LIQUIDITY');
+            require(
+                tokenAmountOut < _reserve0 && idsOut.length * COMPLEMENT_PRECISION < _reserve1,
+                'SeacowsERC721TradePair INSUFFICIENT_LIQUIDITY'
+            );
             uint tokenAmountIn;
             (tokenAmountIn, idsIn) = ISeacowsSwapCallback(msg.sender).seacowsSwapCallback(data);
             require(tokenAmountIn > 0 || idsIn.length > 0, 'SeacowsERC721TradePair: INSUFFICIENT_INPUT_AMOUNT');
@@ -176,14 +176,33 @@ contract SeacowsERC721TradePair is
             {
                 // scope avoids stack too deep errors
                 (uint balance0, uint balance1) = getComplementedBalance();
-                uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
+
+                // NOTE: Aim to fix loss of precision in solidity when math division
+                // Original Formula: 
+                // uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
+                // absAmountIn = balance0 > reserve0 ? ((balance0 - reserve0) - _totalFees) : 0;
+                // require (absAmount * minTotalFeePercent() / PERCENTAGE_PRECISION <= totalFees, "INSUFFICIENT_MIN_FEE"); 
                 
-                absAmountIn = balance0 > reserve0 ? balance0 - reserve0 - _totalFees : 0;
-                absAmountOut = reserve0 > balance0 ? reserve0 - balance0 + _totalFees : 0;
+                // Fixed Formula
+                // In order to reduce precision effect, we make math division happened in the end
+                uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1);
+                absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * balance1 - _totalFees : 0; // 
+                absAmountOut = reserve0 > balance0 ? (reserve0 - balance0) * balance1 + _totalFees : 0;
+
                 {
                     // scope avoids stack too deep errors
                     uint absAmount = Math.max(absAmountIn, absAmountOut);
-                    require(absAmount * minTotalFeePercent() / PERCENTAGE_PRECISION <= _totalFees , "SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE");
+                    require(
+                        (absAmount * minTotalFeePercent()) <= (_totalFees * PERCENTAGE_PRECISION), 
+                        'SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE'
+                    );
+
+                    // Make math division here
+                    _totalFees /= balance1;
+                    absAmountIn /= balance1;
+                    absAmountOut /= balance1;
+                    absAmount = Math.max(absAmountIn, absAmountOut);
+
                     _totalFees -= _handleProtocolFee(absAmount);
                     _totalFees -= _handleSwapFee(absAmount);
                 }
@@ -194,12 +213,19 @@ contract SeacowsERC721TradePair is
                 _update(balance0, balance1, _reserve0, _reserve1);
             }
         }
-        emit Swap(msg.sender, absAmountIn, idsIn.length * COMPLEMENT_PRECISION, absAmountOut, idsOut.length * COMPLEMENT_PRECISION, to);
+        emit Swap(
+            msg.sender,
+            absAmountIn,
+            idsIn.length * COMPLEMENT_PRECISION,
+            absAmountOut,
+            idsOut.length * COMPLEMENT_PRECISION,
+            to
+        );
     }
 
     function setProtocolFeePercent(uint256 _protocolFee) public {
-        require(positionManager().feeManager() == msg.sender, "SeacowsERC721TradePair: UNAUTHORIZED");
-        require(_protocolFee <= MAX_PROTOCOL_FEE_PERCENT, "SeacowsERC721TradePair: FEE_OUT_OF_RANGE");
+        require(positionManager().feeManager() == msg.sender, 'SeacowsERC721TradePair: UNAUTHORIZED');
+        require(_protocolFee <= MAX_PROTOCOL_FEE_PERCENT, 'SeacowsERC721TradePair: FEE_OUT_OF_RANGE');
         protocolFeePercent = _protocolFee;
     }
 
@@ -228,8 +254,8 @@ contract SeacowsERC721TradePair is
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
             // * never overflows, and + overflow is desired
-            price0CumulativeLast += _reserve1 / _reserve0 * timeElapsed;
-            price1CumulativeLast += _reserve0 / _reserve1 * timeElapsed;
+            price0CumulativeLast += (_reserve1 / _reserve0) * timeElapsed;
+            price1CumulativeLast += (_reserve0 / _reserve1) * timeElapsed;
         }
         reserve0 = uint256(balance0);
         reserve1 = uint256(balance1);
@@ -247,18 +273,18 @@ contract SeacowsERC721TradePair is
 
     function _handleProtocolFee(uint _amount) private returns (uint protocolFee) {
         address _feeTo = positionManager().feeTo();
-        protocolFee =  _amount * protocolFeePercent / PERCENTAGE_PRECISION;
+        protocolFee = (_amount * protocolFeePercent) / PERCENTAGE_PRECISION;
         if (_feeTo != address(0)) {
             IERC20(token).transfer(_feeTo, protocolFee);
         }
     }
 
     function _handleSwapFee(uint _amount) private returns (uint swapFee) {
-        swapFee =  _amount * feePercent / PERCENTAGE_PRECISION;
-        feeBalance += swapFee;
+        swapFee = (_amount * feePercent) / PERCENTAGE_PRECISION;
+        feeBalance = feeBalance + swapFee;
     }
 
-    function _handleRoyaltyFee(uint _amount, uint[] memory idsIn, uint[] memory idsOut) private {  
+    function _handleRoyaltyFee(uint _amount, uint[] memory idsIn, uint[] memory idsOut) private {
         if (_amount != 0 && isRoyaltySupported()) {
             uint feePerToken = _amount / (idsOut.length + idsIn.length);
             for (uint i = 0; i < idsOut.length; i++) {

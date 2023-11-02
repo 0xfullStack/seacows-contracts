@@ -241,9 +241,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IWETH__factory>;
     getContractFactory(
+      name: "FixidityLib",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FixidityLib__factory>;
+    getContractFactory(
       name: "NFTRenderer",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.NFTRenderer__factory>;
+    getContractFactory(
+      name: "PricingKernel",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PricingKernel__factory>;
     getContractFactory(
       name: "SeacowsERC721TradePair",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -264,10 +272,6 @@ declare module "hardhat/types/runtime" {
       name: "MockRoyaltyRegistry",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockRoyaltyRegistry__factory>;
-    getContractFactory(
-      name: "MockSeacowsComplement",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.MockSeacowsComplement__factory>;
     getContractFactory(
       name: "MockSeacowsERC3525",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -567,10 +571,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IWETH>;
     getContractAt(
+      name: "FixidityLib",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FixidityLib>;
+    getContractAt(
       name: "NFTRenderer",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.NFTRenderer>;
+    getContractAt(
+      name: "PricingKernel",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PricingKernel>;
     getContractAt(
       name: "SeacowsERC721TradePair",
       address: string,
@@ -596,11 +610,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MockRoyaltyRegistry>;
-    getContractAt(
-      name: "MockSeacowsComplement",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.MockSeacowsComplement>;
     getContractAt(
       name: "MockSeacowsERC3525",
       address: string,

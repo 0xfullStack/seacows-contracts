@@ -1,4 +1,4 @@
-import { BigNumber, Contract, type Signer } from 'ethers';
+import { BigNumber, utils, Contract, type Signer } from 'ethers';
 import { type Provider } from '@ethersproject/abstract-provider';
 import PAIR_ABI from '../abis/amm/ISeacowsERC721TradePair.json';
 import ERC721_ABI from '../abis/common/ERC721.json';
@@ -24,7 +24,8 @@ const getTokenInMax = (
   // tokenInWithFee = tokenIn * (1 + Protocol Fee Percent + Fee Percent)
   const tokenInWithFee = tokenIn
     .mul(feeDenominator.add(protocolFeeNumerator).add(feeNumerator).add(royaltyFeePercent))
-    .div(feeDenominator);
+    .div(feeDenominator)
+    .add(1);
 
   return {
     tokenInMax: tokenInWithFee,
@@ -169,7 +170,7 @@ const getDepositTokenInMax = async (
 };
 
 /**
-  @notice Calculate the Max. Token input amount when user add liquidity to pool
+  @notice Calculate the min token and nft when user want to remove liquidity from pool
   @param pair The Pair contract address or the Pair contract interface
   @param liquidity The amount of liquidity to be burnt
   @param slippageNumerator The Slippage Tolerance Numerator. E.g. 3% slipage, use 3. Default: 0
@@ -185,58 +186,34 @@ const getWithdrawAssetsOutMin = async (
 ): Promise<{
   cTokenOutMin: BigNumber;
   cNftOutMin: BigNumber;
-  tokenInRange: [BigNumber, BigNumber];
-  tokenOutRange: [BigNumber, BigNumber];
-  nftOutRange: [number, number];
 }> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
-  const collection = await pairContract.collection();
-
-  const collectionRealBalance = await (
-    new Contract(collection, ERC721_ABI, pairContract.signer || pairContract.provider) as ERC721
-  ).balanceOf(pairContract.address);
 
   const [tokenBalance, nftBalance] = await pairContract.getComplementedBalance();
 
   const totalSupply = await pairContract.totalSupply();
-  const complement = await pairContract.COMPLEMENT_PRECISION();
 
-  const cTokenOut = liquidity.mul(tokenBalance).div(totalSupply);
-  const cNftOut = liquidity.mul(nftBalance).div(totalSupply);
+  const tokenExpectedOut = liquidity.mul(tokenBalance).div(totalSupply);
+  const nftExpectedOut = liquidity.mul(nftBalance).div(totalSupply);
 
-  const cTokenOutMin = cTokenOut
+  const tokenExpectedOutMin = tokenExpectedOut
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
-  const cNftOutMin = cNftOut
+  const nftExpectedOutMin = nftExpectedOut
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
 
-  let nftOutMax = cNftOut.div(complement).add(1);
-  nftOutMax = nftOutMax.gt(collectionRealBalance) ? collectionRealBalance : nftOutMax;
-
-  const nftOutMin = cNftOutMin.div(complement);
-
-  const tokenInMax = cNftOutMin.lt(complement.div(2))
-    ? complement
-        .sub(cNftOutMin.sub(cNftOutMin.div(complement).mul(complement)))
-        .mul(cTokenOutMin)
-        .div(cNftOutMin)
-    : BI_ZERO;
-
-  let tokenOutMin = cTokenOutMin.sub(nftOutMax.mul(complement).sub(cNftOut).mul(cTokenOutMin).div(cNftOutMin));
-  if (tokenOutMin.lte(BI_ZERO)) {
-    tokenOutMin = BI_ZERO;
-  }
-
-  const tokenOutMax = cTokenOut.add(cNftOutMin.sub(nftOutMin.mul(complement)).mul(cTokenOutMin).div(cNftOutMin));
+  const [cTokenOutMin, cNftOutMin] = await pairContract.caculateAssetsOutAfterComplemented(
+    tokenBalance,
+    nftBalance,
+    tokenExpectedOutMin,
+    nftExpectedOutMin,
+  );
 
   return {
     cTokenOutMin,
     cNftOutMin,
-    tokenInRange: [BI_ZERO, tokenInMax],
-    tokenOutRange: [tokenOutMin, tokenOutMax],
-    nftOutRange: [nftOutMin.toNumber(), nftOutMax.toNumber()],
   };
 };
 

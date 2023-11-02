@@ -33,7 +33,6 @@ contract SeacowsPositionManager is
     struct RemoveLiquidityConstraint {
         uint cTokenOutMin;
         uint cNftOutMin;
-        uint tokenInMax;
         uint[] nftIds;
     }
 
@@ -210,20 +209,19 @@ contract SeacowsPositionManager is
         public
         virtual
         checkDeadline(deadline)
-        returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut)
+        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
         address pair = getPair(token, collection, fee);
 
         transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
-        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(
+        (cTokenOut, cNftOut, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(
             msg.sender,
             to,
             constraint.nftIds
         );
         require(cTokenOut >= constraint.cTokenOutMin, 'SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN');
         require(cNftOut >= constraint.cNftOutMin, 'SeacowsPositionManager: BELOW_C_NFT_OUT_MIN');
-        require(constraint.tokenInMax >= tokenIn, 'SeacowsPositionManager: EXCEED_TOKEN_IN_MAX');
     }
 
     /**
@@ -248,10 +246,10 @@ contract SeacowsPositionManager is
         public
         virtual
         checkDeadline(deadline)
-        returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut)
+        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
-        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = removeLiquidity(
+        (cTokenOut, cNftOut, tokenOut, idsOut) = removeLiquidity(
             WETH,
             collection,
             fee,

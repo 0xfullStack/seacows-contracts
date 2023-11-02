@@ -1,17 +1,10 @@
-import { MaxUint256, Zero } from '@ethersproject/constants';
+import { MaxUint256 } from '@ethersproject/constants';
 import { deployContract } from 'ethereum-waffle';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import {
-  getSwapTokenInMax,
-  getSwapTokenOutMin,
-  getDepositTokenInMax,
-  getWithdrawAssetsOutMin,
-  BI_ZERO,
-} from '@yolominds/seacows-sdk';
+import { getWithdrawAssetsOutMin, BI_ZERO } from '@yolominds/seacows-sdk';
 import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
 import SeacowsRouterArtifact from '@yolominds/seacows-periphery/artifacts/contracts/SeacowsRouter.sol/SeacowsRouter.json';
 import { expect } from 'chai';
-import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   type SeacowsERC721TradePair,
@@ -19,6 +12,7 @@ import {
   type WETH,
   type MockERC721,
   type MockERC20,
+  type MockRoyaltyRegistry,
 } from 'types';
 import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
 import { sqrt } from './utils';
@@ -32,6 +26,8 @@ describe('SeacowsPositionManager', () => {
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
   let rendererLib;
+
+  let registry: MockRoyaltyRegistry;
   let router: SeacowsRouter;
   before(async () => {
     [owner, alice, bob] = await ethers.getSigners();
@@ -39,7 +35,21 @@ describe('SeacowsPositionManager', () => {
     rendererLib = await nftFactoryLibraryFactory.deploy();
 
     const WETHFC = await ethers.getContractFactory('WETH');
-    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
+
+    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const fixidityLib = await FixidityLibFC.deploy();
+
+    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+      libraries: {
+        FixidityLib: fixidityLib.address,
+      },
+    });
+    const pricingKernelLib = await PricingKernelLibraryFC.deploy();
+    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+      libraries: {
+        PricingKernel: pricingKernelLib.address,
+      },
+    });
 
     weth = await WETHFC.deploy();
     template = await SeacowsERC721TradePairFC.deploy();
@@ -49,6 +59,10 @@ describe('SeacowsPositionManager', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     beforeEach(async () => {
+      // Prepare Royalty Registry
+      const MockRoyaltyRegistryFC = await ethers.getContractFactory('MockRoyaltyRegistry');
+      registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
+
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
@@ -523,6 +537,9 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+
+      await manager.setRoyaltyRegistry(registry.address);
+
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -584,17 +601,13 @@ describe('SeacowsPositionManager', () => {
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
 
-      const { cTokenOutMin, cNftOutMin, tokenInRange, nftOutRange } = await getWithdrawAssetsOutMin(
+      const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
         0,
         100,
         alice,
       );
-      expect(tokenInRange[0]).to.be.equal(0);
-      expect(tokenInRange[1]).to.be.equal(0);
-      expect(nftOutRange[0]).to.be.equal(1);
-      expect(nftOutRange[1]).to.be.equal(2);
 
       await manager
         .connect(alice)
@@ -603,7 +616,7 @@ describe('SeacowsPositionManager', () => {
           erc721.address,
           ONE_PERCENT,
           ethers.utils.parseEther('1'),
-          { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [1] },
+          { cTokenOutMin, cNftOutMin, nftIds: [1] },
           2,
           alice.address,
           MaxUint256,
@@ -623,7 +636,7 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('Should revert for invalid token ID', async () => {
-      const { cTokenOutMin, cNftOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
+      const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
         0,
@@ -638,148 +651,12 @@ describe('SeacowsPositionManager', () => {
             erc721.address,
             ONE_PERCENT,
             ethers.utils.parseEther('1'),
-            { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [2] },
+            { cTokenOutMin, cNftOutMin, nftIds: [2] },
             5,
             alice.address,
             MaxUint256,
           ),
       ).to.rejectedWith('SeacowsPositionManager: INVALID_TOKEN_ID');
-    });
-
-    it('Should ask user deposit more token to withdraw when needed', async () => {
-      /**
-       * @notes Bob add liquidity
-       * Input ETH: 6 Ethers
-       * Input ERC721: [1, 3, 5, 6, 7, 8, 9]
-       */
-      await erc20.connect(bob).approve(manager.address, ethers.utils.parseEther('5'));
-      await erc721.connect(bob).setApprovalForAll(manager.address, true);
-      await manager
-        .connect(bob)
-        .mint(
-          erc20.address,
-          erc721.address,
-          ONE_PERCENT,
-          ethers.utils.parseEther('5'),
-          [5, 6, 7, 8, 9],
-          ethers.utils.parseEther('5'),
-          MaxUint256,
-        );
-      expect(await manager.ownerOf(3)).to.be.equal(bob.address);
-
-      /**
-       * @notes Bob add liquidity
-       * Input ETH: 5 Ethers
-       * Input ERC721: [5, 6, 7, 8, 9]
-       *
-       * Pair state:
-       * Input ETH: 8 Ethers
-       * Input ERC721: [2, 3, 5, 6, 7, 8, 9]
-       */
-      const pairNftIds = [2, 3, 5, 6, 7, 8, 9];
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('7'));
-      for (let i = 0; i < pairNftIds.length; i++) {
-        expect(await erc721.ownerOf(pairNftIds[i])).to.be.equal(pair.address);
-      }
-
-      /**
-       * @notes Bob swap out tokens
-       * Input ERC721: [5, 6, 7, 8, 9]
-       *
-       * Pair state:
-       * Input ETH: 49.424242424242424243 Ethers
-       * Input ERC721: [2, 3]
-       */
-      await erc20.connect(bob).approve(router.address, ethers.utils.parseEther('49.42'));
-      await router
-        .connect(bob)
-        .swapTokensForExactNFTs(pair.address, [3, 5, 6, 7, 8, 9], MaxUint256, BI_ZERO, bob.address, MaxUint256);
-      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('49.42'));
-      expect(await pair.nftComplement()).to.be.equal(0);
-
-      /**
-       * @notes Bob withdraw - increase NFT complement
-       * liquidty: 20% of total supply
-       * NFT withdrawing: 0.2 NFT
-       * nftComplement: 0.2 NFT
-       */
-      {
-        // Scope to allow same variable redeclare
-        const totalSupply = await pair.totalSupply();
-        const liquidityToWithdraw = totalSupply.mul(2).div(10);
-        const { cTokenOutMin, cNftOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
-          pair.address,
-          liquidityToWithdraw,
-          0,
-          100,
-          bob,
-        );
-        await manager
-          .connect(bob)
-          .removeLiquidity(
-            erc20.address,
-            erc721.address,
-            ONE_PERCENT,
-            liquidityToWithdraw,
-            { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [2] },
-            3,
-            bob.address,
-            MaxUint256,
-          );
-      }
-      expect(await pair.nftComplement()).to.be.equal(ethers.utils.parseEther('-0.2'));
-
-      /**
-       * @notes Bob withdraw - Requires extra token deposit
-       * liquidty: 37.5% of total supply
-       * NFT withdrawing: 0.3 NFT
-       *
-       * After that,
-       * nftComplement: 0 NFT
-       */
-      {
-        // Scope to allow same variable redeclare
-        const totalSupply = await pair.totalSupply();
-        const liquidityToWithdraw = totalSupply.mul(3).div(8);
-        const { cTokenOutMin, cNftOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
-          pair.address,
-          liquidityToWithdraw,
-          0,
-          100,
-          bob,
-        );
-        // First reverted because of insufficient allowance
-        await expect(
-          manager
-            .connect(bob)
-            .removeLiquidity(
-              erc20.address,
-              erc721.address,
-              ONE_PERCENT,
-              liquidityToWithdraw,
-              { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [2] },
-              3,
-              bob.address,
-              MaxUint256,
-            ),
-        ).to.be.revertedWith('ERC20: insufficient allowance');
-
-        // Then success after allowance
-        await erc20.connect(bob).approve(manager.address, MaxUint256);
-        await manager
-          .connect(bob)
-          .removeLiquidity(
-            erc20.address,
-            erc721.address,
-            ONE_PERCENT,
-            liquidityToWithdraw,
-            { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [2] },
-            3,
-            bob.address,
-            MaxUint256,
-          );
-      }
-      expect(await pair.nftComplement()).to.be.equal(ethers.utils.parseEther('0.5'));
     });
   });
 
@@ -847,7 +724,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(pair.address)).to.be.equal(3);
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
 
-      const { cTokenOutMin, cNftOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
+      const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
         0,
@@ -860,7 +737,7 @@ describe('SeacowsPositionManager', () => {
           erc721.address,
           ONE_PERCENT,
           ethers.utils.parseEther('1'),
-          { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [2] },
+          { cTokenOutMin, cNftOutMin, nftIds: [2] },
           2,
           alice.address,
           MaxUint256,
@@ -883,7 +760,7 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('Should revert for invalid token ID', async () => {
-      const { cTokenOutMin, cNftOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
+      const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
         0,
@@ -897,7 +774,7 @@ describe('SeacowsPositionManager', () => {
             erc721.address,
             ONE_PERCENT,
             ethers.utils.parseEther('1'),
-            { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [2] },
+            { cTokenOutMin, cNftOutMin, nftIds: [2] },
             5,
             alice.address,
             MaxUint256,
@@ -964,7 +841,7 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('Should burn liquidity when liquidity = 0 in the NFT', async () => {
-      const { cTokenOutMin, cNftOutMin, tokenInRange } = await getWithdrawAssetsOutMin(
+      const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('3'),
         0,
@@ -978,7 +855,7 @@ describe('SeacowsPositionManager', () => {
           erc721.address,
           ONE_PERCENT,
           ethers.utils.parseEther('3'),
-          { cTokenOutMin, cNftOutMin, tokenInMax: tokenInRange[1], nftIds: [1, 2, 3] },
+          { cTokenOutMin, cNftOutMin, nftIds: [1, 2, 3] },
           2,
           alice.address,
           MaxUint256,
