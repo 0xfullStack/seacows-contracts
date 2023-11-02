@@ -44,7 +44,20 @@ describe('SeacowsERC721TradePair', () => {
     const nftFactoryLibraryFactory = await ethers.getContractFactory('NFTRenderer');
     const rendererLib = await nftFactoryLibraryFactory.deploy();
 
-    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
+    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const fixidityLib = await FixidityLibFC.deploy();
+
+    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+      libraries: {
+        FixidityLib: fixidityLib.address,
+      },
+    });
+    const pricingKernelLib = await PricingKernelLibraryFC.deploy();
+    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+      libraries: {
+        PricingKernel: pricingKernelLib.address,
+      },
+    });
     const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
       libraries: {
         NFTRenderer: rendererLib.address,
@@ -195,7 +208,6 @@ describe('SeacowsERC721TradePair', () => {
           bob.address,
           ethers.utils.parseEther('1'),
           ethers.utils.parseEther('1'),
-          0,
           ethers.utils.parseEther('1'),
           [1],
           bob.address,

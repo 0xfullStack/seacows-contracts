@@ -1,23 +1,6 @@
-import { MaxUint256, Zero } from '@ethersproject/constants';
-import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import {
-  getSwapTokenInMax,
-  getSwapTokenOutMin,
-  getDepositTokenInMax,
-  getWithdrawAssetsOutMin,
-} from '@yolominds/seacows-sdk';
-import { expect } from 'chai';
-import { type Address } from 'cluster';
+import { Zero } from '@ethersproject/constants';
 import { type BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
-import {
-  type SeacowsERC721TradePair,
-  type SeacowsPositionManager,
-  type WETH,
-  type MockERC721,
-  type MockERC20,
-} from 'types';
-import { ONE_PERCENT, POINT_FIVE_PERCENT } from '../constants';
 import { sqrt } from '../utils';
 
 class Pool {

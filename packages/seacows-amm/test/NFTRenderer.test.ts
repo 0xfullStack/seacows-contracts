@@ -28,7 +28,21 @@ describe('NFTRenderer', () => {
     rendererLib = await nftFactoryLibraryFactory.deploy();
 
     const WETHFC = await ethers.getContractFactory('WETH');
-    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
+
+    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const fixidityLib = await FixidityLibFC.deploy();
+
+    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+      libraries: {
+        FixidityLib: fixidityLib.address,
+      },
+    });
+    const pricingKernelLib = await PricingKernelLibraryFC.deploy();
+    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+      libraries: {
+        PricingKernel: pricingKernelLib.address,
+      },
+    });
 
     weth = await WETHFC.deploy();
     template = await SeacowsERC721TradePairFC.deploy();

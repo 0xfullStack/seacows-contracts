@@ -1,13 +1,7 @@
-import { MaxUint256, Zero } from '@ethersproject/constants';
+import { MaxUint256 } from '@ethersproject/constants';
 import { deployContract } from 'ethereum-waffle';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import {
-  getSwapTokenInMax,
-  getSwapTokenOutMin,
-  getDepositTokenInMax,
-  getWithdrawAssetsOutMin,
-  BI_ZERO,
-} from '@yolominds/seacows-sdk';
+import { getSwapTokenInMax, getSwapTokenOutMin, getDepositTokenInMax } from '@yolominds/seacows-sdk';
 import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
 import SeacowsRouterArtifact from '@yolominds/seacows-periphery/artifacts/contracts/SeacowsRouter.sol/SeacowsRouter.json';
 import { expect } from 'chai';
@@ -21,8 +15,6 @@ import {
   type MockERC20,
   type MockRoyaltyRegistry,
 } from 'types';
-import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
-import { sqrt } from './utils';
 
 describe('RoyaltyManagement', () => {
   let owner: SignerWithAddress;
@@ -56,7 +48,21 @@ describe('RoyaltyManagement', () => {
     rendererLib = await nftFactoryLibraryFactory.deploy();
 
     const WETHFC = await ethers.getContractFactory('WETH');
-    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair');
+
+    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const fixidityLib = await FixidityLibFC.deploy();
+
+    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+      libraries: {
+        FixidityLib: fixidityLib.address,
+      },
+    });
+    const pricingKernelLib = await PricingKernelLibraryFC.deploy();
+    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+      libraries: {
+        PricingKernel: pricingKernelLib.address,
+      },
+    });
 
     weth = await WETHFC.deploy();
     template = await SeacowsERC721TradePairFC.deploy();

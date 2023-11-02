@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.13;
 
 /// @author: manifold.xyz
 
@@ -74,6 +74,7 @@ contract MockRoyaltyRegistry is ERC165, OwnableUpgradeable, IRoyaltyRegistry {
         require(overrideAllowed(tokenAddress), 'Permission denied');
         // look up existing override, if any
         address existingOverride = _overrides[tokenAddress];
+        existingOverride; // silence unused warning
         // set new override and reverse-lookup
         _overrides[tokenAddress] = royaltyLookupAddress;
 

@@ -34,7 +34,22 @@ describe('SeacowsRouter', () => {
     weth = await WETHFC.deploy();
 
     rendererLib = (await deployContract(owner, NFTRendererArtifact)) as NFTRenderer;
-    template = (await deployContract(owner, SeacowsERC721TradePairArtifact)) as SeacowsERC721TradePair;
+
+    const FixidityLibFC = await ethers.getContractFactory('FixidityLib');
+    const fixidityLib = await FixidityLibFC.deploy();
+
+    const PricingKernelLibraryFC = await ethers.getContractFactory('PricingKernel', {
+      libraries: {
+        FixidityLib: fixidityLib.address,
+      },
+    });
+    const pricingKernelLib = await PricingKernelLibraryFC.deploy();
+    const SeacowsERC721TradePairFC = await ethers.getContractFactory('SeacowsERC721TradePair', {
+      libraries: {
+        PricingKernel: pricingKernelLib.address,
+      },
+    });
+    template = (await SeacowsERC721TradePairFC.deploy()) as SeacowsERC721TradePair;
     ONE_PERCENT = await template.ONE_PERCENT();
   });
 

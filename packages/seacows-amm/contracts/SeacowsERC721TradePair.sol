@@ -49,10 +49,8 @@ contract SeacowsERC721TradePair is
     }
 
     function getComplementedBalance() public view returns (uint256 tokenBalance, uint256 nftBalance) {
-        tokenBalance = uint256(int256(IERC20(token).balanceOf(address(this))) + tokenComplement()) - feeBalance;
-        nftBalance = uint256(
-            int256(IERC721(collection).balanceOf(address(this)) * uint256(COMPLEMENT_PRECISION)) + nftComplement()
-        );
+        tokenBalance = uint256(int256(IERC20(token).balanceOf(address(this)))) - feeBalance;
+        nftBalance = IERC721(collection).balanceOf(address(this)) * COMPLEMENT_PRECISION;
     }
 
     function getReserves() public view returns (uint256 _reserve0, uint256 _reserve1, uint32 _blockTimestampLast) {
@@ -97,7 +95,8 @@ contract SeacowsERC721TradePair is
         address from,
         address to,
         uint256[] memory _ids
-    ) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut) {
+    ) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
+        from; // silence unused warning
         (uint balance0, uint balance1) = getComplementedBalance();
 
         ISeacowsPositionManager manager = positionManager();
@@ -111,7 +110,7 @@ contract SeacowsERC721TradePair is
             require(cTokenOut > 0 && cNftOut > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_BURNED');
 
             uint nftOut;
-            (tokenIn, tokenOut, nftOut) = _updateComplement(cTokenOut, cNftOut);
+            (tokenOut, nftOut) = _caculateAssetsOutAfterComplemented(balance0, balance1, cTokenOut, cNftOut);
             _burn(manager.tokenOf(address(this)), liquidity);
             nftAmountOut = nftOut / COMPLEMENT_PRECISION;
 
@@ -138,10 +137,6 @@ contract SeacowsERC721TradePair is
             require(count == nftAmountOut, 'SeacowsERC721TradePair: INSUFFICIENT_NFT_TO_WITHDRAW');
         }
 
-        if (tokenIn > 0) {
-            manager.seacowsBurnCallback(token, from, tokenIn);
-        }
-
         (balance0, balance1) = getComplementedBalance();
 
         {
@@ -149,7 +144,7 @@ contract SeacowsERC721TradePair is
             (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
             _update(balance0, balance1, _reserve0, _reserve1);
         }
-        emit Burn(msg.sender, cTokenOut, cNftOut, tokenIn, tokenOut, idsOut, to);
+        emit Burn(msg.sender, cTokenOut, cNftOut, tokenOut, idsOut, to);
     }
 
     // this low-level function should be called from a contract which performs important safety checks

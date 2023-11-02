@@ -19,7 +19,6 @@ interface ISeacowsERC721TradePair is
         address indexed sender,
         uint cTokenOut,
         uint cNftOut,
-        uint tokenAmountIn,
         uint tokenAmountOut,
         uint[] idsOut,
         address indexed to
@@ -43,7 +42,7 @@ interface ISeacowsERC721TradePair is
         address from,
         address to,
         uint256[] memory ids
-    ) external returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut);
+    ) external returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut);
 
     function swap(uint tokenAmountOut, uint[] memory idsOut, address to, bytes calldata data) external;
 

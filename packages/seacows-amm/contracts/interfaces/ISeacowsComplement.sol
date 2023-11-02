@@ -2,17 +2,12 @@
 pragma solidity ^0.8.13;
 
 interface ISeacowsComplement {
-    function COMPLEMENT_PRECISION() external view returns (uint);
+    function COMPLEMENT_PRECISION() external view returns (uint256);
 
-    function tokenComplement() external view returns (int256);
-
-    function nftComplement() external view returns (int256);
-
-    function getComplemenetedAssetsOut(
-        int256 _tokenAmountOut,
-        int256 _nftAmountOut
-    )
-        external
-        view
-        returns (int256 tokenAmountOut, int256 nftAmountOut, int256 newTokenComplement, int256 newNftComplement);
+    function caculateAssetsOutAfterComplemented(
+        uint256 _tokenBalance, 
+        uint256 _nftBalance,
+        uint256 _tokenExpectedOut,
+        uint256 _nftExpectedOut
+    ) external pure returns (uint256, uint256);
 }
