@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.3 (2023-11-02)
+
+
+### Features
+
+* new complement algorithm ([#17](https://github.com/yolominds/seacows-contracts/issues/17)) ([782e9d4](https://github.com/yolominds/seacows-contracts/commit/782e9d421689c0dad4f8925acebc8eb0ed30f971))
+
 ### 1.20.2 (2023-11-01)
 
 
