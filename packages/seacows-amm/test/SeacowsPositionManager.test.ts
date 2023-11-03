@@ -53,16 +53,16 @@ describe('SeacowsPositionManager', () => {
 
     weth = await WETHFC.deploy();
     template = await SeacowsERC721TradePairFC.deploy();
+
+    // Prepare Royalty Registry
+    const MockRoyaltyRegistryFC = await ethers.getContractFactory('MockRoyaltyRegistry');
+    registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
   });
 
   describe('Create Pair', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     beforeEach(async () => {
-      // Prepare Royalty Registry
-      const MockRoyaltyRegistryFC = await ethers.getContractFactory('MockRoyaltyRegistry');
-      registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
-
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
@@ -75,6 +75,7 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+      await manager.setRoyaltyRegistry(registry.address);
     });
 
     it('Should have correct initial configuration after create pair', async () => {
@@ -134,7 +135,7 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
-
+      await manager.setRoyaltyRegistry(registry.address);
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -247,7 +248,7 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
-
+      await manager.setRoyaltyRegistry(registry.address);
       /**
        * @notes Prepare assets for Alice
        * ERC721: [1, 2, 3, 4, 5]
@@ -343,7 +344,7 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
-
+      await manager.setRoyaltyRegistry(registry.address);
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -451,6 +452,8 @@ describe('SeacowsPositionManager', () => {
       });
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+
+      await manager.setRoyaltyRegistry(registry.address);
       /**
        * @notes Prepare assets for Alice
        * ERC721: [1, 2, 3, 4, 5]
@@ -673,6 +676,8 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+
+      await manager.setRoyaltyRegistry(registry.address);
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
