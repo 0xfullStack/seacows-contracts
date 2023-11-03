@@ -8,25 +8,27 @@ import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
-    struct TokenWithdrawal {
-        address token;
+
+    event RegisterToken(address indexed owner, address indexed token, uint256 amount);
+    event WithdrawToken(address indexed sender, address indexed token, uint256 amount);
+    event RegisterNFTs(address indexed owner, address indexed collection, uint256[] tokenIds);
+    event WithdrawNFTs(address indexed sender, address indexed collection, uint256[] tokenIds);
+
+    struct Token {
+        uint256 blockNumber;
         uint256 amount;
-        uint256 blockNumber;
     }
 
-    struct NFTWithdrawal {
-        uint256 id;
+    struct NFT {
         uint256 blockNumber;
+        address owner;
     }
 
-    // User addresss => NFT collection address => Withdrawal
-    mapping(address => mapping (address => NFTWithdrawal)) public userCollections;
+    // collection address => nft id => NFT
+    mapping(address => mapping (uint256 => NFT)) public collections;
 
-    // User address => collection address
-    mapping(address => address[]) public userToCollections;
-
-    // Token address => User address => Withdrawal
-    mapping(address => mapping (address => Withdrawal)) public tokenWithdrawals;
+    // token address => owner address => Token
+    mapping(address => mapping (address => Token)) public tokens;
 
     address public positionManager;
 
@@ -34,42 +36,43 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
         positionManager = _positionManager;
     }
 
-    function registerNftWithdrawal(address collection, uint256 tokenId, address user) external onlyPositionManager {
-        nftWithdrawals[collection][tokenId] = Withdrawal(user, 1, block.number);
+    function batchRegisterNFTs(address collection, uint256[] memory tokenIds, address owner) public onlyPositionManager nonReentrant {
+        for (uint i = 0; i < tokenIds.length; i++) {
+            collections[collection][tokenIds[i]] = NFT(block.number, owner);
+        }
+        emit RegisterNFTs(owner, collection, tokenIds);
     }
 
-    function withdrawNft(address collection, uint256 tokenId) external nonReentrant {
-        Withdrawal memory withdrawal = nftWithdrawals[collection][tokenId];
-
-        require(withdrawal.user == msg.sender, "SpeedBump: INVALID_MSG_SENDER");
-        require(withdrawal.amount != 0, "SpeedBump: INVALID_TOKEN_ID");
-        require(block.number > withdrawal.blockNumber, "SpeedBump: Please wait one more block");
-
-        delete nftWithdrawals[collection][tokenId];
-        IERC721(collection).safeTransferFrom(address(this), msg.sender, tokenId);
+    function batchWithdrawNFTs(address collection, uint256[] memory tokenIds) public nonReentrant {
+        for (uint i = 0; i < tokenIds.length; i++) {
+            uint256 tokenId = tokenIds[i];
+            NFT memory nft = collections[collection][tokenId];
+            require(nft.owner == msg.sender, "SpeedBump: INVALID_MSG_SENDER");
+            require(block.number > nft.blockNumber, "SpeedBump: Please wait one more block");
+            delete collections[collection][tokenId];
+            IERC721(collection).safeTransferFrom(address(this), msg.sender, tokenId);
+        }
+        emit WithdrawNFTs(msg.sender, collection, tokenIds);
     }
 
-    function registerTokenWithdrawal(address token, uint256 amount, address user) external onlyPositionManager nonReentrant {
+    function registerToken(address token, uint256 amount, address owner) public onlyPositionManager nonReentrant {
         require(amount > 0, "SpeedBump: Token amount must be great than zero");
-        tokenWithdrawals[token][user] = Withdrawal(user, amount, block.number);
+        uint256 existedAmount = tokens[token][owner].amount;
+        tokens[token][owner] = Token(block.number, existedAmount + amount); // overlap with latest block number 
+        emit RegisterToken(owner, token, amount);
     }
 
-    function withdrawToken(address token) external nonReentrant {
-        Withdrawal memory withdrawal = tokenWithdrawals[token][msg.sender];
-
-        require(withdrawal.user == msg.sender, "SpeedBump: INVALID_MSG_SENDER");
-        require(block.number > withdrawal.blockNumber, "Speed bump: Please wait one more block");
-
-        delete tokenWithdrawals[token][msg.sender];
-        require(IERC20(token).transfer(msg.sender, withdrawal.amount), "Speed bump: Token transfer failed");
+    function withdrawToken(address token) public nonReentrant {
+        Token memory _token = tokens[token][msg.sender];
+        require(block.number > _token.blockNumber, "Speed bump: Please wait one more block");
+        require(_token.amount > 0, "SpeedBump: Token amount must be great than zero");
+        delete tokens[token][msg.sender];
+        require(IERC20(token).transfer(msg.sender, _token.amount), "Speed bump: Token transfer failed");
+        emit WithdrawToken(msg.sender, token, _token.amount);
     }
 
     modifier onlyPositionManager() {
-        require(msg.sender == address(positionManager), "Speed bump: Not authorized");
+        require(msg.sender == address(positionManager), "Speed bump: INVALID_MSG_SENDER");
         _;
     }
-
-    // User address => ()
-    mapping(address => mapping (address => Withdrawal)) public tokens;
-    mapping(address => mapping (address => Withdrawal)) public nfts;
 }

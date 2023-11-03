@@ -24,26 +24,23 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
         public
         override
         checkDeadline(deadline)
-        returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut)
+        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
-        // Call the original removeLiquidity function
-        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = super.removeLiquidity(
+        (cTokenOut, cNftOut, tokenOut, idsOut) = super.removeLiquidity(
             token,
             collection,
             fee,
             liquidity,
             constraint,
             fromTokenId,
-            address(speedBump),  // transfers NFTS to speedBump
+            address(speedBump),  // transfers to speedBump
             deadline
         );
+        
+        speedBump.batchRegisterNFTs(collection, idsOut, to);
+        speedBump.registerToken(token, tokenOut, to);
 
-        for (uint i = 0; i < idsOut.length; i++) {
-            // IERC721(collection).approve(address(speedBump), idsOut[i]);
-            speedBump.registerNftWithdrawal(collection, idsOut[i], to);
-        }
-
-        return (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut);
+        return (cTokenOut, cNftOut, tokenOut, idsOut);
     }
 
     function removeLiquidityETH(
@@ -57,9 +54,9 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
     )
         public
         override
-        returns (uint cTokenOut, uint cNftOut, uint tokenIn, uint tokenOut, uint[] memory idsOut)
+        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
-        (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut) = removeLiquidity(
+        (cTokenOut, cNftOut, tokenOut, idsOut) = removeLiquidity(
             WETH,
             collection,
             fee,
@@ -70,9 +67,12 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
             deadline
         );
 
-        // IERC20(WETH).approve(address(speedBump), tokenOut);
-        speedBump.registerTokenWithdrawal(WETH, tokenOut, to);
+        speedBump.batchRegisterNFTs(collection, idsOut, to);
+        speedBump.registerToken(WETH, tokenOut, to);
 
-        return (cTokenOut, cNftOut, tokenIn, tokenOut, idsOut);
+        return (cTokenOut, cNftOut, tokenOut, idsOut);
     }
 }
+
+// IERC721(collection).approve(address(speedBump), idsOut[i]);
+// IERC20(WETH).approve(address(speedBump), tokenOut);
