@@ -37,6 +37,10 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
+      mining: {
+        auto: true,
+        interval: 5000,
+      },
     },
     mumbai: {
       chainId: SupportedChain.MUMBAI,

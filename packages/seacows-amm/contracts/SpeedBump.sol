@@ -6,13 +6,22 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import {IWETH} from './interfaces/IWETH.sol';
 
 contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
 
+    event RegisterETH(address indexed owner, uint256 amount);
     event RegisterToken(address indexed owner, address indexed token, uint256 amount);
-    event WithdrawToken(address indexed sender, address indexed token, uint256 amount);
     event RegisterNFTs(address indexed owner, address indexed collection, uint256[] tokenIds);
+
+    event WithdrawETH(address indexed sender, uint256 amount);
+    event WithdrawToken(address indexed sender, address indexed token, uint256 amount);
     event WithdrawNFTs(address indexed sender, address indexed collection, uint256[] tokenIds);
+
+    struct ETH {
+        uint256 blockNumber;
+        uint256 amount;
+    }
 
     struct Token {
         uint256 blockNumber;
@@ -24,11 +33,14 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
         address owner;
     }
 
-    // collection address => nft id => NFT
-    mapping(address => mapping (uint256 => NFT)) public collections;
+    // owner address => ETH
+    mapping(address => ETH) public eths;
 
     // token address => owner address => Token
     mapping(address => mapping (address => Token)) public tokens;
+
+    // collection address => nft id => NFT
+    mapping(address => mapping (uint256 => NFT)) public collections;
 
     address public positionManager;
 
@@ -71,8 +83,27 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
         emit WithdrawToken(msg.sender, token, _token.amount);
     }
 
+    function registerETH(uint256 amount, address owner) public onlyPositionManager nonReentrant {
+        require(amount > 0, "SpeedBump: ETH amount must be great than zero");
+        uint256 existedAmount = eths[owner].amount;
+        eths[owner] = ETH(block.number, existedAmount + amount); // overlap with latest block number 
+        emit RegisterETH(owner, amount);
+    }
+
+    function withdrawETH() public nonReentrant {
+        ETH memory eth = eths[msg.sender];
+        require(block.number > eth.blockNumber, "Speed bump: Please wait one more block");
+        require(eth.amount > 0, "SpeedBump: Token amount must be great than zero");
+        delete eths[msg.sender];
+        (bool success, ) = msg.sender.call{value: eth.amount}(new bytes(0));
+        require(success, "Speed bump: ETH transfer failed");
+        emit WithdrawETH(msg.sender, eth.amount);
+    }
+
     modifier onlyPositionManager() {
         require(msg.sender == address(positionManager), "Speed bump: INVALID_MSG_SENDER");
         _;
     }
+
+    receive() external payable {}
 }

@@ -8,7 +8,7 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
     SpeedBump public speedBump;
 
     constructor(address template_, address _WETH, address _speedBump) SeacowsPositionManager(template_, _WETH) {
-        speedBump = SpeedBump(_speedBump);
+        speedBump = SpeedBump(payable(_speedBump));
     }
 
     function removeLiquidity(
@@ -23,7 +23,6 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
     )
         public
         override
-        checkDeadline(deadline)
         returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
         (cTokenOut, cNftOut, tokenOut, idsOut) = super.removeLiquidity(
@@ -56,8 +55,7 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
         override
         returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
-        (cTokenOut, cNftOut, tokenOut, idsOut) = removeLiquidity(
-            WETH,
+        (cTokenOut, cNftOut, tokenOut, idsOut) = super.removeLiquidityETH(
             collection,
             fee,
             liquidity,
@@ -68,7 +66,7 @@ contract SeacowsPositionManagerWithSpeedBump is SeacowsPositionManager {
         );
 
         speedBump.batchRegisterNFTs(collection, idsOut, to);
-        speedBump.registerToken(WETH, tokenOut, to);
+        speedBump.registerETH(tokenOut, to);
 
         return (cTokenOut, cNftOut, tokenOut, idsOut);
     }

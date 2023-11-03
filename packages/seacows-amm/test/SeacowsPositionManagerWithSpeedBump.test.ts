@@ -155,18 +155,25 @@ describe('SeacowsPositionManager', () => {
         alice,
       );
 
-      await manager
-        .connect(alice)
-        .removeLiquidity(
-          erc20.address,
-          erc721.address,
-          ONE_PERCENT,
-          ethers.utils.parseEther('1'),
-          { cTokenOutMin, cNftOutMin, nftIds: [1] },
-          2,
-          alice.address,
-          MaxUint256,
-        );
+      await expect(
+        manager
+          .connect(alice)
+          .removeLiquidity(
+            erc20.address,
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            { cTokenOutMin, cNftOutMin, nftIds: [1] },
+            2,
+            alice.address,
+            MaxUint256,
+          ),
+      )
+        .to.emit(speedBump, 'RegisterNFTs')
+        .withArgs(alice.address, erc721.address, [1])
+        .to.emit(speedBump, 'RegisterToken')
+        .withArgs(alice.address, erc20.address, ethers.utils.parseEther('1'));
+
       /**
        * @notes Pair State after remove liqudity
        * Input ETH: 2 Ethers
@@ -187,6 +194,41 @@ describe('SeacowsPositionManager', () => {
 
       // Check liqudity balance of Alice Position NFT
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
+    });
+
+    it('Should withdraw to be reverted when sender is not owner', async () => {
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('100'));
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(5);
+
+      await expect(speedBump.connect(bob).batchWithdrawNFTs(erc721.address, [1])).to.be.reverted;
+      await expect(speedBump.connect(bob).withdrawToken(erc20.address)).to.be.reverted;
+
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('100'));
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(5);
+    });
+
+    it('Should withdraw assets when sender is owner', async () => {
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+
+      await expect(await speedBump.connect(alice).batchWithdrawNFTs(erc721.address, [1]))
+        .to.emit(speedBump, 'WithdrawNFTs')
+        .withArgs(alice.address, erc721.address, [1]);
+
+      await expect(speedBump.connect(alice).withdrawToken(erc20.address))
+        .to.emit(speedBump, 'WithdrawToken')
+        .withArgs(alice.address, erc20.address, ethers.utils.parseEther('1'));
+
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('0'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(0);
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('8'));
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
     });
   });
 
@@ -263,6 +305,7 @@ describe('SeacowsPositionManager', () => {
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('3'));
       expect(await erc721.balanceOf(pair.address)).to.be.equal(3);
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+    //   expect(await erc721.ownerOf(2)).to.be.equal(alice.address);
 
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
@@ -271,17 +314,24 @@ describe('SeacowsPositionManager', () => {
         100,
         alice,
       );
-      await manager
-        .connect(alice)
-        .removeLiquidityETH(
-          erc721.address,
-          ONE_PERCENT,
-          ethers.utils.parseEther('1'),
-          { cTokenOutMin, cNftOutMin, nftIds: [2] },
-          2,
-          alice.address,
-          MaxUint256,
-        );
+
+      await expect(
+        manager
+          .connect(alice)
+          .removeLiquidityETH(
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            { cTokenOutMin, cNftOutMin, nftIds: [2] },
+            2,
+            alice.address,
+            MaxUint256,
+          ),
+      )
+        .to.emit(speedBump, 'RegisterNFTs')
+        .withArgs(alice.address, erc721.address, [2])
+        .to.emit(speedBump, 'RegisterETH')
+        .withArgs(alice.address, ethers.utils.parseEther('1'));
 
       /**
        * @notes Pair State after remove liqudity
@@ -297,11 +347,42 @@ describe('SeacowsPositionManager', () => {
        * Input ETH: 1 Ethers
        * Input ERC721: [2]
        */
-      expect(await weth.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
       expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
 
       // Check liqudity balance of Alice Position NFT
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
+    });
+
+    it('Should withdraw to be reverted when sender is not owner', async () => {
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(10);
+
+      await expect(speedBump.connect(bob).batchWithdrawNFTs(erc721.address, [2])).to.be.reverted;
+      await expect(speedBump.connect(bob).withdrawETH()).to.be.reverted;
+
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(10);
+    });
+
+    it('Should withdraw assets when sender is owner', async () => {
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+
+      await expect(await speedBump.connect(alice).batchWithdrawNFTs(erc721.address, [2]))
+        .to.emit(speedBump, 'WithdrawNFTs')
+        .withArgs(alice.address, erc721.address, [2]);
+
+      await expect(speedBump.connect(alice).withdrawETH())
+        .to.emit(speedBump, 'WithdrawETH')
+        .withArgs(alice.address, ethers.utils.parseEther('1'));
+
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('0'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(0);
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
     });
   });
 });
