@@ -14,6 +14,7 @@ import {
   type MockERC721,
   type MockERC20,
   type MockRoyaltyRegistry,
+  type SpeedBump,
 } from 'types';
 
 describe('RoyaltyManagement', () => {
@@ -30,6 +31,7 @@ describe('RoyaltyManagement', () => {
   let POINT_FIVE_PERCENT: BigNumber;
   let minRoyaltyFeePercent: BigNumber;
 
+  let speedBump: SpeedBump;
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
   let rendererLib;
@@ -69,6 +71,7 @@ describe('RoyaltyManagement', () => {
 
     const erc721FC = await ethers.getContractFactory('MockERC721');
     const erc20FC = await ethers.getContractFactory('MockERC20');
+    const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
     const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
       libraries: {
         NFTRenderer: rendererLib.address,
@@ -77,11 +80,13 @@ describe('RoyaltyManagement', () => {
 
     erc721 = await erc721FC.deploy();
     erc20 = await erc20FC.deploy();
-    manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+    speedBump = await SpeedBumpFC.deploy();
+    manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
     router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
 
     await manager.setFeeTo(feeTo.address);
     await manager.setRoyaltyRegistry(registry.address);
+    await speedBump.initialize(manager.address);
 
     ONE_PERCENT = await template.ONE_PERCENT();
     POINT_FIVE_PERCENT = await template.POINT_FIVE_PERCENT();

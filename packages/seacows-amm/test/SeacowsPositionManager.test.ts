@@ -13,6 +13,7 @@ import {
   type MockERC721,
   type MockERC20,
   type MockRoyaltyRegistry,
+  type SpeedBump,
 } from 'types';
 import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
 import { sqrt } from './utils';
@@ -23,6 +24,7 @@ describe('SeacowsPositionManager', () => {
   let bob: SignerWithAddress;
   let weth: WETH;
 
+  let speedBump: SpeedBump;
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
   let rendererLib;
@@ -65,6 +67,7 @@ describe('SeacowsPositionManager', () => {
     beforeEach(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
@@ -73,9 +76,11 @@ describe('SeacowsPositionManager', () => {
 
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
     });
 
     it('Should have correct initial configuration after create pair', async () => {
@@ -126,6 +131,7 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
@@ -133,9 +139,11 @@ describe('SeacowsPositionManager', () => {
       });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -240,15 +248,18 @@ describe('SeacowsPositionManager', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
         },
       });
       erc721 = await erc721FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
       /**
        * @notes Prepare assets for Alice
        * ERC721: [1, 2, 3, 4, 5]
@@ -335,6 +346,7 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
@@ -342,9 +354,11 @@ describe('SeacowsPositionManager', () => {
       });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -445,15 +459,18 @@ describe('SeacowsPositionManager', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
         },
       });
       erc721 = await erc721FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
-
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
+
       /**
        * @notes Prepare assets for Alice
        * ERC721: [1, 2, 3, 4, 5]
@@ -531,6 +548,7 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
@@ -538,10 +556,11 @@ describe('SeacowsPositionManager', () => {
       });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
-
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
 
       /**
        * @notes Prepare assets for Alice
@@ -589,7 +608,7 @@ describe('SeacowsPositionManager', () => {
       pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
     });
 
-    it('Should remove liquidity from existing NFT IDs', async () => {
+    it('Should remove liquidity from Pool to SpeedBump', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -601,8 +620,10 @@ describe('SeacowsPositionManager', () => {
        */
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('3'));
       expect(await erc721.balanceOf(pair.address)).to.be.equal(3);
+
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+      expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
 
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
@@ -612,18 +633,25 @@ describe('SeacowsPositionManager', () => {
         alice,
       );
 
-      await manager
-        .connect(alice)
-        .removeLiquidity(
-          erc20.address,
-          erc721.address,
-          ONE_PERCENT,
-          ethers.utils.parseEther('1'),
-          { cTokenOutMin, cNftOutMin, nftIds: [1] },
-          2,
-          alice.address,
-          MaxUint256,
-        );
+      await expect(
+        manager
+          .connect(alice)
+          .removeLiquidity(
+            erc20.address,
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            { cTokenOutMin, cNftOutMin, nftIds: [1] },
+            2,
+            alice.address,
+            MaxUint256,
+          ),
+      )
+        .to.emit(speedBump, 'RegisterNFTs')
+        .withArgs(alice.address, erc721.address, [1])
+        .to.emit(speedBump, 'RegisterToken')
+        .withArgs(alice.address, erc20.address, ethers.utils.parseEther('1'));
+
       /**
        * @notes Pair State after remove liqudity
        * Input ETH: 2 Ethers
@@ -631,11 +659,54 @@ describe('SeacowsPositionManager', () => {
        */
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('2'));
       expect(await erc721.balanceOf(pair.address)).to.be.equal(2);
-      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('8'));
-      expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+
+      /**
+       * @notes SpeedBump State after remove liqudity
+       * Input ETH: 1 Ethers
+       * Input ERC721: [2]
+       */
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
 
       // Check liqudity balance of Alice Position NFT
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
+    });
+
+    it('Should withdraw to be reverted when sender is not owner', async () => {
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('100'));
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(5);
+
+      await expect(speedBump.connect(bob).batchWithdrawNFTs(erc721.address, [1])).to.be.reverted;
+      await expect(speedBump.connect(bob).withdrawToken(erc20.address)).to.be.reverted;
+
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('100'));
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(5);
+    });
+
+    it('Should withdraw assets when sender is owner', async () => {
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+
+      await expect(await speedBump.connect(alice).batchWithdrawNFTs(erc721.address, [1]))
+        .to.emit(speedBump, 'WithdrawNFTs')
+        .withArgs(alice.address, erc721.address, [1]);
+
+      await expect(speedBump.connect(alice).withdrawToken(erc20.address))
+        .to.emit(speedBump, 'WithdrawToken')
+        .withArgs(alice.address, erc20.address, ethers.utils.parseEther('1'));
+
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('0'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(0);
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('8'));
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
     });
 
     it('Should revert for invalid token ID', async () => {
@@ -668,16 +739,19 @@ describe('SeacowsPositionManager', () => {
     let pair: SeacowsERC721TradePair;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
         },
       });
       erc721 = await erc721FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
-
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
+
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers
@@ -715,7 +789,7 @@ describe('SeacowsPositionManager', () => {
       pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
     });
 
-    it('Should remove liquidity from existing NFT IDs', async () => {
+    it('Should remove liquidity from Pool to SpeedBump', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -728,6 +802,7 @@ describe('SeacowsPositionManager', () => {
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('3'));
       expect(await erc721.balanceOf(pair.address)).to.be.equal(3);
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+      expect(await erc721.ownerOf(2)).to.be.equal(pair.address);
 
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
@@ -736,32 +811,75 @@ describe('SeacowsPositionManager', () => {
         100,
         alice,
       );
-      await manager
-        .connect(alice)
-        .removeLiquidityETH(
-          erc721.address,
-          ONE_PERCENT,
-          ethers.utils.parseEther('1'),
-          { cTokenOutMin, cNftOutMin, nftIds: [2] },
-          2,
-          alice.address,
-          MaxUint256,
-        );
+
+      await expect(
+        manager
+          .connect(alice)
+          .removeLiquidityETH(
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            { cTokenOutMin, cNftOutMin, nftIds: [2] },
+            2,
+            alice.address,
+            MaxUint256,
+          ),
+      )
+        .to.emit(speedBump, 'RegisterNFTs')
+        .withArgs(alice.address, erc721.address, [2])
+        .to.emit(speedBump, 'RegisterETH')
+        .withArgs(alice.address, ethers.utils.parseEther('1'));
+
       /**
-       * @notes Pair State after add liqudity
+       * @notes Pair State after remove liqudity
        * Input ETH: 2 Ethers
        * Input ERC721: [1, 3]
-       *
-       * Position NFT ID of Pair: 1
-       * Position NFT ID of Pair Lock Position: 2
-       * Position NFT ID of Alice: 3
        */
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('2'));
       expect(await erc721.balanceOf(pair.address)).to.be.equal(2);
-      expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
 
-      // // Check liqudity balance of Alice Position NFT
+      /**
+       * @notes SpeedBump State after remove liqudity
+       * Input ETH: 1 Ethers
+       * Input ERC721: [2]
+       */
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+
+      // Check liqudity balance of Alice Position NFT
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
+    });
+
+    it('Should withdraw to be reverted when sender is not owner', async () => {
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(10);
+
+      await expect(speedBump.connect(bob).batchWithdrawNFTs(erc721.address, [2])).to.be.reverted;
+      await expect(speedBump.connect(bob).withdrawETH()).to.be.reverted;
+
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc721.balanceOf(bob.address)).to.be.equal(10);
+    });
+
+    it('Should withdraw assets when sender is owner', async () => {
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
+
+      await expect(await speedBump.connect(alice).batchWithdrawNFTs(erc721.address, [2]))
+        .to.emit(speedBump, 'WithdrawNFTs')
+        .withArgs(alice.address, erc721.address, [2]);
+
+      await expect(speedBump.connect(alice).withdrawETH())
+        .to.emit(speedBump, 'WithdrawETH')
+        .withArgs(alice.address, ethers.utils.parseEther('1'));
+
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('0'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(0);
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
     });
 
     it('Should revert for invalid token ID', async () => {
@@ -795,6 +913,7 @@ describe('SeacowsPositionManager', () => {
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
       const erc20FC = await ethers.getContractFactory('MockERC20');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
       const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
         libraries: {
           NFTRenderer: rendererLib.address,
@@ -802,8 +921,11 @@ describe('SeacowsPositionManager', () => {
       });
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
-      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
+      await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
       /**
        * @notes Prepare assets for Alice
        * ERC20: 10 Ethers

@@ -11,6 +11,7 @@ import {
   type MockERC721,
   type MockERC20,
   type MockSeacowsPairSwap,
+  type SpeedBump,
 } from 'types';
 import { ONE_PERCENT, COMPLEMENT_PRECISION } from './constants';
 import { sqrt } from './utils';
@@ -26,6 +27,7 @@ describe('SeacowsERC721TradePair', () => {
   let erc721: MockERC721;
   let erc20: MockERC20;
 
+  let speedBump: SpeedBump;
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
   let pair: SeacowsERC721TradePair;
@@ -37,6 +39,7 @@ describe('SeacowsERC721TradePair', () => {
     const WETHFC = await ethers.getContractFactory('WETH');
     const MockERC721FC = await ethers.getContractFactory('MockERC721');
     const MockERC20FC = await ethers.getContractFactory('MockERC20');
+    const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
     weth = await WETHFC.deploy();
     erc721 = await MockERC721FC.deploy();
     erc20 = await MockERC20FC.deploy();
@@ -65,7 +68,9 @@ describe('SeacowsERC721TradePair', () => {
     });
 
     template = await SeacowsERC721TradePairFC.deploy();
-    manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address);
+    speedBump = await SpeedBumpFC.deploy();
+    manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
+    await speedBump.initialize(manager.address);
   });
 
   describe('Mint', () => {

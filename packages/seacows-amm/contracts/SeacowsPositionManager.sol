@@ -14,6 +14,7 @@ import {FeeManagement} from './base/FeeManagement.sol';
 import {ISeacowsPositionManager} from './interfaces/ISeacowsPositionManager.sol';
 import {ISeacowsERC721TradePair} from './interfaces/ISeacowsERC721TradePair.sol';
 import {IWETH} from './interfaces/IWETH.sol';
+import {SpeedBump} from "./SpeedBump.sol";
 import {NFTRenderer} from './lib/NFTRenderer.sol';
 
 contract SeacowsPositionManager is
@@ -28,6 +29,8 @@ contract SeacowsPositionManager is
 
     address public immutable WETH;
 
+    SpeedBump public immutable speedBump;
+
     Counters.Counter private _slotGenerator;
 
     struct RemoveLiquidityConstraint {
@@ -38,9 +41,11 @@ contract SeacowsPositionManager is
 
     constructor(
         address template_,
-        address _WETH
+        address _WETH,
+        address _speedBump
     ) SeacowsERC3525('Seacows LP Token', 'SLP', 18) SeacowsERC721TradePairFactory(template_) {
         WETH = _WETH;
+        speedBump = SpeedBump(payable(_speedBump));
     }
 
     modifier onlyPair(uint256 _slot) {
@@ -207,21 +212,23 @@ contract SeacowsPositionManager is
         uint deadline
     )
         public
-        virtual
-        checkDeadline(deadline)
         returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
-        require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
-        address pair = getPair(token, collection, fee);
-
-        transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
-        (cTokenOut, cNftOut, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(
-            msg.sender,
-            to,
-            constraint.nftIds
+        (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidity(
+            token,
+            collection,
+            fee,
+            liquidity,
+            constraint,
+            fromTokenId,
+            address(speedBump),  // transfers to speedBump
+            deadline
         );
-        require(cTokenOut >= constraint.cTokenOutMin, 'SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN');
-        require(cNftOut >= constraint.cNftOutMin, 'SeacowsPositionManager: BELOW_C_NFT_OUT_MIN');
+        
+        speedBump.batchRegisterNFTs(collection, idsOut, to);
+        speedBump.registerToken(token, tokenOut, to);
+
+        return (cTokenOut, cNftOut, tokenOut, idsOut);
     }
 
     /**
@@ -240,16 +247,70 @@ contract SeacowsPositionManager is
         uint liquidity,
         RemoveLiquidityConstraint memory constraint,
         uint256 fromTokenId,
-        address to,
+        address to,  // owner of the NFTs, the user
         uint deadline
     )
         public
-        virtual
+        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
+    {
+        (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidityETH(
+            collection,
+            fee,
+            liquidity,
+            constraint,
+            fromTokenId,
+            address(speedBump),
+            deadline
+        );
+
+        speedBump.batchRegisterNFTs(collection, idsOut, to);
+        speedBump.registerETH(tokenOut, to);
+
+        return (cTokenOut, cNftOut, tokenOut, idsOut);
+    }
+    
+    function _removeLiquidity(
+        address token,
+        address collection,
+        uint256 fee,
+        uint liquidity,
+        RemoveLiquidityConstraint memory constraint,
+        uint256 fromTokenId,
+        address to,
+        uint deadline
+    )
+        internal
         checkDeadline(deadline)
         returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
     {
         require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
-        (cTokenOut, cNftOut, tokenOut, idsOut) = removeLiquidity(
+        address pair = getPair(token, collection, fee);
+
+        transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
+        (cTokenOut, cNftOut, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(
+            msg.sender,
+            to,
+            constraint.nftIds
+        );
+        require(cTokenOut >= constraint.cTokenOutMin, 'SeacowsPositionManager: BELOW_C_TOKEN_OUT_MIN');
+        require(cNftOut >= constraint.cNftOutMin, 'SeacowsPositionManager: BELOW_C_NFT_OUT_MIN');
+    }
+
+    function _removeLiquidityETH(
+        address collection,
+        uint256 fee,
+        uint liquidity,
+        RemoveLiquidityConstraint memory constraint,
+        uint256 fromTokenId,
+        address to,
+        uint deadline
+    )
+        internal
+        checkDeadline(deadline)
+        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
+    {
+        require(_exists(fromTokenId), 'SeacowsPositionManager: INVALID_TOKEN_ID');
+        (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidity(
             WETH,
             collection,
             fee,

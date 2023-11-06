@@ -63,6 +63,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "slotOfPair(address)": FunctionFragment;
     "slotPairs(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
+    "speedBump()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "template()": FunctionFragment;
@@ -265,6 +266,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "slotURI",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "speedBump", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
@@ -402,6 +404,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "slotOfPair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotPairs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "speedBump", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -805,6 +808,8 @@ export class SeacowsPositionManager extends BaseContract {
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
+    speedBump(overrides?: CallOverrides): Promise<[string]>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -1096,6 +1101,8 @@ export class SeacowsPositionManager extends BaseContract {
   slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  speedBump(overrides?: CallOverrides): Promise<string>;
 
   supportsInterface(
     interfaceId: BytesLike,
@@ -1411,6 +1418,8 @@ export class SeacowsPositionManager extends BaseContract {
     slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    speedBump(overrides?: CallOverrides): Promise<string>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -1866,6 +1875,8 @@ export class SeacowsPositionManager extends BaseContract {
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
+    speedBump(overrides?: CallOverrides): Promise<BigNumber>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -2186,6 +2197,8 @@ export class SeacowsPositionManager extends BaseContract {
       slot_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    speedBump(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     supportsInterface(
       interfaceId: BytesLike,

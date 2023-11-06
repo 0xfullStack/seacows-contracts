@@ -261,6 +261,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SeacowsPositionManager__factory>;
     getContractFactory(
+      name: "SpeedBump",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SpeedBump__factory>;
+    getContractFactory(
       name: "MockERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockERC20__factory>;
@@ -595,6 +599,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.SeacowsPositionManager>;
+    getContractAt(
+      name: "SpeedBump",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SpeedBump>;
     getContractAt(
       name: "MockERC20",
       address: string,

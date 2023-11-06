@@ -107,3 +107,6 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
 
     receive() external payable {}
 }
+
+// IERC721(collection).approve(address(speedBump), idsOut[i]);
+// IERC20(WETH).approve(address(speedBump), tokenOut);
