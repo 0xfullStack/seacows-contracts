@@ -16,7 +16,6 @@ import {
   type NFTRenderer,
 } from '@yolominds/seacows-sdk/types/amm';
 import { type WETH, type MockERC20, type MockERC721, type SeacowsRouter, type MockRoyaltyRegistry } from 'types';
-import { link } from 'fs';
 import { type BigNumber } from 'ethers';
 
 describe('SeacowsRouter', () => {
@@ -55,7 +54,7 @@ describe('SeacowsRouter', () => {
     ONE_PERCENT = await template.ONE_PERCENT();
   });
 
-  describe('Swap Tokens For Exact NFTs, and keep K no change approximatly', () => {
+  describe('Swap Tokens For Exact NFTs success, and keep K no change approximatly', () => {
     let manager: SeacowsPositionManager;
     let router: SeacowsRouter;
     let erc721: MockERC721;
@@ -225,7 +224,7 @@ describe('SeacowsRouter', () => {
     });
   });
 
-  describe('Swap Exact NFTs For Tokens, and keep K no change approximatly', () => {
+  describe('Swap Exact NFTs For Tokens success, and keep K no change approximatly', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
@@ -380,6 +379,148 @@ describe('SeacowsRouter', () => {
       expect(newReserve0).to.be.equal(ethers.utils.parseEther('1.810515000000000000'));
       expect(newReserve1).to.be.equal(ethers.utils.parseEther('5'));
       expect(newReserve0.mul(newReserve1)).to.be.greaterThanOrEqual(reserve0.mul(reserve1)); // 1.810515000000000000 * 5 = 3 * 3
+    });
+  });
+
+  describe('Swap Tokens For Exact NFTs failure when pool has only one nft left', () => {
+    let manager: SeacowsPositionManager;
+    let router: SeacowsRouter;
+    let erc721: MockERC721;
+    let erc20: MockERC20;
+    let pair: SeacowsERC721TradePair;
+
+    let registry: MockRoyaltyRegistry;
+    let minRoyaltyFeePercent: BigNumber;
+
+    before(async () => {
+      // Prepare Royalty Registry
+      const MockRoyaltyRegistryFC = await ethers.getContractFactory('MockRoyaltyRegistry');
+      registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
+
+      const erc721FC = await ethers.getContractFactory('MockERC721');
+      const erc20FC = await ethers.getContractFactory('MockERC20');
+      erc721 = await erc721FC.deploy();
+      erc20 = await erc20FC.deploy();
+
+      const SeacowsPositionManagerFactory = await ethers.getContractFactoryFromArtifact(
+        SeacowsPositionManagerArtifact,
+        {
+          libraries: {
+            NFTRenderer: rendererLib.address,
+          },
+        },
+      );
+      manager = (await SeacowsPositionManagerFactory.deploy(template.address, weth.address)) as SeacowsPositionManager;
+      await manager.deployed();
+      await manager.setFeeTo(ethers.constants.AddressZero);
+      await manager.setRoyaltyRegistry(registry.address);
+
+      // Deploy Router
+      const SeacowsRouterFC = await ethers.getContractFactory('SeacowsRouter');
+      router = await SeacowsRouterFC.deploy(manager.address, weth.address);
+
+      /**
+       * @notes Prepare assets for Alice
+       * ERC20: 10 Ethers
+       * ERC721: [0, 1, 2, 3, 4]
+       */
+      for (let i = 0; i < 10; i++) {
+        await erc721.mint(alice.address);
+      }
+      await erc20.mint(alice.address, ethers.utils.parseEther('10'));
+      await erc20.mint(bob.address, ethers.utils.parseEther('10'));
+
+      /**
+       * @notes Mint Position NFTs
+       * Input ETH: 3 Ethers
+       * Input ERC721: [1, 2, 3]
+       *
+       * Position NFT ID of Pair: 1
+       * Position NFT ID of Alice: 2
+       */
+      await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
+      await erc721.connect(alice).setApprovalForAll(manager.address, true);
+      await manager
+        .connect(alice)
+        .mint(
+          erc20.address,
+          erc721.address,
+          ONE_PERCENT,
+          ethers.utils.parseEther('3'),
+          [1, 2, 3],
+          ethers.utils.parseEther('3'),
+          MaxUint256,
+        );
+      pair = (await ethers.getContractAt(
+        SeacowsERC721TradePairAbi,
+        await manager.getPair(erc20.address, erc721.address, ONE_PERCENT),
+      )) as SeacowsERC721TradePair;
+    });
+
+    it('should have 0% min royalty fee intially', async () => {
+      minRoyaltyFeePercent = await pair.minRoyaltyFeePercent();
+      expect(minRoyaltyFeePercent).to.be.equal(0);
+    });
+
+    it('should set min royalty fee correctly', async () => {
+      await pair.connect(owner).setMinRoyaltyFeePercent(100);
+      minRoyaltyFeePercent = await pair.minRoyaltyFeePercent();
+      expect(minRoyaltyFeePercent).to.be.equal(100);
+    });
+
+    it('swapTokensForExactNFTs', async () => {
+      // Caculate how much need to be paid
+      const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
+        pair.address,
+        [1, 2],
+        minRoyaltyFeePercent,
+        1,
+        100,
+        owner,
+      );
+
+      expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.183018000000000001'));
+
+      // Approve token cost
+      await erc20.connect(bob).approve(router.address, tokenInMaxWithSlippage);
+      await router
+        .connect(bob)
+        .swapTokensForExactNFTs(
+          pair.address,
+          [1, 2],
+          tokenInMaxWithSlippage,
+          minRoyaltyFeePercent,
+          bob.address,
+          MaxUint256,
+        );
+
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('9.121800000000000001'));
+      const [tokenBalance] = await pair.getComplementedBalance();
+      expect(tokenBalance).to.be.equal(ethers.utils.parseEther('9.061800000000000001'));
+
+      expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('3.878199999999999999'));
+      expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
+      expect(await erc721.ownerOf(2)).to.be.equal(bob.address);
+
+      // now pool has only one nft id = 3
+      expect(await erc721.ownerOf(3)).to.be.equal(pair.address);
+      const [newReserve0, newReserve1] = await pair.getReserves();
+      expect(newReserve0).to.be.equal(ethers.utils.parseEther('9.061800000000000001'));
+      expect(newReserve1).to.be.equal(ethers.utils.parseEther('1'));
+
+      // bob can not swap left 1 nft out
+      await expect(
+        router
+          .connect(bob)
+          .swapTokensForExactNFTs(
+            pair.address,
+            [3],
+            ethers.utils.parseEther('5'),
+            minRoyaltyFeePercent,
+            bob.address,
+            MaxUint256,
+          ),
+      ).to.be.reverted;
     });
   });
 });
