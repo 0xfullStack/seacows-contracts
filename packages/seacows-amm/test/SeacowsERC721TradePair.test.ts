@@ -94,13 +94,13 @@ describe('SeacowsERC721TradePair', () => {
       expect(nftReserve).to.be.equal(0);
     });
 
-    it('Should mint 2 Position NFTs the Pair and 1 for Alice', async () => {
+    it('Should mint 2 Position NFTs the Pair and 1 for Alice using SeacowsPositionManager', async () => {
       // await pair.mint(erc20.address, erc721.address, ONE_PERCENT);
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('2'));
       await erc721.connect(alice).setApprovalForAll(manager.address, true);
       await manager
         .connect(alice)
-        .mint(erc20.address, erc721.address, ONE_PERCENT, ethers.utils.parseEther('2'), [0], 0, MaxUint256);
+        .mint(erc20.address, erc721.address, ONE_PERCENT, ethers.utils.parseEther('2'), [1, 2], 0, MaxUint256);
 
       /**
        * @notes
@@ -112,7 +112,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(await manager.ownerOf(2)).to.be.equal(alice.address);
 
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(
-        sqrt(ethers.utils.parseEther('2').mul(BigNumber.from(1).mul(COMPLEMENT_PRECISION))),
+        sqrt(ethers.utils.parseEther('2').mul(BigNumber.from(2).mul(COMPLEMENT_PRECISION))),
       );
     });
 
@@ -121,12 +121,11 @@ describe('SeacowsERC721TradePair', () => {
       /**
        * @notes transfer assets from Alice to Pair
        * ERC20: 2 Ethers
-       * ERC721: [1, 2, 3]
+       * ERC721: [3,4]
        */
       await erc20.connect(alice).transfer(pair.address, ethers.utils.parseEther('2'));
-      await erc721.connect(alice)['safeTransferFrom(address,address,uint256)'](alice.address, pair.address, 1);
-      await erc721.connect(alice)['safeTransferFrom(address,address,uint256)'](alice.address, pair.address, 2);
       await erc721.connect(alice)['safeTransferFrom(address,address,uint256)'](alice.address, pair.address, 3);
+      await erc721.connect(alice)['safeTransferFrom(address,address,uint256)'](alice.address, pair.address, 4);
       expect(await erc721.balanceOf(pair.address)).to.be.equal(4);
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4'));
 
@@ -140,7 +139,7 @@ describe('SeacowsERC721TradePair', () => {
       // Mint liquidity based on balance
       await expect(pair.connect(alice).mint(2))
         .to.be.emit(pair, 'Mint')
-        .withArgs(alice.address, ethers.utils.parseEther('2'), ethers.utils.parseEther('3'));
+        .withArgs(alice.address, ethers.utils.parseEther('2'), ethers.utils.parseEther('2'));
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(aliceLiquidityBefore.add(expectedLiquidityToMint));
     });
 
@@ -243,11 +242,10 @@ describe('SeacowsERC721TradePair', () => {
 
       /**
        * @notes Summary of Pair at this stage
-       * ERC721: [0, 2, 3, 5]
+       * ERC721: [1, 2, 3, 5]
        * ERC20: 4 Ethers
        * Pair NFT: [1, 2]
        */
-      expect(await erc721.ownerOf(0)).to.be.equal(pair.address);
       expect(await erc721.ownerOf(2)).to.be.equal(pair.address);
       expect(await erc721.ownerOf(3)).to.be.equal(pair.address);
       expect(await erc721.ownerOf(5)).to.be.equal(pair.address);
@@ -286,7 +284,7 @@ describe('SeacowsERC721TradePair', () => {
     it('Should swap out ERC20 token successfully, and keep K no change approximatly', async () => {
       /**
        * @notes Summary of Alice before swap
-       * ERC721: [4]
+       * ERC721: [0]
        * ERC20: 6 Ethers
        * Pair NFT: [3]
        */
@@ -295,15 +293,15 @@ describe('SeacowsERC721TradePair', () => {
 
       /**
        * @notes Alice's swap
-       * Swap in ERC721: [4]
+       * Swap in ERC721: [0]
        * Swap out ERC20 (Including fee): 0.792 Ethers
        */
-      expect(await erc721.ownerOf(4)).to.be.equal(alice.address);
+      expect(await erc721.ownerOf(0)).to.be.equal(alice.address);
 
       const [oldReserve0, oldReserve1] = await pair.getReserves();
       expect(oldReserve0).to.be.equal(ethers.utils.parseEther('4'));
       expect(oldReserve1).to.be.equal(ethers.utils.parseEther('4'));
-      const { tokenOutMin } = await getSwapTokenOutMin(pair.address, [4], BI_ZERO, 0, 100, owner);
+      const { tokenOutMin } = await getSwapTokenOutMin(pair.address, [0], BI_ZERO, 0, 100, owner);
 
       // Expected ERC20 output after = 0.784 Ethers
       expect(tokenOutMin).to.be.equal(ethers.utils.parseEther('0.712'));
@@ -314,7 +312,7 @@ describe('SeacowsERC721TradePair', () => {
        * ERC20: 6.712 Ethers
        */
       await erc721.connect(alice).setApprovalForAll(pairSwap.address, true);
-      await expect(pairSwap.connect(alice).swap(pair.address, tokenOutMin, [], alice.address, 0, [4]))
+      await expect(pairSwap.connect(alice).swap(pair.address, tokenOutMin, [], alice.address, 0, [0]))
         .to.be.emit(pair, 'Swap')
         .withArgs(pairSwap.address, 0, ethers.utils.parseEther('1'), ethers.utils.parseEther('0.8'), 0, alice.address);
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6.712'));
