@@ -88,6 +88,7 @@ contract SeacowsPositionManager is
         require(pair != address(0), 'SeacowsPositionManager: PAIR_DOES_NOT_EXIST');
         (uint256 tokenReserve, uint256 nftReserve, ) = ISeacowsERC721TradePair(pair).getReserves();
         if (tokenReserve == 0 && nftReserve == 0) {
+            require(idsDesired.length >= 2, 'SeacowsPositionManager: INSUFFICIENT_AMOUNT');
             (tokenAmount, ids) = (tokenDesired, idsDesired);
         } else {
             require(idsDesired.length > 0, 'SeacowsPositionManager: INSUFFICIENT_AMOUNT');
