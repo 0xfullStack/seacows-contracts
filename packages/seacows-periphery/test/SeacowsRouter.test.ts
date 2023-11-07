@@ -55,7 +55,7 @@ describe('SeacowsRouter', () => {
     ONE_PERCENT = await template.ONE_PERCENT();
   });
 
-  describe('Swap Tokens For Exact NFTs', () => {
+  describe('Swap Tokens For Exact NFTs, and keep K no change approximatly', () => {
     let manager: SeacowsPositionManager;
     let router: SeacowsRouter;
     let erc721: MockERC721;
@@ -64,6 +64,9 @@ describe('SeacowsRouter', () => {
 
     let registry: MockRoyaltyRegistry;
     let minRoyaltyFeePercent: BigNumber;
+
+    let reserve0: BigNumber;
+    let reserve1: BigNumber;
 
     before(async () => {
       // Prepare Royalty Registry
@@ -141,6 +144,14 @@ describe('SeacowsRouter', () => {
       expect(minRoyaltyFeePercent).to.be.equal(100);
     });
 
+    it('should set K constant correctly', async () => {
+      const [_reserve0, _reserve1] = await pair.getReserves();
+      reserve0 = _reserve0;
+      reserve1 = _reserve1;
+      expect(reserve0).to.be.equal(ethers.utils.parseEther('3'));
+      expect(reserve1).to.be.equal(ethers.utils.parseEther('3'));
+    });
+
     it('swapTokensForExactNFTs', async () => {
       // Caculate how much need to be paid
       const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
@@ -205,9 +216,16 @@ describe('SeacowsRouter', () => {
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('3.862436364999999997'));
       expect(await erc721.ownerOf(2)).to.be.equal(bob.address);
     });
+
+    it('should keep K no change approximatly after swap', async () => {
+      const [newReserve0, newReserve1] = await pair.getReserves();
+      expect(newReserve0).to.be.equal(ethers.utils.parseEther('9.077409135000000003'));
+      expect(newReserve1).to.be.equal(ethers.utils.parseEther('1'));
+      expect(newReserve0.mul(newReserve1)).to.be.greaterThanOrEqual(reserve0.mul(reserve1)); // 9.077409135000000003 * 1 = 3 * 3
+    });
   });
 
-  describe('Swap Exact NFTs For Tokens', () => {
+  describe('Swap Exact NFTs For Tokens, and keep K no change approximatly', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
@@ -216,6 +234,9 @@ describe('SeacowsRouter', () => {
 
     let registry: MockRoyaltyRegistry;
     let minRoyaltyFeePercent: BigNumber;
+
+    let reserve0: BigNumber;
+    let reserve1: BigNumber;
 
     before(async () => {
       // Prepare Royalty Registry
@@ -292,6 +313,14 @@ describe('SeacowsRouter', () => {
       expect(minRoyaltyFeePercent).to.be.equal(100);
     });
 
+    it('should set K constant correctly', async () => {
+      const [_reserve0, _reserve1] = await pair.getReserves();
+      reserve0 = _reserve0;
+      reserve1 = _reserve1;
+      expect(reserve0).to.be.equal(ethers.utils.parseEther('3'));
+      expect(reserve1).to.be.equal(ethers.utils.parseEther('3'));
+    });
+
     it('swapExactNFTsForTokens', async () => {
       // Alice balances before
       const prevAliceBalance = await erc20.balanceOf(alice.address);
@@ -344,6 +373,13 @@ describe('SeacowsRouter', () => {
       expect(await erc20.balanceOf(alice.address)).to.be.equal(prevAliceBalance.add(tokenOutWithFee));
       expect(await erc20.balanceOf(pair.address)).to.be.equal(prevPairBalance.sub(tokenOutWithFee));
       expect(await erc721.ownerOf(5)).to.be.equal(pair.address);
+    });
+
+    it('should keep K no change approximatly after swap', async () => {
+      const [newReserve0, newReserve1] = await pair.getReserves();
+      expect(newReserve0).to.be.equal(ethers.utils.parseEther('1.810515000000000000'));
+      expect(newReserve1).to.be.equal(ethers.utils.parseEther('5'));
+      expect(newReserve0.mul(newReserve1)).to.be.greaterThanOrEqual(reserve0.mul(reserve1)); // 1.810515000000000000 * 5 = 3 * 3
     });
   });
 });

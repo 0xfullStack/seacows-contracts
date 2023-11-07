@@ -283,7 +283,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(protocolFeePercent).to.be.equal(await pair.MAX_PROTOCOL_FEE_PERCENT());
     });
 
-    it('Should swap out ERC20 token successfully', async () => {
+    it('Should swap out ERC20 token successfully, and keep K no change approximatly', async () => {
       /**
        * @notes Summary of Alice before swap
        * ERC721: [4]
@@ -299,6 +299,10 @@ describe('SeacowsERC721TradePair', () => {
        * Swap out ERC20 (Including fee): 0.792 Ethers
        */
       expect(await erc721.ownerOf(4)).to.be.equal(alice.address);
+
+      const [oldReserve0, oldReserve1] = await pair.getReserves();
+      expect(oldReserve0).to.be.equal(ethers.utils.parseEther('4'));
+      expect(oldReserve1).to.be.equal(ethers.utils.parseEther('4'));
       const { tokenOutMin } = await getSwapTokenOutMin(pair.address, [4], BI_ZERO, 0, 100, owner);
 
       // Expected ERC20 output after = 0.784 Ethers
@@ -316,9 +320,14 @@ describe('SeacowsERC721TradePair', () => {
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('6.712'));
       expect(await erc20.balanceOf(feeTo.address)).to.be.equal(ethers.utils.parseEther('0.08'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(0);
+
+      const [newReserve0, newReserve1] = await pair.getReserves();
+      expect(newReserve0).to.be.equal(ethers.utils.parseEther('3.2'));
+      expect(newReserve1).to.be.equal(ethers.utils.parseEther('5'));
+      expect(newReserve0.mul(newReserve1)).to.be.greaterThanOrEqual(oldReserve0.mul(oldReserve1)); // 4 * 4 = 3.2 * 5
     });
 
-    it('Should swap out NFT successfully', async () => {
+    it('Should swap out NFT successfully, and keep K no change approximatly', async () => {
       /**
        * @notes Summary of Bob before swap
        * ERC721: [1, 6]
@@ -341,6 +350,10 @@ describe('SeacowsERC721TradePair', () => {
        * Swap in ERC20 (including fee): 0.81002 ether
        * Swap out ERC721: [6]
        */
+
+      const [oldReserve0, oldReserve1] = await pair.getReserves();
+      expect(oldReserve0).to.be.equal(ethers.utils.parseEther('3.2'));
+      expect(oldReserve1).to.be.equal(ethers.utils.parseEther('5'));
       const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [4], BI_ZERO, 1, 100, owner);
       expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('0.896880000000000001'));
 
@@ -358,6 +371,11 @@ describe('SeacowsERC721TradePair', () => {
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
       expect(await erc721.ownerOf(4)).to.be.equal(bob.address);
       expect(await erc721.ownerOf(6)).to.be.equal(bob.address);
+
+      const [newReserve0, newReserve1] = await pair.getReserves();
+      expect(newReserve0).to.be.equal(ethers.utils.parseEther('4.008880000000000001'));
+      expect(newReserve1).to.be.equal(ethers.utils.parseEther('4'));
+      expect(newReserve0.mul(newReserve1)).to.be.greaterThanOrEqual(oldReserve0.mul(oldReserve1)); // 3.2 * 5 = 4.008880000000000001 * 4
     });
   });
 });
