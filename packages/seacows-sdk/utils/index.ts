@@ -204,16 +204,9 @@ const getWithdrawAssetsOutMin = async (
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
 
-  const [cTokenOutMin, cNftOutMin] = await pairContract.caculateAssetsOutAfterComplemented(
-    tokenBalance,
-    nftBalance,
-    tokenExpectedOutMin,
-    nftExpectedOutMin,
-  );
-
   return {
-    cTokenOutMin,
-    cNftOutMin,
+    cTokenOutMin: tokenExpectedOutMin,
+    cNftOutMin: nftExpectedOutMin,
   };
 };
 
