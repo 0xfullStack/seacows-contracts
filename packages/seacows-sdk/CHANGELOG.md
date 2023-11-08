@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.5 (2023-11-08)
+
+
+### Bug Fixes
+
+* should return tokenOut and nftOut without pool complement ([52b4f2b](https://github.com/yolominds/seacows-contracts/commit/52b4f2bf433d8dca563514eaf9fac4076f759adc))
+
 ### 1.20.4 (2023-11-02)
 
 ### 1.20.3 (2023-11-02)
