@@ -27,22 +27,32 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
         PricingKernel: pricingKernelLib.address,
       },
     });
+
     const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
       libraries: {
         NFTRenderer: lib.address,
       },
     });
 
+    const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
+
     const template = await SeacowsERC721TradePairFC.deploy();
     await template.deployed();
     await save(env, network.name, 'SeacowsERC721TradePair', template.address);
 
-    const manager = await SeacowsPositionManagerFC.deploy(template.address, weth);
+    const speedBump = await SpeedBumpFC.deploy();
+    await speedBump.deployed();
+    await save(env, network.name, 'SpeedBump', speedBump.address);
+
+    const manager = await SeacowsPositionManagerFC.deploy(template.address, weth, speedBump.address);
     await manager.deployed();
     await save(env, network.name, 'SeacowsPositionManager', manager.address);
 
-    const txn = await manager.setRoyaltyRegistry(royaltyRegistry);
-    await txn.wait();
+    const managerTxn = await manager.setRoyaltyRegistry(royaltyRegistry);
+    await managerTxn.wait();
+
+    const speedBumpTxn = await speedBump.initialize(manager.address);
+    await speedBumpTxn.wait();
 
     await delay(1 * 30 * 1000);
 
@@ -59,8 +69,13 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     });
 
     await run('verify:verify', {
+      address: speedBump.address,
+      constructorArguments: [],
+    });
+
+    await run('verify:verify', {
       address: manager.address,
-      constructorArguments: [template.address, weth],
+      constructorArguments: [template.address, weth, speedBump.address],
     });
 
     console.log('All contracts Verified!!!');
