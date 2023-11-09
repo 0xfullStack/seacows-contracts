@@ -14,7 +14,7 @@ import {FeeManagement} from './base/FeeManagement.sol';
 import {ISeacowsPositionManager} from './interfaces/ISeacowsPositionManager.sol';
 import {ISeacowsERC721TradePair} from './interfaces/ISeacowsERC721TradePair.sol';
 import {IWETH} from './interfaces/IWETH.sol';
-import {SpeedBump} from "./SpeedBump.sol";
+import {SpeedBump} from "./base/SpeedBump.sol";
 import {NFTRenderer} from './lib/NFTRenderer.sol';
 
 contract SeacowsPositionManager is

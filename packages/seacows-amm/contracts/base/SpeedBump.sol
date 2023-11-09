@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import {IWETH} from './interfaces/IWETH.sol';
+import {IWETH} from '../interfaces/IWETH.sol';
 
 contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
 
