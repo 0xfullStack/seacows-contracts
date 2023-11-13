@@ -1,4 +1,4 @@
-import { MaxUint256 } from '@ethersproject/constants';
+import { AddressZero, MaxUint256 } from '@ethersproject/constants';
 import { deployContract } from 'ethereum-waffle';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { getWithdrawAssetsOutMin, BI_ZERO } from '@yolominds/seacows-sdk';
@@ -155,7 +155,54 @@ describe('SeacowsPositionManager', () => {
       await erc20.mint(alice.address, ethers.utils.parseEther('10'));
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity', async () => {
+    it('Should create a new pair, mint Position NFT and add liquidity failure if initial nfts mininum liquidy amount < 2', async () => {
+      /**
+       * @notes Mint Position NFTs
+       * Input ERC20: 1 Ethers
+       * Input ERC721: [1]
+       *
+       * Position NFT ID of Pair: 1
+       * Position NFT ID of Pair Lock Position: 2
+       * Position NFT ID of Alice: 3
+       */
+      await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
+      await erc721.connect(alice).setApprovalForAll(manager.address, true);
+
+      const pairAddress = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+      /**
+       * @notes Verify Event emitted
+       * Alice Position NFT
+       */
+      await expect(
+        manager
+          .connect(alice)
+          .mint(
+            erc20.address,
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            [1],
+            ethers.utils.parseEther('1'),
+            MaxUint256,
+          ),
+      ).to.be.revertedWith('SeacowsPositionManager: INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT');
+
+      // Verify Pair assets
+      expect(pair.address).to.be.eq(AddressZero);
+      expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('0'));
+      await expect(erc721.balanceOf(pair.address)).to.be.revertedWith('ERC721: address zero is not a valid owner');
+
+      // Verify Position NFT owned by address zero
+      await expect(manager.ownerOf(2)).to.be.revertedWith('ERC3525: invalid token ID');
+      await expect(manager['balanceOf(uint256)'](2)).to.be.revertedWith('ERC3525: invalid token ID');
+
+      // Verify Alice balances no change
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('10'));
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(5);
+    });
+
+    it('Should create a new pair, mint Position NFT and add liquidity success if initial nfts mininum liquidy amount >= 2', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ERC20: 3 Ethers
@@ -269,7 +316,44 @@ describe('SeacowsPositionManager', () => {
       }
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity with ETH', async () => {
+    it('Should create a new pair, mint Position NFT and add liquidity failure if initial nfts mininum liquidy amount < 2', async () => {
+      /**
+       * @notes Mint Position NFTs
+       * Input ETH: 3 Ethers
+       * Input ERC721: [1, 2, 3]
+       *
+       * Position NFT ID of Pair: 1
+       * Position NFT ID of Pair Lock Position: 2
+       * Position NFT ID of Alice: 3
+       */
+      await erc721.connect(alice).setApprovalForAll(manager.address, true);
+
+      const pairAddress = await manager.getPair(weth.address, erc721.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+      /**
+       * @notes Verify Event emitted
+       * Alice Position NFT
+       */
+      await expect(
+        manager.connect(alice).mintWithETH(erc721.address, ONE_PERCENT, [1], ethers.utils.parseEther('1'), MaxUint256, {
+          value: ethers.utils.parseEther('3'),
+        }),
+      ).to.be.revertedWith('SeacowsPositionManager: INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT');
+
+      // Verify Pair assets
+      expect(pair.address).to.be.eq(AddressZero);
+      expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('0'));
+      await expect(erc721.balanceOf(pair.address)).to.be.revertedWith('ERC721: address zero is not a valid owner');
+
+      // Verify Position NFT owned by address zero
+      await expect(manager.ownerOf(2)).to.be.revertedWith('ERC3525: invalid token ID');
+      await expect(manager['balanceOf(uint256)'](2)).to.be.revertedWith('ERC3525: invalid token ID');
+
+      // Verify Alice balances no change
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(5);
+    });
+
+    it('Should create a new pair, mint Position NFT and add liquidity success if initial nfts mininum liquidy amount >= 2', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ETH: 3 Ethers
