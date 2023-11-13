@@ -535,7 +535,7 @@ describe('SeacowsPositionManager', () => {
             10,
             MaxUint256,
           ),
-      ).to.rejectedWith('SeacowsPositionManager: INVALID_TOKEN_ID');
+      ).to.revertedWithCustomError(manager, 'SPM_INVALID_TOKEN_ID');
     });
   });
 
@@ -621,7 +621,7 @@ describe('SeacowsPositionManager', () => {
           .addLiquidityETH(erc721.address, ONE_PERCENT, [4], ethers.utils.parseEther('1'), 10, MaxUint256, {
             value: ethers.utils.parseEther('1'),
           }),
-      ).to.rejectedWith('SeacowsPositionManager: INVALID_TOKEN_ID');
+      ).to.revertedWithCustomError(manager, 'SPM_INVALID_TOKEN_ID');
     });
   });
 
@@ -814,7 +814,7 @@ describe('SeacowsPositionManager', () => {
             alice.address,
             MaxUint256,
           ),
-      ).to.rejectedWith('SeacowsPositionManager: INVALID_TOKEN_ID');
+      ).to.revertedWithCustomError(manager, 'SPM_INVALID_TOKEN_ID');
     });
   });
 
@@ -986,7 +986,7 @@ describe('SeacowsPositionManager', () => {
             alice.address,
             MaxUint256,
           ),
-      ).to.rejectedWith('SeacowsPositionManager: INVALID_TOKEN_ID');
+      ).to.revertedWithCustomError(manager, 'SPM_INVALID_TOKEN_ID');
     });
   });
 
@@ -1048,7 +1048,10 @@ describe('SeacowsPositionManager', () => {
 
     it('Should not burn liquidity when liquidity > 0 in the NFT', async () => {
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('3'));
-      await expect(manager.connect(alice).burn(2)).to.be.revertedWith('SeacowsPositionManager: NOT_CLEARED');
+      await expect(manager.connect(alice).burn(2)).to.revertedWithCustomError(
+        manager,
+        'SPM_ONLY_BURNABLE_WHEN_CLEARED',
+      );
     });
 
     it('Should burn liquidity when liquidity = 0 in the NFT', async () => {

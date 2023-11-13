@@ -2,6 +2,7 @@ import { MaxUint256, Zero } from '@ethersproject/constants';
 import SeacowsERC721TradePairAbi from '@yolominds/seacows-amm/abis/ISeacowsERC721TradePair.json';
 import SeacowsERC721TradePairArtifact from '@yolominds/seacows-amm/artifacts/contracts/SeacowsERC721TradePair.sol/SeacowsERC721TradePair.json';
 import SeacowsPositionManagerArtifact from '@yolominds/seacows-amm/artifacts/contracts/SeacowsPositionManager.sol/SeacowsPositionManager.json';
+import SpeedBumpArtifact from '@yolominds/seacows-amm/artifacts/contracts/base/SpeedBump.sol/SpeedBump.json';
 import NFTRendererArtifact from '@yolominds/seacows-amm/artifacts/contracts/lib/NFTRenderer.sol/NFTRenderer.json';
 import PricingKernelArtifact from '@yolominds/seacows-amm/artifacts/contracts/lib/PricingKernel.sol/PricingKernel.json';
 import FixidityLibArtifact from '@yolominds/seacows-amm/artifacts/contracts/lib/FixidityLib.sol/FixidityLib.json';
@@ -14,6 +15,7 @@ import {
   type SeacowsERC721TradePair,
   type SeacowsPositionManager,
   type NFTRenderer,
+  type SpeedBump,
 } from '@yolominds/seacows-sdk/types/amm';
 import { type WETH, type MockERC20, type MockERC721, type SeacowsRouter, type MockRoyaltyRegistry } from 'types';
 import { type BigNumber } from 'ethers';
@@ -61,6 +63,7 @@ describe('SeacowsRouter', () => {
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
 
+    let speedBump: SpeedBump;
     let registry: MockRoyaltyRegistry;
     let minRoyaltyFeePercent: BigNumber;
 
@@ -77,6 +80,8 @@ describe('SeacowsRouter', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
 
+      const SpeedBumpFC = await ethers.getContractFactoryFromArtifact(SpeedBumpArtifact);
+      speedBump = await SpeedBumpFC.deploy();
       const SeacowsPositionManagerFactory = await ethers.getContractFactoryFromArtifact(
         SeacowsPositionManagerArtifact,
         {
@@ -85,10 +90,15 @@ describe('SeacowsRouter', () => {
           },
         },
       );
-      manager = (await SeacowsPositionManagerFactory.deploy(template.address, weth.address)) as SeacowsPositionManager;
+      manager = (await SeacowsPositionManagerFactory.deploy(
+        template.address,
+        weth.address,
+        speedBump.address,
+      )) as SeacowsPositionManager;
       await manager.deployed();
       await manager.setFeeTo(ethers.constants.AddressZero);
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
 
       // Deploy Router
       const SeacowsRouterFC = await ethers.getContractFactory('SeacowsRouter');
@@ -230,6 +240,7 @@ describe('SeacowsRouter', () => {
     let pair: SeacowsERC721TradePair;
     let manager: SeacowsPositionManager;
     let router: SeacowsRouter;
+    let speedBump: SpeedBump;
 
     let registry: MockRoyaltyRegistry;
     let minRoyaltyFeePercent: BigNumber;
@@ -247,6 +258,8 @@ describe('SeacowsRouter', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
 
+      const SpeedBumpFC = await ethers.getContractFactoryFromArtifact(SpeedBumpArtifact);
+      speedBump = await SpeedBumpFC.deploy();
       const SeacowsPositionManagerFactory = await ethers.getContractFactoryFromArtifact(
         SeacowsPositionManagerArtifact,
         {
@@ -255,10 +268,14 @@ describe('SeacowsRouter', () => {
           },
         },
       );
-      manager = (await SeacowsPositionManagerFactory.deploy(template.address, weth.address)) as SeacowsPositionManager;
+      manager = (await SeacowsPositionManagerFactory.deploy(
+        template.address,
+        weth.address,
+        speedBump.address,
+      )) as SeacowsPositionManager;
       await manager.deployed();
       await manager.setRoyaltyRegistry(registry.address);
-
+      await speedBump.initialize(manager.address);
       // Deploy Router
       const SeacowsRouterFC = await ethers.getContractFactory('SeacowsRouter');
       router = await SeacowsRouterFC.deploy(manager.address, weth.address);
@@ -388,7 +405,7 @@ describe('SeacowsRouter', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
-
+    let speedBump: SpeedBump;
     let registry: MockRoyaltyRegistry;
     let minRoyaltyFeePercent: BigNumber;
 
@@ -402,6 +419,8 @@ describe('SeacowsRouter', () => {
       erc721 = await erc721FC.deploy();
       erc20 = await erc20FC.deploy();
 
+      const SpeedBumpFC = await ethers.getContractFactoryFromArtifact(SpeedBumpArtifact);
+      speedBump = await SpeedBumpFC.deploy();
       const SeacowsPositionManagerFactory = await ethers.getContractFactoryFromArtifact(
         SeacowsPositionManagerArtifact,
         {
@@ -410,10 +429,15 @@ describe('SeacowsRouter', () => {
           },
         },
       );
-      manager = (await SeacowsPositionManagerFactory.deploy(template.address, weth.address)) as SeacowsPositionManager;
+      manager = (await SeacowsPositionManagerFactory.deploy(
+        template.address,
+        weth.address,
+        speedBump.address,
+      )) as SeacowsPositionManager;
       await manager.deployed();
       await manager.setFeeTo(ethers.constants.AddressZero);
       await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
 
       // Deploy Router
       const SeacowsRouterFC = await ethers.getContractFactory('SeacowsRouter');
