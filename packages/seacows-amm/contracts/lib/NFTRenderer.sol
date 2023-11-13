@@ -142,29 +142,27 @@ library NFTRenderer {
 
     function renderContent(RenderParams memory params) internal pure returns (string memory content) {
         content = string.concat(
-            renderPoolAddress(params.pool),
-            renderId(params.id),
+            renderCollectionAddress(params.nftAddress),
             renderSymbol(params.tokenSymbol, params.nftSymbol),
             renderSwapFee(params.swapFee),
-            renderPoolShare(params.poolShare),
-            renderOwnerAddress(params.owner)
+            renderTokenAddress(params.tokenAddress)
         );
     }
 
-    function renderPoolAddress(address _pool) internal pure returns (string memory pool) {
-        pool = string.concat(
+    function renderCollectionAddress(address _collection) internal pure returns (string memory collection) {
+        collection = string.concat(
             '<text x="41.36" y="57" fill="black" class="text-quantico text-sm text-addr">',
-            'POOL: ',
-            Strings.toHexString(_pool),
+            'COLLECTION: ',
+            Strings.toHexString(_collection),
             '</text>'
         );
     }
 
-    function renderOwnerAddress(address _owner) internal pure returns (string memory owner) {
-        owner = string.concat(
-            '<text x="50.08" y="1020.01" fill="black" class="text-quantico text-sm text-addr">',
-            'Owner: ',
-            Strings.toHexString(_owner),
+    function renderTokenAddress(address _token) internal pure returns (string memory token) {
+        token = string.concat(
+            '<text x="41.36" y="57" fill="black" class="text-quantico text-sm text-addr">',
+            'TOKEN: ',
+            Strings.toHexString(_token),
             '</text>'
         );
     }
@@ -205,21 +203,11 @@ library NFTRenderer {
         );
     }
 
-    function renderPoolShare(uint256 _poolShare) internal pure returns (string memory poolShare) {
-        poolShare = string.concat(
-            '<text x="41.36" y="874" fill="black" class="text-quantico text-lg">',
-            'Pool Share: ',
-            convertToFloatString(_poolShare),
-            '%',
-            '</text>'
-        );
-    }
-
     function renderSwapFee(uint256 _swapFee) internal pure returns (string memory swapFee) {
         swapFee = string.concat(
             '<text x="41.36" y="803.96" fill="black" class="text-quantico text-lg">',
             'Swap Fee: ',
-            convertToFloatString(_swapFee),
+            convertToFloatString(_swapFee * 100),
             '%',
             '</text>'
         );
