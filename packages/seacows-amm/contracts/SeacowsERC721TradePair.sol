@@ -1,21 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import {ISeacowsSwapCallback} from '@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import '@openzeppelin/contracts/utils/math/Math.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+
+import {ISeacowsSwapCallback} from '@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol';
 import {ERC3525Upgradeable} from '@solvprotocol/erc-3525/ERC3525Upgradeable.sol';
 import {ISeacowsERC721TradePair} from './interfaces/ISeacowsERC721TradePair.sol';
 import {ISeacowsERC721TradePairFactory} from './interfaces/ISeacowsERC721TradePairFactory.sol';
 import {ISeacowsPositionManager} from './interfaces/ISeacowsPositionManager.sol';
-import './base/SeacowsComplement.sol';
-import './base/SeacowsPairMetadata.sol';
-import './base/SeacowsRewarder.sol';
-import './base/RoyaltyManagement.sol';
+import {SeacowsErrors} from './base/SeacowsErrors.sol';
+import {SeacowsComplement} from './base/SeacowsComplement.sol';
+import {SeacowsPairMetadata} from './base/SeacowsPairMetadata.sol';
+import {SeacowsRewarder} from './base/SeacowsRewarder.sol';
+import {RoyaltyManagement} from './base/RoyaltyManagement.sol';
 
 contract SeacowsERC721TradePair is
     ReentrancyGuardUpgradeable,
@@ -23,15 +25,13 @@ contract SeacowsERC721TradePair is
     SeacowsPairMetadata,
     SeacowsRewarder,
     RoyaltyManagement,
-    ISeacowsERC721TradePair
+    ISeacowsERC721TradePair,
+    SeacowsErrors
 {
     uint256 public feePercent;
     uint256 public protocolFeePercent;
 
-    // Token reserve
     uint256 private reserve0;
-
-    // NFT reserve
     uint256 private reserve1;
 
     uint32 private blockTimestampLast;
@@ -40,8 +40,7 @@ contract SeacowsERC721TradePair is
     uint public price1CumulativeLast;
 
     function initialize(address token_, address collection_, uint256 fee_) public initializer {
-        require(fee_ == ONE_PERCENT || fee_ == POINT_FIVE_PERCENT, 'Invalid _fee');
-
+        if (fee_ != ONE_PERCENT && fee_ != POINT_FIVE_PERCENT) { revert STP_INVALID_FEE(); }
         feePercent = fee_;
         protocolFeePercent = 3; // Initially, 0.3%
         __SeacowsPairMetadata_init(msg.sender, token_, collection_);
@@ -70,44 +69,40 @@ contract SeacowsERC721TradePair is
         return (_feeTo != address(0) ? feePercent : 0) + protocolFeePercent + minRoyaltyFeePercent;
     }
 
-    // this low-level function should be called from a contract which performs important safety checks
     function mint(uint256 toTokenId) public nonReentrant returns (uint liquidity) {
-        (uint256 _reserve0, uint256 _reserve1, ) = getReserves(); // gas savings
+        (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
         (uint balance0, uint balance1) = getComplementedBalance();
         uint256 amount0 = uint256(balance0 - _reserve0);
         uint256 amount1 = uint256(balance1 - _reserve1);
 
-        uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
+        uint _totalSupply = totalSupply();
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0 * amount1);
         } else {
             liquidity = Math.min((amount0 * _totalSupply) / _reserve0, (amount1 * _totalSupply) / _reserve1);
         }
-        require(liquidity > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_MINTED');
+        if (liquidity <= 0) { revert STP_INSUFFICIENT_LIQUIDITY_MINTED(); }
         _mint(toTokenId, liquidity);
-
         _update(balance0, balance1, _reserve0, _reserve1);
         emit Mint(msg.sender, amount0, amount1);
     }
 
-    // this low-level function should be called from a contract which performs important safety checks
     function burn(
         address from,
         address to,
         uint256[] memory _ids
     ) public nonReentrant returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
-        from; // silence unused warning
+        from;
         (uint balance0, uint balance1) = getComplementedBalance();
 
         ISeacowsPositionManager manager = positionManager();
 
         uint nftAmountOut;
         {
-            // scope to avoid stack too deep errors
             uint liquidity = manager.balanceOf(manager.tokenOf(address(this)));
-            cTokenOut = (liquidity * balance0) / totalSupply(); // using balances ensures pro-rata distribution
-            cNftOut = (liquidity * balance1) / totalSupply(); // using balances ensures pro-rata distribution
-            require(cTokenOut > 0 && cNftOut > 0, 'SeacowsERC721TradePair: INSUFFICIENT_LIQUIDITY_BURNED');
+            cTokenOut = (liquidity * balance0) / totalSupply();
+            cNftOut = (liquidity * balance1) / totalSupply();
+            if (cTokenOut <= 0 || cNftOut <= 0) { revert STP_INSUFFICIENT_LIQUIDITY_BURNED(); }
 
             uint nftOut;
             (tokenOut, nftOut) = _caculateAssetsOutAfterComplemented(balance0, balance1, cTokenOut, cNftOut);
@@ -118,11 +113,10 @@ contract SeacowsERC721TradePair is
                 tokenOut = IERC20(token).balanceOf(address(this));
             }
         }
-        require(_ids.length >= nftAmountOut, 'SeacowsERC721TradePair: EXCEED_NFT_OUT_MAX');
+        if (_ids.length < nftAmountOut) { revert STP_EXCEED_NFT_OUT_MAX(); }
         IERC20(token).transfer(to, tokenOut);
 
         {
-            // scope to avoid stack too deep errors
             idsOut = new uint[](nftAmountOut);
             uint count = 0;
             uint i = 0;
@@ -134,42 +128,38 @@ contract SeacowsERC721TradePair is
                 }
                 i++;
             }
-            require(count == nftAmountOut, 'SeacowsERC721TradePair: INSUFFICIENT_NFT_TO_WITHDRAW');
+            if (count != nftAmountOut) { revert STP_INSUFFICIENT_NFT_TO_WITHDRAW(); }
         }
 
         (balance0, balance1) = getComplementedBalance();
 
         {
-            // scope to avoid stack too deep errors
             (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
             _update(balance0, balance1, _reserve0, _reserve1);
         }
         emit Burn(msg.sender, cTokenOut, cNftOut, tokenOut, idsOut, to);
     }
 
-    // this low-level function should be called from a contract which performs important safety checks
     function swap(uint tokenAmountOut, uint[] memory idsOut, address to, bytes calldata data) external nonReentrant {
-        require(tokenAmountOut > 0 || idsOut.length > 0, 'SeacowsERC721TradePair: INSUFFICIENT_OUTPUT_AMOUNT');
+        if (tokenAmountOut <= 0 && idsOut.length <= 0) { revert STP_INSUFFICIENT_OUTPUT_AMOUNT(); }
 
         uint absAmountIn;
         uint absAmountOut;
         uint[] memory idsIn;
         {
-            // scope avoids stack too deep errors
-            (uint256 _reserve0, uint256 _reserve1, ) = getReserves(); // gas savings
-            require(
-                tokenAmountOut < _reserve0 && idsOut.length * COMPLEMENT_PRECISION < _reserve1,
-                'SeacowsERC721TradePair INSUFFICIENT_LIQUIDITY'
-            );
+            (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
+            if (tokenAmountOut >= _reserve0 || idsOut.length * COMPLEMENT_PRECISION >= _reserve1) {
+                revert STP_INSUFFICIENT_LIQUIDITY();
+            }
             uint tokenAmountIn;
             (tokenAmountIn, idsIn) = ISeacowsSwapCallback(msg.sender).seacowsSwapCallback(data);
-            require(tokenAmountIn > 0 || idsIn.length > 0, 'SeacowsERC721TradePair: INSUFFICIENT_INPUT_AMOUNT');
 
-            require(to != token && to != collection, 'SeacowsERC721TradePair: INVALID_TO');
-            if (tokenAmountOut > 0) IERC20(token).transfer(to, tokenAmountOut); // optimistically transfer tokens
+            if (tokenAmountIn <= 0 && idsIn.length <= 0) { revert STP_INSUFFICIENT_INPUT_AMOUNT(); }
+            if (to == token || to == collection) { revert STP_INVALID_TO(); }
+            if (tokenAmountOut > 0) IERC20(token).transfer(to, tokenAmountOut);
             if (idsOut.length > 0) {
                 for (uint i = 0; i < idsOut.length; i++) {
-                    IERC721(collection).safeTransferFrom(address(this), to, idsOut[i]); // optimistically transfer tokens
+                    IERC721(collection).safeTransferFrom(address(this), to, idsOut[i]);
                 }
             }
 
@@ -224,19 +214,15 @@ contract SeacowsERC721TradePair is
     }
 
     function setProtocolFeePercent(uint256 _protocolFee) public {
-        require(positionManager().feeManager() == msg.sender, 'SeacowsERC721TradePair: UNAUTHORIZED');
-        require(_protocolFee <= MAX_PROTOCOL_FEE_PERCENT, 'SeacowsERC721TradePair: FEE_OUT_OF_RANGE');
+        if (positionManager().feeManager() != msg.sender) { revert STP_UNAUTHORIZED(); }
+        if (_protocolFee > MAX_PROTOCOL_FEE_PERCENT) { revert STP_FEE_OUT_OF_RANGE(); }
         protocolFeePercent = _protocolFee;
     }
 
     // force balances to match reserves
     function skim(address to, uint256[] memory ids) external nonReentrant {
         (uint balance0, uint balance1) = getComplementedBalance();
-        require(
-            balance1 - reserve1 == ids.length * COMPLEMENT_PRECISION,
-            'SeacowsERC721TradePair: SKIM_QUANTITY_MISMATCH'
-        );
-
+        if (balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) { revert STP_SKIM_QUANTITY_MISMATCH(); }
         IERC20(token).transfer(to, balance0 / reserve0);
         for (uint i = 0; i < ids.length; i++) {
             IERC721(collection).safeTransferFrom(address(this), to, ids[i]);
@@ -249,7 +235,7 @@ contract SeacowsERC721TradePair is
     }
 
     function _update(uint balance0, uint balance1, uint256 _reserve0, uint256 _reserve1) private {
-        require(balance0 <= type(uint256).max && balance1 <= type(uint256).max, 'SeacowsERC721TradePair: OVERFLOW ');
+        if (balance0 > type(uint256).max || balance1 > type(uint256).max) { revert STP_OVERFLOW(); }
         uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
