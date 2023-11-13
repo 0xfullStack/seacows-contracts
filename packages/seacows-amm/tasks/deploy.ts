@@ -54,7 +54,7 @@ export const deploy: ActionType<{ env: Environment }> = async ({ env }, { ethers
     const speedBumpTxn = await speedBump.initialize(manager.address);
     await speedBumpTxn.wait();
 
-    await delay(1 * 30 * 1000);
+    await delay(1 * 10 * 1000);
 
     console.log('Start verifying contracts...');
 
