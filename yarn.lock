@@ -1996,6 +1996,17 @@ array-uniq@1.0.3:
   resolved "https://registry.npmjs.org/array-uniq/-/array-uniq-1.0.3.tgz"
   integrity sha512-MNha4BWQ6JbwhFhj03YK552f7cb3AzoE8SzeljgChvL1dl3IcvggXVz1DilzySZkCja+CXuZbdW7yATchWn8/Q==
 
+array.prototype.findlast@^1.2.2:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/array.prototype.findlast/-/array.prototype.findlast-1.2.3.tgz#4e4b375de5adf4897fed155e2d2771564865cc3b"
+  integrity sha512-kcBubumjciBg4JKp5KTKtI7ec7tRefPk88yjkWJwaVKYd9QfTaxcsOxoMNKd7iBr447zCfDV0z1kOF47umv42g==
+  dependencies:
+    call-bind "^1.0.2"
+    define-properties "^1.2.0"
+    es-abstract "^1.22.1"
+    es-shim-unscopables "^1.0.0"
+    get-intrinsic "^1.2.1"
+
 array.prototype.findlastindex@^1.2.2:
   version "1.2.3"
   resolved "https://registry.npmjs.org/array.prototype.findlastindex/-/array.prototype.findlastindex-1.2.3.tgz"
@@ -4491,7 +4502,7 @@ growl@1.10.5:
   resolved "https://registry.npmjs.org/growl/-/growl-1.10.5.tgz"
   integrity sha512-qBr4OuELkhPenW6goKVXiv47US3clb3/IbuWF9KNKEijAy9oeHxU9IgzjvJhHkUzhaj7rOUD7+YGWqUjLp5oSA==
 
-handlebars@^4.0.1:
+handlebars@^4.0.1, handlebars@^4.7.7:
   version "4.7.8"
   resolved "https://registry.npmjs.org/handlebars/-/handlebars-4.7.8.tgz"
   integrity sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==
@@ -7347,6 +7358,13 @@ solhint@^3.6.2:
   optionalDependencies:
     prettier "^2.8.3"
 
+solidity-ast@^0.4.38:
+  version "0.4.53"
+  resolved "https://registry.yarnpkg.com/solidity-ast/-/solidity-ast-0.4.53.tgz#098259472fccd234ff00f050afaf7843a7ccd635"
+  integrity sha512-/7xYF//mAt4iP9S21fCFSLMouYXzXJqrd84jbI1LHL1rq7XhyFLUXxVcRkl9KqEEQmI+DmDbTeS6W5cEwcJ2wQ==
+  dependencies:
+    array.prototype.findlast "^1.2.2"
+
 solidity-comments-extractor@^0.0.7:
   version "0.0.7"
   resolved "https://registry.npmjs.org/solidity-comments-extractor/-/solidity-comments-extractor-0.0.7.tgz"
@@ -7377,6 +7395,14 @@ solidity-coverage@^0.8.4:
     semver "^7.3.4"
     shelljs "^0.8.3"
     web3-utils "^1.3.6"
+
+solidity-docgen@^0.6.0-beta.36:
+  version "0.6.0-beta.36"
+  resolved "https://registry.yarnpkg.com/solidity-docgen/-/solidity-docgen-0.6.0-beta.36.tgz#9c76eda58580fb52e2db318c22fe3154e0c09dd1"
+  integrity sha512-f/I5G2iJgU1h0XrrjRD0hHMr7C10u276vYvm//rw1TzFcYQ4xTOyAoi9oNAHRU0JU4mY9eTuxdVc2zahdMuhaQ==
+  dependencies:
+    handlebars "^4.7.7"
+    solidity-ast "^0.4.38"
 
 solmate@^6.6.1:
   version "6.7.0"

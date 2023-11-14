@@ -74,7 +74,11 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
         bytes calldata _data
     ) external pure returns (bytes4) {
         // silence unused warning
-        _operator; _fromTokenId; _toTokenId; _value; _data;
+        _operator;
+        _fromTokenId;
+        _toTokenId;
+        _value;
+        _data;
         return IERC3525Receiver.onERC3525Received.selector;
     }
 }

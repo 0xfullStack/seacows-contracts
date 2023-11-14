@@ -15,7 +15,7 @@ import {SeacowsErrors} from './base/SeacowsErrors.sol';
 import {ISeacowsPositionManager} from './interfaces/ISeacowsPositionManager.sol';
 import {ISeacowsERC721TradePair} from './interfaces/ISeacowsERC721TradePair.sol';
 import {IWETH} from './interfaces/IWETH.sol';
-import {SpeedBump} from "./base/SpeedBump.sol";
+import {SpeedBump} from './base/SpeedBump.sol';
 import {NFTRenderer} from './lib/NFTRenderer.sol';
 
 contract SeacowsPositionManager is
@@ -51,7 +51,9 @@ contract SeacowsPositionManager is
     }
 
     modifier checkDeadline(uint deadline) {
-        if (deadline < block.timestamp) { revert SPM_EXPIRED(); }
+        if (deadline < block.timestamp) {
+            revert SPM_EXPIRED();
+        }
         _;
     }
 
@@ -84,16 +86,26 @@ contract SeacowsPositionManager is
         uint tokenMin
     ) internal virtual returns (uint tokenAmount, uint[] memory ids) {
         address pair = getPair(token, collection, fee);
-        if (pair == address(0)) { revert SPM_PAIR_NOT_EXIST(); }
+        if (pair == address(0)) {
+            revert SPM_PAIR_NOT_EXIST();
+        }
         (uint256 tokenReserve, uint256 nftReserve, ) = ISeacowsERC721TradePair(pair).getReserves();
         if (tokenReserve == 0 && nftReserve == 0) {
             if (idsDesired.length < 2) { revert SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT(); }
             (tokenAmount, ids) = (tokenDesired, idsDesired);
         } else {
-            if (idsDesired.length <= 0) { revert SPM_INSUFFICIENT_AMOUNT(); }
-            if (tokenReserve <= 0 || nftReserve <= 0) { revert SPM_INSUFFICIENT_LIQUIDITY(); }
-            uint tokenOptimal = (idsDesired.length * ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION() * tokenReserve) / nftReserve;
-            if (tokenOptimal > tokenDesired || tokenOptimal < tokenMin) { revert SPM_INSUFFICIENT_AMOUNT(); }
+            if (idsDesired.length <= 0) {
+                revert SPM_INSUFFICIENT_AMOUNT();
+            }
+            if (tokenReserve <= 0 || nftReserve <= 0) {
+                revert SPM_INSUFFICIENT_LIQUIDITY();
+            }
+            uint tokenOptimal = (idsDesired.length *
+                ISeacowsERC721TradePair(pair).COMPLEMENT_PRECISION() *
+                tokenReserve) / nftReserve;
+            if (tokenOptimal > tokenDesired || tokenOptimal < tokenMin) {
+                revert SPM_INSUFFICIENT_AMOUNT();
+            }
             (tokenAmount, ids) = (tokenOptimal, idsDesired);
         }
     }
@@ -119,14 +131,18 @@ contract SeacowsPositionManager is
         uint256 toTokenId,
         uint deadline
     ) public checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
-        if (_exists(toTokenId) == false) { revert SPM_INVALID_TOKEN_ID(); }
+        if (_exists(toTokenId) == false) {
+            revert SPM_INVALID_TOKEN_ID();
+        }
         (tokenAmount, ids) = _addLiquidity(token, collection, fee, tokenDesired, idsDesired, tokenMin);
         address pair = getPair(token, collection, fee);
 
         IERC20(token).transferFrom(msg.sender, pair, tokenAmount);
         for (uint i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
     }
@@ -149,7 +165,9 @@ contract SeacowsPositionManager is
         uint256 toTokenId,
         uint deadline
     ) external payable checkDeadline(deadline) returns (uint tokenAmount, uint[] memory ids, uint liquidity) {
-        if (_exists(toTokenId) == false) { revert SPM_INVALID_TOKEN_ID(); }
+        if (_exists(toTokenId) == false) {
+            revert SPM_INVALID_TOKEN_ID();
+        }
         (tokenAmount, ids) = _addLiquidity(WETH, collection, fee, msg.value, idsDesired, tokenMin);
         address pair = getPair(WETH, collection, fee);
         IWETH(WETH).deposit{value: tokenAmount}();
@@ -157,18 +175,24 @@ contract SeacowsPositionManager is
 
         for (uint i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
 
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
         if (msg.value > tokenAmount) {
             (bool success, ) = msg.sender.call{value: msg.value - tokenAmount}('');
-            if (success == false) { revert SPM_ETH_TRANSFER_FAILED(); }
+            if (success == false) {
+                revert SPM_ETH_TRANSFER_FAILED();
+            }
         }
     }
 
     function seacowsBurnCallback(address _token, address from, uint256 _amount) external {
-        if (slotOfPair(msg.sender) == 0) { revert SPM_PAIR_NOT_EXIST(); }
+        if (slotOfPair(msg.sender) == 0) {
+            revert SPM_PAIR_NOT_EXIST();
+        }
         IERC20(_token).transferFrom(from, msg.sender, _amount);
     }
 
@@ -192,10 +216,7 @@ contract SeacowsPositionManager is
         uint256 fromTokenId,
         address to,
         uint deadline
-    )
-        public
-        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
-    {
+    ) public returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
         (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidity(
             token,
             collection,
@@ -203,10 +224,10 @@ contract SeacowsPositionManager is
             liquidity,
             constraint,
             fromTokenId,
-            address(speedBump),  // transfers to speedBump
+            address(speedBump), // transfers to speedBump
             deadline
         );
-        
+
         speedBump.batchRegisterNFTs(collection, idsOut, to);
         speedBump.registerToken(token, tokenOut, to);
         return (cTokenOut, cNftOut, tokenOut, idsOut);
@@ -228,12 +249,9 @@ contract SeacowsPositionManager is
         uint liquidity,
         RemoveLiquidityConstraint memory constraint,
         uint256 fromTokenId,
-        address to,  // owner of the NFTs, the user
+        address to, // owner of the NFTs, the user
         uint deadline
-    )
-        public
-        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
-    {
+    ) public returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
         (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidityETH(
             collection,
             fee,
@@ -248,7 +266,7 @@ contract SeacowsPositionManager is
         speedBump.registerETH(tokenOut, to);
         return (cTokenOut, cNftOut, tokenOut, idsOut);
     }
-    
+
     function _removeLiquidity(
         address token,
         address collection,
@@ -258,21 +276,19 @@ contract SeacowsPositionManager is
         uint256 fromTokenId,
         address to,
         uint deadline
-    )
-        internal
-        checkDeadline(deadline)
-        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
-    {
-        if (_exists(fromTokenId) == false) { revert SPM_INVALID_TOKEN_ID(); }
+    ) internal checkDeadline(deadline) returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
+        if (_exists(fromTokenId) == false) {
+            revert SPM_INVALID_TOKEN_ID();
+        }
         address pair = getPair(token, collection, fee);
         transferFrom(fromTokenId, tokenOf(pair), liquidity); // send liquidity to pair
-        (cTokenOut, cNftOut, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(
-            msg.sender,
-            to,
-            constraint.nftIds
-        );
-        if (cTokenOut < constraint.cTokenOutMin) { revert SPM_BELOW_TOKEN_OUT_MIN_CONSTRAINT(); }
-        if (cNftOut < constraint.cNftOutMin) { revert SPM_BELOW_NFT_OUT_MIN_CONSTRAINT(); }
+        (cTokenOut, cNftOut, tokenOut, idsOut) = ISeacowsERC721TradePair(pair).burn(msg.sender, to, constraint.nftIds);
+        if (cTokenOut < constraint.cTokenOutMin) {
+            revert SPM_BELOW_TOKEN_OUT_MIN_CONSTRAINT();
+        }
+        if (cNftOut < constraint.cNftOutMin) {
+            revert SPM_BELOW_NFT_OUT_MIN_CONSTRAINT();
+        }
     }
 
     function _removeLiquidityETH(
@@ -283,12 +299,10 @@ contract SeacowsPositionManager is
         uint256 fromTokenId,
         address to,
         uint deadline
-    )
-        internal
-        checkDeadline(deadline)
-        returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut)
-    {
-        if (_exists(fromTokenId) == false) { revert SPM_INVALID_TOKEN_ID(); }
+    ) internal checkDeadline(deadline) returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
+        if (_exists(fromTokenId) == false) {
+            revert SPM_INVALID_TOKEN_ID();
+        }
         (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidity(
             WETH,
             collection,
@@ -302,13 +316,17 @@ contract SeacowsPositionManager is
 
         for (uint i; i < idsOut.length; ) {
             IERC721(collection).safeTransferFrom(address(this), to, idsOut[i]);
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
 
         IWETH(WETH).withdraw(tokenOut);
 
         (bool success, ) = to.call{value: tokenOut}(new bytes(0));
-        if (success == false) { revert SPM_ETH_TRANSFER_FAILED(); }
+        if (success == false) {
+            revert SPM_ETH_TRANSFER_FAILED();
+        }
     }
 
     /**
@@ -383,12 +401,16 @@ contract SeacowsPositionManager is
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
         if (msg.value > tokenAmount) {
             (bool success, ) = msg.sender.call{value: msg.value - tokenAmount}('');
-            if (success == false) { revert SPM_ETH_TRANSFER_FAILED(); }
+            if (success == false) {
+                revert SPM_ETH_TRANSFER_FAILED();
+            }
         }
     }
 
     function mintValue(uint256 tokenId, uint256 _value) public {
-        if (pairSlots[msg.sender] != slotOf(tokenId)) { revert SPM_ONLY_PAIR_CAN_MINT(); }
+        if (pairSlots[msg.sender] != slotOf(tokenId)) {
+            revert SPM_ONLY_PAIR_CAN_MINT();
+        }
         _mintValue(tokenId, _value);
     }
 
@@ -397,13 +419,19 @@ contract SeacowsPositionManager is
         @param tokenId The token ID to be burnt
      */
     function burn(uint256 tokenId) public {
-        if (ownerOf(tokenId) != msg.sender) { revert SPM_UNAUTHORIZED(); }
-        if (balanceOf(tokenId) != 0) { revert SPM_ONLY_BURNABLE_WHEN_CLEARED(); }
+        if (ownerOf(tokenId) != msg.sender) {
+            revert SPM_UNAUTHORIZED();
+        }
+        if (balanceOf(tokenId) != 0) {
+            revert SPM_ONLY_BURNABLE_WHEN_CLEARED();
+        }
         _burn(tokenId);
     }
 
     function burnValue(uint256 tokenId, uint256 burnValue_) public {
-        if (pairSlots[msg.sender] != slotOf(tokenId)) { revert SPM_ONLY_PAIR_CAN_BURN(); }
+        if (pairSlots[msg.sender] != slotOf(tokenId)) {
+            revert SPM_ONLY_PAIR_CAN_BURN();
+        }
         _burnValue(tokenId, burnValue_);
     }
 
@@ -420,7 +448,9 @@ contract SeacowsPositionManager is
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        if (_exists(tokenId) == false) { revert SPM_INVALID_TOKEN_ID(); }
+        if (_exists(tokenId) == false) {
+            revert SPM_INVALID_TOKEN_ID();
+        }
 
         uint256 slotId = slotOf(tokenId);
         ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(slotPairs[slotId]);
