@@ -30,6 +30,8 @@ contract SeacowsErrors {
 
     error SPM_ONLY_BURNABLE_WHEN_CLEARED();
 
+    error SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT();
+
     /**
      * SeacowsERC721TradePair Errors
      */

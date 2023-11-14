@@ -186,7 +186,7 @@ describe('SeacowsPositionManager', () => {
             ethers.utils.parseEther('1'),
             MaxUint256,
           ),
-      ).to.be.revertedWith('SeacowsPositionManager: INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT');
+      ).to.revertedWithCustomError(manager, 'SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT');
 
       // Verify Pair assets
       expect(pair.address).to.be.eq(AddressZero);
@@ -338,7 +338,7 @@ describe('SeacowsPositionManager', () => {
         manager.connect(alice).mintWithETH(erc721.address, ONE_PERCENT, [1], ethers.utils.parseEther('1'), MaxUint256, {
           value: ethers.utils.parseEther('3'),
         }),
-      ).to.be.revertedWith('SeacowsPositionManager: INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT');
+      ).to.revertedWithCustomError(manager, 'SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT');
 
       // Verify Pair assets
       expect(pair.address).to.be.eq(AddressZero);
