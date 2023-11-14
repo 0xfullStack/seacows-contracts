@@ -252,15 +252,30 @@ contract SeacowsPositionManager is
         address to, // owner of the NFTs, the user
         uint deadline
     ) public returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
-        (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidityETH(
+        (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidity(
+            WETH,
             collection,
             fee,
             liquidity,
             constraint,
             fromTokenId,
-            address(speedBump),
+            address(this),
             deadline
         );
+
+        for (uint i; i < idsOut.length; ) {
+            IERC721(collection).safeTransferFrom(address(this), address(speedBump), idsOut[i]);
+            unchecked {
+                ++i;
+            }
+        }
+
+        IWETH(WETH).withdraw(tokenOut);
+
+        (bool success, ) = address(speedBump).call{value: tokenOut}(new bytes(0));
+        if (success == false) {
+            revert SPM_ETH_TRANSFER_FAILED();
+        }
 
         speedBump.batchRegisterNFTs(collection, idsOut, to);
         speedBump.registerETH(tokenOut, to);
@@ -288,44 +303,6 @@ contract SeacowsPositionManager is
         }
         if (cNftOut < constraint.cNftOutMin) {
             revert SPM_BELOW_NFT_OUT_MIN_CONSTRAINT();
-        }
-    }
-
-    function _removeLiquidityETH(
-        address collection,
-        uint256 fee,
-        uint liquidity,
-        RemoveLiquidityConstraint memory constraint,
-        uint256 fromTokenId,
-        address to,
-        uint deadline
-    ) internal checkDeadline(deadline) returns (uint cTokenOut, uint cNftOut, uint tokenOut, uint[] memory idsOut) {
-        if (_exists(fromTokenId) == false) {
-            revert SPM_INVALID_TOKEN_ID();
-        }
-        (cTokenOut, cNftOut, tokenOut, idsOut) = _removeLiquidity(
-            WETH,
-            collection,
-            fee,
-            liquidity,
-            constraint,
-            fromTokenId,
-            address(this),
-            deadline
-        );
-
-        for (uint i; i < idsOut.length; ) {
-            IERC721(collection).safeTransferFrom(address(this), to, idsOut[i]);
-            unchecked {
-                ++i;
-            }
-        }
-
-        IWETH(WETH).withdraw(tokenOut);
-
-        (bool success, ) = to.call{value: tokenOut}(new bytes(0));
-        if (success == false) {
-            revert SPM_ETH_TRANSFER_FAILED();
         }
     }
 
