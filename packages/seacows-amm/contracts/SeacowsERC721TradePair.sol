@@ -40,7 +40,9 @@ contract SeacowsERC721TradePair is
     uint public price1CumulativeLast;
 
     function initialize(address token_, address collection_, uint256 fee_) public initializer {
-        if (fee_ != ONE_PERCENT && fee_ != POINT_FIVE_PERCENT) { revert STP_INVALID_FEE(); }
+        if (fee_ != ONE_PERCENT && fee_ != POINT_FIVE_PERCENT) {
+            revert STP_INVALID_FEE();
+        }
         feePercent = fee_;
         protocolFeePercent = 3; // Initially, 0.3%
         __SeacowsPairMetadata_init(msg.sender, token_, collection_);
@@ -81,7 +83,9 @@ contract SeacowsERC721TradePair is
         } else {
             liquidity = Math.min((amount0 * _totalSupply) / _reserve0, (amount1 * _totalSupply) / _reserve1);
         }
-        if (liquidity <= 0) { revert STP_INSUFFICIENT_LIQUIDITY_MINTED(); }
+        if (liquidity <= 0) {
+            revert STP_INSUFFICIENT_LIQUIDITY_MINTED();
+        }
         _mint(toTokenId, liquidity);
         _update(balance0, balance1, _reserve0, _reserve1);
         emit Mint(msg.sender, amount0, amount1);
@@ -102,7 +106,9 @@ contract SeacowsERC721TradePair is
             uint liquidity = manager.balanceOf(manager.tokenOf(address(this)));
             cTokenOut = (liquidity * balance0) / totalSupply();
             cNftOut = (liquidity * balance1) / totalSupply();
-            if (cTokenOut <= 0 || cNftOut <= 0) { revert STP_INSUFFICIENT_LIQUIDITY_BURNED(); }
+            if (cTokenOut <= 0 || cNftOut <= 0) {
+                revert STP_INSUFFICIENT_LIQUIDITY_BURNED();
+            }
 
             uint nftOut;
             (tokenOut, nftOut) = _caculateAssetsOutAfterComplemented(balance0, balance1, cTokenOut, cNftOut);
@@ -113,7 +119,9 @@ contract SeacowsERC721TradePair is
                 tokenOut = IERC20(token).balanceOf(address(this));
             }
         }
-        if (_ids.length < nftAmountOut) { revert STP_EXCEED_NFT_OUT_MAX(); }
+        if (_ids.length < nftAmountOut) {
+            revert STP_EXCEED_NFT_OUT_MAX();
+        }
         IERC20(token).transfer(to, tokenOut);
 
         {
@@ -128,7 +136,9 @@ contract SeacowsERC721TradePair is
                 }
                 i++;
             }
-            if (count != nftAmountOut) { revert STP_INSUFFICIENT_NFT_TO_WITHDRAW(); }
+            if (count != nftAmountOut) {
+                revert STP_INSUFFICIENT_NFT_TO_WITHDRAW();
+            }
         }
 
         (balance0, balance1) = getComplementedBalance();
@@ -141,7 +151,9 @@ contract SeacowsERC721TradePair is
     }
 
     function swap(uint tokenAmountOut, uint[] memory idsOut, address to, bytes calldata data) external nonReentrant {
-        if (tokenAmountOut <= 0 && idsOut.length <= 0) { revert STP_INSUFFICIENT_OUTPUT_AMOUNT(); }
+        if (tokenAmountOut <= 0 && idsOut.length <= 0) {
+            revert STP_INSUFFICIENT_OUTPUT_AMOUNT();
+        }
 
         uint absAmountIn;
         uint absAmountOut;
@@ -154,8 +166,12 @@ contract SeacowsERC721TradePair is
             uint tokenAmountIn;
             (tokenAmountIn, idsIn) = ISeacowsSwapCallback(msg.sender).seacowsSwapCallback(data);
 
-            if (tokenAmountIn <= 0 && idsIn.length <= 0) { revert STP_INSUFFICIENT_INPUT_AMOUNT(); }
-            if (to == token || to == collection) { revert STP_INVALID_TO(); }
+            if (tokenAmountIn <= 0 && idsIn.length <= 0) {
+                revert STP_INSUFFICIENT_INPUT_AMOUNT();
+            }
+            if (to == token || to == collection) {
+                revert STP_INVALID_TO();
+            }
             if (tokenAmountOut > 0) IERC20(token).transfer(to, tokenAmountOut);
             if (idsOut.length > 0) {
                 for (uint i = 0; i < idsOut.length; i++) {
@@ -168,22 +184,22 @@ contract SeacowsERC721TradePair is
                 (uint balance0, uint balance1) = getComplementedBalance();
 
                 // NOTE: Aim to fix loss of precision in solidity when math division
-                // Original Formula: 
+                // Original Formula:
                 // uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
                 // absAmountIn = balance0 > reserve0 ? ((balance0 - reserve0) - _totalFees) : 0;
-                // require (absAmount * minTotalFeePercent() / PERCENTAGE_PRECISION <= totalFees, "INSUFFICIENT_MIN_FEE"); 
-                
+                // require (absAmount * minTotalFeePercent() / PERCENTAGE_PRECISION <= totalFees, "INSUFFICIENT_MIN_FEE");
+
                 // Fixed Formula
                 // In order to reduce precision effect, we make math division happened in the end
                 uint _totalFees = (balance0 * balance1 - _reserve0 * _reserve1);
-                absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * balance1 - _totalFees : 0; // 
+                absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * balance1 - _totalFees : 0; //
                 absAmountOut = reserve0 > balance0 ? (reserve0 - balance0) * balance1 + _totalFees : 0;
 
                 {
                     // scope avoids stack too deep errors
                     uint absAmount = Math.max(absAmountIn, absAmountOut);
                     require(
-                        (absAmount * minTotalFeePercent()) <= (_totalFees * PERCENTAGE_PRECISION), 
+                        (absAmount * minTotalFeePercent()) <= (_totalFees * PERCENTAGE_PRECISION),
                         'SeacowsERC721TradePair: INSUFFICIENT_MIN_FEE'
                     );
 
@@ -214,15 +230,21 @@ contract SeacowsERC721TradePair is
     }
 
     function setProtocolFeePercent(uint256 _protocolFee) public {
-        if (positionManager().feeManager() != msg.sender) { revert STP_UNAUTHORIZED(); }
-        if (_protocolFee > MAX_PROTOCOL_FEE_PERCENT) { revert STP_FEE_OUT_OF_RANGE(); }
+        if (positionManager().feeManager() != msg.sender) {
+            revert STP_UNAUTHORIZED();
+        }
+        if (_protocolFee > MAX_PROTOCOL_FEE_PERCENT) {
+            revert STP_FEE_OUT_OF_RANGE();
+        }
         protocolFeePercent = _protocolFee;
     }
 
     // force balances to match reserves
     function skim(address to, uint256[] memory ids) external nonReentrant {
         (uint balance0, uint balance1) = getComplementedBalance();
-        if (balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) { revert STP_SKIM_QUANTITY_MISMATCH(); }
+        if (balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) {
+            revert STP_SKIM_QUANTITY_MISMATCH();
+        }
         IERC20(token).transfer(to, balance0 / reserve0);
         for (uint i = 0; i < ids.length; i++) {
             IERC721(collection).safeTransferFrom(address(this), to, ids[i]);
@@ -235,7 +257,9 @@ contract SeacowsERC721TradePair is
     }
 
     function _update(uint balance0, uint balance1, uint256 _reserve0, uint256 _reserve1) private {
-        if (balance0 > type(uint256).max || balance1 > type(uint256).max) { revert STP_OVERFLOW(); }
+        if (balance0 > type(uint256).max || balance1 > type(uint256).max) {
+            revert STP_OVERFLOW();
+        }
         uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {

@@ -38,7 +38,9 @@ contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
         uint256 slot_,
         uint256 value_
     ) internal override {
-        from_; to_; value_; // slience unused warning
+        from_;
+        to_;
+        value_; // slience unused warning
         if (slotPairs[slot_] != address(0)) {
             ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(slotPairs[slot_]);
             pair.updateSwapFee();

@@ -64,8 +64,12 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
         for (uint i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             NFT memory nft = collections[collection][tokenId];
-            if (nft.owner != msg.sender) { revert SSB_UNAUTHORIZED(); }
-            if (nft.blockNumber >= block.number) { revert SSB_ONE_MORE_BLOCK_AT_LEAST(); }
+            if (nft.owner != msg.sender) {
+                revert SSB_UNAUTHORIZED();
+            }
+            if (nft.blockNumber >= block.number) {
+                revert SSB_ONE_MORE_BLOCK_AT_LEAST();
+            }
             delete collections[collection][tokenId];
             IERC721(collection).safeTransferFrom(address(this), msg.sender, tokenId);
         }
@@ -73,7 +77,9 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
     }
 
     function registerToken(address token, uint256 amount, address owner) public onlyPositionManager nonReentrant {
-        if (amount <= 0) { revert SSB_INSUFFICIENT_AMOUNT(); }
+        if (amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         uint256 existedAmount = tokens[token][owner].amount;
         tokens[token][owner] = Token(block.number, existedAmount + amount); // overlap with latest block number
         emit RegisterToken(owner, token, amount);
@@ -81,16 +87,24 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
 
     function withdrawToken(address token) public nonReentrant {
         Token memory _token = tokens[token][msg.sender];
-        if (_token.blockNumber >= block.number) { revert SSB_ONE_MORE_BLOCK_AT_LEAST(); }
-        if (_token.amount <= 0) { revert SSB_INSUFFICIENT_AMOUNT(); }
+        if (_token.blockNumber >= block.number) {
+            revert SSB_ONE_MORE_BLOCK_AT_LEAST();
+        }
+        if (_token.amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         delete tokens[token][msg.sender];
         bool success = IERC20(token).transfer(msg.sender, _token.amount);
-        if (success == false) { revert SSB_TOKEN_TRANSFER_FAILED(); }
+        if (success == false) {
+            revert SSB_TOKEN_TRANSFER_FAILED();
+        }
         emit WithdrawToken(msg.sender, token, _token.amount);
     }
 
     function registerETH(uint256 amount, address owner) public onlyPositionManager nonReentrant {
-        if (amount <= 0) { revert SSB_INSUFFICIENT_AMOUNT(); }
+        if (amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         uint256 existedAmount = eths[owner].amount;
         eths[owner] = ETH(block.number, existedAmount + amount); // overlap with latest block number
         emit RegisterETH(owner, amount);
@@ -98,16 +112,24 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
 
     function withdrawETH() public nonReentrant {
         ETH memory eth = eths[msg.sender];
-        if (eth.blockNumber >= block.number) { revert SSB_ONE_MORE_BLOCK_AT_LEAST(); }
-        if (eth.amount <= 0) { revert SSB_INSUFFICIENT_AMOUNT(); }
+        if (eth.blockNumber >= block.number) {
+            revert SSB_ONE_MORE_BLOCK_AT_LEAST();
+        }
+        if (eth.amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         delete eths[msg.sender];
         (bool success, ) = msg.sender.call{value: eth.amount}(new bytes(0));
-        if (success == false) { revert SSB_ETH_TRANSFER_FAILED(); }
+        if (success == false) {
+            revert SSB_ETH_TRANSFER_FAILED();
+        }
         emit WithdrawETH(msg.sender, eth.amount);
     }
 
     modifier onlyPositionManager() {
-        if (address(positionManager) != msg.sender) { revert SSB_UNAUTHORIZED(); }
+        if (address(positionManager) != msg.sender) {
+            revert SSB_UNAUTHORIZED();
+        }
         _;
     }
 

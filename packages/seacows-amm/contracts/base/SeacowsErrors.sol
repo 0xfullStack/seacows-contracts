@@ -2,7 +2,6 @@
 pragma solidity ^0.8.13;
 
 contract SeacowsErrors {
-
     /**
      * SeacowsPositionManager Errors
      */
@@ -17,7 +16,7 @@ contract SeacowsErrors {
     error SPM_ONLY_PAIR_CAN_MINT();
 
     error SPM_ONLY_PAIR_CAN_BURN();
-    
+
     error SPM_INSUFFICIENT_AMOUNT();
 
     error SPM_INSUFFICIENT_LIQUIDITY();
@@ -33,7 +32,6 @@ contract SeacowsErrors {
     /**
      * SeacowsERC721TradePair Errors
      */
-
     error STP_INVALID_FEE();
 
     error STP_INSUFFICIENT_LIQUIDITY_MINTED();
@@ -58,4 +56,17 @@ contract SeacowsErrors {
     error STP_SKIM_QUANTITY_MISMATCH();
 
     error STP_OVERFLOW();
+
+    /**
+     * SpeedBump Errors
+     */
+    error SSB_UNAUTHORIZED();
+
+    error SSB_ONE_MORE_BLOCK_AT_LEAST();
+
+    error SSB_INSUFFICIENT_AMOUNT();
+
+    error SSB_ETH_TRANSFER_FAILED();
+
+    error SSB_TOKEN_TRANSFER_FAILED();
 }
