@@ -152,16 +152,16 @@ library NFTRenderer {
     function renderCollectionAddress(address _collection) internal pure returns (string memory collection) {
         collection = string.concat(
             '<text x="41.36" y="57" fill="black" class="text-quantico text-sm text-addr">',
-            'COLLECTION: ',
+            'Collection: ',
             Strings.toHexString(_collection),
             '</text>'
         );
     }
 
-    function renderTokenAddress(address _token) internal pure returns (string memory token) {
-        token = string.concat(
-            '<text x="41.36" y="57" fill="black" class="text-quantico text-sm text-addr">',
-            'TOKEN: ',
+    function renderTokenAddress(address _token) internal pure returns (string memory owner) {
+        owner = string.concat(
+            '<text x="50.08" y="1020.01" fill="black" class="text-quantico text-sm text-addr">',
+            'Token: ',
             Strings.toHexString(_token),
             '</text>'
         );
