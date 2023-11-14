@@ -69,13 +69,10 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         address to,
         uint deadline
     ) external payable checkDeadline(deadline) returns (uint amountIn) {
-        // convert eth to weth
         IWETH(weth).deposit{value: amountIn}();
         IWETH(weth).transfer(_pair, amountIn);
 
         amountIn = this.swapTokensForExactNFTs(_pair, idsOut, amountInMax, royaltyPercent, to, deadline);
-
-        // refund remaining eth
         _sendETH(msg.sender, msg.value - amountIn);
     }
 
@@ -128,9 +125,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         uint deadline
     ) external checkDeadline(deadline) returns (uint amountOut) {
         amountOut = swapExactNFTsForTokens(_pair, idsIn, amountOutMin, royaltyPercent, address(this), deadline);
-        // withdraw eth
         IWETH(weth).withdraw(amountOut);
-        // send to user
         _sendETH(to, amountOut);
     }
 
@@ -208,7 +203,6 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             'SeacowsRouter: INVALID_PARAMS_LENGTH'
         );
 
-        // convert eth to weth
         IWETH(weth).deposit{value: msg.value}();
 
         for (uint256 i = 0; i < _pairs.length; i++) {
@@ -222,7 +216,6 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             );
         }
 
-        // refund remaining eth
         uint256 remainingAmount = msg.value - amountIn;
         IWETH(weth).withdraw(remainingAmount);
         _sendETH(msg.sender, remainingAmount);
@@ -259,13 +252,10 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             );
         }
 
-        // withdraw eth
         IWETH(weth).withdraw(amountOut);
-        // send to user
         _sendETH(to, amountOut);
     }
 
-    /** Internal functions */
     function _sendETH(address to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}('');
         require(sent, 'Failed to send Ether');
