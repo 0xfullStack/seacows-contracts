@@ -13,6 +13,7 @@ import 'hardhat-gas-reporter';
 import * as tdly from '@tenderly/hardhat-tenderly';
 import './tasks';
 import 'solidity-coverage';
+import 'solidity-docgen';
 
 tdly.setup();
 dotenv.config();
@@ -103,6 +104,7 @@ const config: HardhatUserConfig = {
     project: 'seacows',
     privateVerification: false, // if true, contracts will be verified privately, if false, contracts will be verified publicly
   },
+  docgen: {},
 };
 
 export default config;
