@@ -35,7 +35,6 @@ contract SeacowsERC721TradePair is
     uint256 private reserve1;
 
     uint32 private blockTimestampLast;
-
     uint public price0CumulativeLast;
     uint public price1CumulativeLast;
 
@@ -239,7 +238,6 @@ contract SeacowsERC721TradePair is
         protocolFeePercent = _protocolFee;
     }
 
-    // force balances to match reserves
     function skim(address to, uint256[] memory ids) external nonReentrant {
         (uint balance0, uint balance1) = getComplementedBalance();
         if (balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) {
