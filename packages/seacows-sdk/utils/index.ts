@@ -1,10 +1,7 @@
-import { BigNumber, utils, Contract, type Signer } from 'ethers';
+import { BigNumber, Contract, type Signer } from 'ethers';
 import { type Provider } from '@ethersproject/abstract-provider';
 import PAIR_ABI from '../abis/amm/ISeacowsERC721TradePair.json';
-import ERC721_ABI from '../abis/common/ERC721.json';
 import { type SeacowsERC721TradePair } from '../types/amm';
-import { BI_ZERO } from '../constants';
-import { type ERC721 } from '../types/periphery';
 
 const getTokenInMax = (
   idsOut: number[],
