@@ -186,6 +186,8 @@ const getWithdrawAssetsOutMin = async (
 ): Promise<{
   cTokenOutMin: BigNumber;
   cNftOutMin: BigNumber;
+  tokenOut: BigNumber;
+  nftOut: BigNumber;
 }> => {
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
@@ -204,9 +206,18 @@ const getWithdrawAssetsOutMin = async (
     .mul(BigNumber.from(slippageDenominator - slippageNumerator))
     .div(BigNumber.from(slippageDenominator));
 
+  const [tokenOut, nftOut] = await pairContract.caculateAssetsOutAfterComplemented(
+    tokenBalance,
+    nftBalance,
+    tokenExpectedOut,
+    nftExpectedOut,
+  );
+
   return {
     cTokenOutMin: tokenExpectedOutMin,
     cNftOutMin: nftExpectedOutMin,
+    tokenOut,
+    nftOut,
   };
 };
 
