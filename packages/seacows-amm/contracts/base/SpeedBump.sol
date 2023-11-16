@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
-import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
+
+import {SeacowsErrors} from './SeacowsErrors.sol';
 import {IWETH} from '../interfaces/IWETH.sol';
 
-contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
-
+contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
     event RegisterETH(address indexed owner, uint256 amount);
     event RegisterToken(address indexed owner, address indexed token, uint256 amount);
     event RegisterNFTs(address indexed owner, address indexed collection, uint256[] tokenIds);
@@ -37,10 +38,10 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
     mapping(address => ETH) public eths;
 
     // token address => owner address => Token
-    mapping(address => mapping (address => Token)) public tokens;
+    mapping(address => mapping(address => Token)) public tokens;
 
     // collection address => nft id => NFT
-    mapping(address => mapping (uint256 => NFT)) public collections;
+    mapping(address => mapping(uint256 => NFT)) public collections;
 
     address public positionManager;
 
@@ -48,7 +49,11 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
         positionManager = _positionManager;
     }
 
-    function batchRegisterNFTs(address collection, uint256[] memory tokenIds, address owner) public onlyPositionManager nonReentrant {
+    function batchRegisterNFTs(
+        address collection,
+        uint256[] memory tokenIds,
+        address owner
+    ) public onlyPositionManager nonReentrant {
         for (uint i = 0; i < tokenIds.length; i++) {
             collections[collection][tokenIds[i]] = NFT(block.number, owner);
         }
@@ -59,8 +64,12 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
         for (uint i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             NFT memory nft = collections[collection][tokenId];
-            require(nft.owner == msg.sender, "SpeedBump: INVALID_MSG_SENDER");
-            require(block.number > nft.blockNumber, "SpeedBump: Please wait one more block");
+            if (nft.owner != msg.sender) {
+                revert SSB_UNAUTHORIZED();
+            }
+            if (nft.blockNumber >= block.number) {
+                revert SSB_ONE_MORE_BLOCK_AT_LEAST();
+            }
             delete collections[collection][tokenId];
             IERC721(collection).safeTransferFrom(address(this), msg.sender, tokenId);
         }
@@ -68,45 +77,61 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder {
     }
 
     function registerToken(address token, uint256 amount, address owner) public onlyPositionManager nonReentrant {
-        require(amount > 0, "SpeedBump: Token amount must be great than zero");
+        if (amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         uint256 existedAmount = tokens[token][owner].amount;
-        tokens[token][owner] = Token(block.number, existedAmount + amount); // overlap with latest block number 
+        tokens[token][owner] = Token(block.number, existedAmount + amount); // overlap with latest block number
         emit RegisterToken(owner, token, amount);
     }
 
     function withdrawToken(address token) public nonReentrant {
         Token memory _token = tokens[token][msg.sender];
-        require(block.number > _token.blockNumber, "Speed bump: Please wait one more block");
-        require(_token.amount > 0, "SpeedBump: Token amount must be great than zero");
+        if (_token.blockNumber >= block.number) {
+            revert SSB_ONE_MORE_BLOCK_AT_LEAST();
+        }
+        if (_token.amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         delete tokens[token][msg.sender];
-        require(IERC20(token).transfer(msg.sender, _token.amount), "Speed bump: Token transfer failed");
+        bool success = IERC20(token).transfer(msg.sender, _token.amount);
+        if (success == false) {
+            revert SSB_TOKEN_TRANSFER_FAILED();
+        }
         emit WithdrawToken(msg.sender, token, _token.amount);
     }
 
     function registerETH(uint256 amount, address owner) public onlyPositionManager nonReentrant {
-        require(amount > 0, "SpeedBump: ETH amount must be great than zero");
+        if (amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         uint256 existedAmount = eths[owner].amount;
-        eths[owner] = ETH(block.number, existedAmount + amount); // overlap with latest block number 
+        eths[owner] = ETH(block.number, existedAmount + amount); // overlap with latest block number
         emit RegisterETH(owner, amount);
     }
 
     function withdrawETH() public nonReentrant {
         ETH memory eth = eths[msg.sender];
-        require(block.number > eth.blockNumber, "Speed bump: Please wait one more block");
-        require(eth.amount > 0, "SpeedBump: Token amount must be great than zero");
+        if (eth.blockNumber >= block.number) {
+            revert SSB_ONE_MORE_BLOCK_AT_LEAST();
+        }
+        if (eth.amount <= 0) {
+            revert SSB_INSUFFICIENT_AMOUNT();
+        }
         delete eths[msg.sender];
         (bool success, ) = msg.sender.call{value: eth.amount}(new bytes(0));
-        require(success, "Speed bump: ETH transfer failed");
+        if (success == false) {
+            revert SSB_ETH_TRANSFER_FAILED();
+        }
         emit WithdrawETH(msg.sender, eth.amount);
     }
 
     modifier onlyPositionManager() {
-        require(msg.sender == address(positionManager), "Speed bump: INVALID_MSG_SENDER");
+        if (address(positionManager) != msg.sender) {
+            revert SSB_UNAUTHORIZED();
+        }
         _;
     }
 
     receive() external payable {}
 }
-
-// IERC721(collection).approve(address(speedBump), idsOut[i]);
-// IERC20(WETH).approve(address(speedBump), tokenOut);

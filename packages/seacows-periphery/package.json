@@ -10,6 +10,7 @@
     "deploy:dev:mumbai": "hardhat deploy --env dev --network mumbai",
     "test": "hardhat test",
     "size": "hardhat size-contracts",
+    "doc": "hardhat docgen",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
   "devDependencies": {
@@ -64,7 +65,8 @@
     "solmate": "^6.6.1",
     "ts-node": "^10.7.0",
     "typechain": "^8.1.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "solidity-docgen": "^0.6.0-beta.36"
   },
   "dependencies": {
     "@yolominds/seacows-amm": "*",
