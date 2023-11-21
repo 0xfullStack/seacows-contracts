@@ -52,6 +52,11 @@
   },
   {
     "inputs": [],
+    "name": "SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SPM_INVALID_TOKEN_ID",
     "type": "error"
   },
@@ -78,6 +83,31 @@
   {
     "inputs": [],
     "name": "SPM_UNAUTHORIZED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_ETH_TRANSFER_FAILED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_INSUFFICIENT_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_ONE_MORE_BLOCK_AT_LEAST",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_TOKEN_TRANSFER_FAILED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_UNAUTHORIZED",
     "type": "error"
   },
   {

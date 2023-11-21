@@ -1,5 +1,160 @@
 [
   {
+    "inputs": [],
+    "name": "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_BELOW_TOKEN_OUT_MIN_CONSTRAINT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_ETH_TRANSFER_FAILED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_EXPIRED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_INSUFFICIENT_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_INSUFFICIENT_LIQUIDITY",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_INVALID_TOKEN_ID",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_ONLY_BURNABLE_WHEN_CLEARED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_ONLY_PAIR_CAN_BURN",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_ONLY_PAIR_CAN_MINT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_PAIR_NOT_EXIST",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SPM_UNAUTHORIZED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_ETH_TRANSFER_FAILED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_INSUFFICIENT_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_ONE_MORE_BLOCK_AT_LEAST",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_TOKEN_TRANSFER_FAILED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSB_UNAUTHORIZED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_EXCEED_NFT_OUT_MAX",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_FEE_OUT_OF_RANGE",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INSUFFICIENT_INPUT_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INSUFFICIENT_LIQUIDITY",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INSUFFICIENT_LIQUIDITY_BURNED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INSUFFICIENT_LIQUIDITY_MINTED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INSUFFICIENT_NFT_TO_WITHDRAW",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INSUFFICIENT_OUTPUT_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INVALID_FEE",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_INVALID_TO",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_OVERFLOW",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_SKIM_QUANTITY_MISMATCH",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_UNAUTHORIZED",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
