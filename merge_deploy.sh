@@ -7,7 +7,7 @@ networks=("mainnet" "goerli" "sepolia")
 select network in "${networks[@]}"; do
   case $network in
     "mainnet")
-      environment="production"
+      environment="prod"
       break
       ;;
     "sepolia"|"goerli")

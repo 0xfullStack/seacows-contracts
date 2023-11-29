@@ -1,8 +1,8 @@
 import { Environment } from '@yolominds/seacows-sdk';
 import dev from './dev';
-import production from './production';
+import prod from './prod';
 
 export const addresses = {
   [Environment.DEV]: dev,
-  [Environment.PRODUCTION]: production,
+  [Environment.PRODUCTION]: prod,
 };
