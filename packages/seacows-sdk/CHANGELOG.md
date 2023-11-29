@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.9 (2023-11-29)
+
+
+### Features
+
+* clean sundries ([#18](https://github.com/yolominds/seacows-contracts/issues/18)) ([5e079c7](https://github.com/yolominds/seacows-contracts/commit/5e079c7f775b66ae250af37d8bd9e9595e288dfe))
+
 ### 1.20.8 (2023-11-21)
 
 ### 1.20.7 (2023-11-16)
