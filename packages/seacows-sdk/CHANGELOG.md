@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.10 (2023-11-29)
+
+
+### Features
+
+* merge deploy script  based on clean-sundries branch ([#19](https://github.com/yolominds/seacows-contracts/issues/19)) ([5fdc4a0](https://github.com/yolominds/seacows-contracts/commit/5fdc4a0a922128c986c896b440dd50868567f4fa))
+
 ### 1.20.9 (2023-11-29)
 
 
