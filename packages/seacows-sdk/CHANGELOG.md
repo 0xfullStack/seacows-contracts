@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.11 (2023-11-29)
+
+
+### Features
+
+* multi chain support based on merge-deploy-script branch ([#20](https://github.com/yolominds/seacows-contracts/issues/20)) ([fdc8b5f](https://github.com/yolominds/seacows-contracts/commit/fdc8b5f28c0a78ccec3c87868a878654bdefe606))
+
 ### 1.20.10 (2023-11-29)
 
 
