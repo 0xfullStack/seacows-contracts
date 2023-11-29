@@ -9,6 +9,21 @@ import type { SeacowsErrors, SeacowsErrorsInterface } from "../SeacowsErrors";
 const _abi = [
   {
     inputs: [],
+    name: "FM_NON_FEE_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "FM_NON_ROYALTY_FEE_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "RM_NON_ROYALTY_FEE_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
     type: "error",
   },
@@ -39,6 +54,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "SPM_INVALID_TOKEN_ID",
     type: "error",
   },
@@ -59,12 +79,47 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "SPM_ONLY_POSITION_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "SPM_PAIR_NOT_EXIST",
     type: "error",
   },
   {
     inputs: [],
     name: "SPM_UNAUTHORIZED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_ETH_TRANSFER_FAILED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_INSUFFICIENT_AMOUNT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_ONE_MORE_BLOCK_AT_LEAST",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_TOKEN_TRANSFER_FAILED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_UNAUTHORIZED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STPF_PAIR_ALREADY_EXIST",
     type: "error",
   },
   {
@@ -99,6 +154,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "STP_INSUFFICIENT_MIN_FEE",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "STP_INSUFFICIENT_NFT_TO_WITHDRAW",
     type: "error",
   },
@@ -119,6 +179,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "STP_K",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "STP_OVERFLOW",
     type: "error",
   },
@@ -135,7 +200,7 @@ const _abi = [
 ];
 
 const _bytecode =
-  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212204c993c537a0d317d9bd978733e9a44cc3ab0d86da09f313088c199e5e4de19d264736f6c63430008120033";
+  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220fdf08842d4624d2482042d4a9fb4e226f55e54dc20b5198d4dc24ef74b73df5264736f6c63430008120033";
 
 export class SeacowsErrors__factory extends ContractFactory {
   constructor(

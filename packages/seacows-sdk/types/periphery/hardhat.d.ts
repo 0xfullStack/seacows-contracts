@@ -85,10 +85,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IRoyaltyManagement__factory>;
     getContractFactory(
-      name: "ISeacowsCallback",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISeacowsCallback__factory>;
-    getContractFactory(
       name: "ISeacowsComplement",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISeacowsComplement__factory>;
@@ -120,6 +116,10 @@ declare module "hardhat/types/runtime" {
       name: "PeripheryImmutableState",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PeripheryImmutableState__factory>;
+    getContractFactory(
+      name: "SeacowsErrors",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SeacowsErrors__factory>;
     getContractFactory(
       name: "SeacowsSwapCallback",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -256,11 +256,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IRoyaltyManagement>;
     getContractAt(
-      name: "ISeacowsCallback",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ISeacowsCallback>;
-    getContractAt(
       name: "ISeacowsComplement",
       address: string,
       signer?: ethers.Signer
@@ -300,6 +295,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.PeripheryImmutableState>;
+    getContractAt(
+      name: "SeacowsErrors",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SeacowsErrors>;
     getContractAt(
       name: "SeacowsSwapCallback",
       address: string,

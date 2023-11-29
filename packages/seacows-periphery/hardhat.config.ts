@@ -42,7 +42,21 @@ const config: HardhatUserConfig = {
     goerli: {
       chainId: SupportedChain.GÖRLI,
       url: process.env.GOERLI_ALCHEMY_KEY
-        ? `https://eth-goerli.alchemyapi.io/v2/${process.env.GOERLI_ALCHEMY_KEY}`
+        ? `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_KEY}`
+        : '',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    sepolia: {
+      chainId: SupportedChain.SEPOLIA,
+      url: process.env.SEPOLIA_ALCHEMY_KEY
+        ? `https://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_KEY}`
+        : '',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    mainnet: {
+      chainId: SupportedChain.MAINNET,
+      url: process.env.MAINNET_ALCHEMY_KEY
+        ? `https://eth-mainnet.g.alchemy.com/v2/${process.env.MAINNET_ALCHEMY_KEY}`
         : '',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },

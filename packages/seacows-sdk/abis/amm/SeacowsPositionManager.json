@@ -8,7 +8,7 @@
       },
       {
         "internalType": "address",
-        "name": "_WETH",
+        "name": "_weth",
         "type": "address"
       },
       {
@@ -19,6 +19,21 @@
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "FM_NON_FEE_MANAGER",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FM_NON_ROYALTY_FEE_MANAGER",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RM_NON_ROYALTY_FEE_MANAGER",
+    "type": "error"
   },
   {
     "inputs": [],
@@ -77,6 +92,11 @@
   },
   {
     "inputs": [],
+    "name": "SPM_ONLY_POSITION_MANAGER",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SPM_PAIR_NOT_EXIST",
     "type": "error"
   },
@@ -112,6 +132,11 @@
   },
   {
     "inputs": [],
+    "name": "STPF_PAIR_ALREADY_EXIST",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "STP_EXCEED_NFT_OUT_MAX",
     "type": "error"
   },
@@ -142,6 +167,11 @@
   },
   {
     "inputs": [],
+    "name": "STP_INSUFFICIENT_MIN_FEE",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "STP_INSUFFICIENT_NFT_TO_WITHDRAW",
     "type": "error"
   },
@@ -158,6 +188,11 @@
   {
     "inputs": [],
     "name": "STP_INVALID_TO",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_K",
     "type": "error"
   },
   {
@@ -383,6 +418,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SPEED_BUMP",
+    "outputs": [
+      {
+        "internalType": "contract SpeedBump",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1303,29 +1351,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "seacowsBurnCallback",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "operator_",
         "type": "address"
       },
@@ -1463,19 +1488,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "speedBump",
-    "outputs": [
-      {
-        "internalType": "contract SpeedBump",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

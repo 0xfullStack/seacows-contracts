@@ -22,6 +22,196 @@ const _abi = [
     type: "constructor",
   },
   {
+    inputs: [],
+    name: "FM_NON_FEE_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "FM_NON_ROYALTY_FEE_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "RM_NON_ROYALTY_FEE_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_BELOW_TOKEN_OUT_MIN_CONSTRAINT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_ETH_TRANSFER_FAILED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_EXPIRED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_INSUFFICIENT_AMOUNT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_INSUFFICIENT_LIQUIDITY",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_INVALID_TOKEN_ID",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_ONLY_BURNABLE_WHEN_CLEARED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_ONLY_PAIR_CAN_BURN",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_ONLY_PAIR_CAN_MINT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_ONLY_POSITION_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_PAIR_NOT_EXIST",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPM_UNAUTHORIZED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_ETH_TRANSFER_FAILED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_INSUFFICIENT_AMOUNT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_ONE_MORE_BLOCK_AT_LEAST",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_TOKEN_TRANSFER_FAILED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SSB_UNAUTHORIZED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STPF_PAIR_ALREADY_EXIST",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_EXCEED_NFT_OUT_MAX",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_FEE_OUT_OF_RANGE",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INSUFFICIENT_INPUT_AMOUNT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INSUFFICIENT_LIQUIDITY",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INSUFFICIENT_LIQUIDITY_BURNED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INSUFFICIENT_LIQUIDITY_MINTED",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INSUFFICIENT_MIN_FEE",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INSUFFICIENT_NFT_TO_WITHDRAW",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INSUFFICIENT_OUTPUT_AMOUNT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INVALID_FEE",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_INVALID_TO",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_K",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_OVERFLOW",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_SKIM_QUANTITY_MISMATCH",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "STP_UNAUTHORIZED",
+    type: "error",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -66,7 +256,7 @@ const _abi = [
 ];
 
 const _bytecode =
-  "0x60a060405234801561001057600080fd5b506040516101d53803806101d583398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014b61008a60003960006099015261014b6000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80635eced4801461003b5780636f2ddd9314610097575b600080fd5b61007b6100493660046100d9565b6001600160a01b0392831660009081526020818152604080832094861683529381528382209282529190915220541690565b6040516001600160a01b03909116815260200160405180910390f35b7f000000000000000000000000000000000000000000000000000000000000000061007b565b80356001600160a01b03811681146100d457600080fd5b919050565b6000806000606084860312156100ee57600080fd5b6100f7846100bd565b9250610105602085016100bd565b915060408401359050925092509256fea26469706673582212202de682651f85920571d65d5ea581e62943083b0e696a36874d65aa3999b2682664736f6c63430008120033";
+  "0x60a060405234801561001057600080fd5b506040516101d53803806101d583398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014b61008a60003960006099015261014b6000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80635eced4801461003b5780636f2ddd9314610097575b600080fd5b61007b6100493660046100d9565b6001600160a01b0392831660009081526020818152604080832094861683529381528382209282529190915220541690565b6040516001600160a01b03909116815260200160405180910390f35b7f000000000000000000000000000000000000000000000000000000000000000061007b565b80356001600160a01b03811681146100d457600080fd5b919050565b6000806000606084860312156100ee57600080fd5b6100f7846100bd565b9250610105602085016100bd565b915060408401359050925092509256fea2646970667358221220f03063922124d7f603dc12ebda36cef2b968ace46a3f53b8be00084aac04283964736f6c63430008120033";
 
 export class SeacowsERC721TradePairFactory__factory extends ContractFactory {
   constructor(

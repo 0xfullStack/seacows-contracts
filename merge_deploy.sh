@@ -5,8 +5,13 @@ echo "############################## Choose The Network ########################
 networks=("mainnet" "goerli" "sepolia")
 
 select network in "${networks[@]}"; do
-  case $network in "mainnet"|"goerli"|"sepolia")
-      echo "You choose the $network network..."
+  case $network in
+    "mainnet")
+      environment="production"
+      break
+      ;;
+    "sepolia"|"goerli")
+      environment="dev"
       break
       ;;
     *)
@@ -14,6 +19,9 @@ select network in "${networks[@]}"; do
       ;;
   esac
 done
+
+echo "You choose the $network network..."
+echo "Environment set to: $environment"
 
 # directories
 seacows_amm_directory="./packages/seacows-amm"
@@ -41,7 +49,7 @@ npx hardhat coverage
 npx hardhat compile
 
 # - deploy
-npx hardhat deploy:seacows --env dev --network $network
+npx hardhat deploy:seacows --env $environment --network $network
 
 
 echo "############################## Update Seacows SDK Once ##############################"
@@ -57,6 +65,8 @@ npx copyfiles -u 3 ../seacows-periphery/types/**/*.d.ts ../seacows-periphery/typ
 
 # - build
 rm -rf dist && npx tsc && npx copyfiles -u 1 types/**/*.d.ts dist/types
+
+echo "############################## Update Seacows SDK Once Finish ##############################"
 
 
 echo "############################## Start Periphery Deploy Tasks ##############################"
@@ -80,7 +90,7 @@ npx hardhat coverage
 npx hardhat compile
 
 # - deploy
-npx hardhat deploy:seacows --env dev --network $network
+npx hardhat deploy:seacows --env $environment --network $network
 
 
 echo "############################## Update Seacows SDK Twice ##############################"
@@ -96,3 +106,5 @@ npx copyfiles -u 3 ../seacows-periphery/types/**/*.d.ts ../seacows-periphery/typ
 
 # - build
 rm -rf dist && npx tsc && npx copyfiles -u 1 types/**/*.d.ts dist/types
+
+echo "############################## Update Seacows SDK Once Finish ##############################"

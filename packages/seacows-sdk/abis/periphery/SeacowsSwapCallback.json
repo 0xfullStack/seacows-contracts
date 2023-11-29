@@ -17,6 +17,41 @@
   },
   {
     "inputs": [],
+    "name": "SR_ETH_TRANSFER_FAILED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SR_EXCESSIVE_INPUT_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SR_EXPIRED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SR_INSUFFICIENT_OUTPUT_AMOUNT",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SR_INVALID_PARAMS_LENGTH",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSC_NOT_SEACOWS_PAIR",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SSC_PAIR_MISMATCH",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "manager",
     "outputs": [
       {

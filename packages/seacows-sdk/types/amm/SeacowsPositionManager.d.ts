@@ -23,6 +23,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   functions: {
     "PERCENTAGE_PRECISION()": FunctionFragment;
+    "SPEED_BUMP()": FunctionFragment;
     "WETH()": FunctionFragment;
     "addLiquidity(address,address,uint256,uint256,uint256[],uint256,uint256,uint256)": FunctionFragment;
     "addLiquidityETH(address,uint256,uint256[],uint256,uint256,uint256)": FunctionFragment;
@@ -53,7 +54,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "royaltyFeeManager()": FunctionFragment;
     "royaltyRegistry()": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
-    "seacowsBurnCallback(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setFeeManager(address)": FunctionFragment;
     "setFeeTo(address)": FunctionFragment;
@@ -63,7 +63,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "slotOfPair(address)": FunctionFragment;
     "slotPairs(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
-    "speedBump()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "template()": FunctionFragment;
@@ -79,6 +78,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "PERCENTAGE_PRECISION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "SPEED_BUMP",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
@@ -233,10 +236,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "seacowsBurnCallback",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
   ): string;
@@ -266,7 +265,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "slotURI",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "speedBump", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
@@ -307,6 +305,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "PERCENTAGE_PRECISION",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "SPEED_BUMP", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addLiquidity",
@@ -380,10 +379,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "seacowsBurnCallback",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
@@ -404,7 +399,6 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "slotOfPair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotPairs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "speedBump", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -566,6 +560,8 @@ export class SeacowsPositionManager extends BaseContract {
 
   functions: {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    SPEED_BUMP(overrides?: CallOverrides): Promise<[string]>;
 
     WETH(overrides?: CallOverrides): Promise<[string]>;
 
@@ -764,13 +760,6 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    seacowsBurnCallback(
-      _token: string,
-      from: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     setApprovalForAll(
       operator_: string,
       approved_: boolean,
@@ -807,8 +796,6 @@ export class SeacowsPositionManager extends BaseContract {
     slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
-    speedBump(overrides?: CallOverrides): Promise<[string]>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -869,6 +856,8 @@ export class SeacowsPositionManager extends BaseContract {
   };
 
   PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  SPEED_BUMP(overrides?: CallOverrides): Promise<string>;
 
   WETH(overrides?: CallOverrides): Promise<string>;
 
@@ -1061,13 +1050,6 @@ export class SeacowsPositionManager extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  seacowsBurnCallback(
-    _token: string,
-    from: string,
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   setApprovalForAll(
     operator_: string,
     approved_: boolean,
@@ -1101,8 +1083,6 @@ export class SeacowsPositionManager extends BaseContract {
   slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  speedBump(overrides?: CallOverrides): Promise<string>;
 
   supportsInterface(
     interfaceId: BytesLike,
@@ -1160,6 +1140,8 @@ export class SeacowsPositionManager extends BaseContract {
 
   callStatic: {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SPEED_BUMP(overrides?: CallOverrides): Promise<string>;
 
     WETH(overrides?: CallOverrides): Promise<string>;
 
@@ -1387,13 +1369,6 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    seacowsBurnCallback(
-      _token: string,
-      from: string,
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     setApprovalForAll(
       operator_: string,
       approved_: boolean,
@@ -1418,8 +1393,6 @@ export class SeacowsPositionManager extends BaseContract {
     slotPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    speedBump(overrides?: CallOverrides): Promise<string>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -1631,6 +1604,8 @@ export class SeacowsPositionManager extends BaseContract {
   estimateGas: {
     PERCENTAGE_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
+    SPEED_BUMP(overrides?: CallOverrides): Promise<BigNumber>;
+
     WETH(overrides?: CallOverrides): Promise<BigNumber>;
 
     addLiquidity(
@@ -1828,13 +1803,6 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    seacowsBurnCallback(
-      _token: string,
-      from: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     setApprovalForAll(
       operator_: string,
       approved_: boolean,
@@ -1874,8 +1842,6 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<BigNumber>;
 
     slotURI(slot_: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
-    speedBump(overrides?: CallOverrides): Promise<BigNumber>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -1939,6 +1905,8 @@ export class SeacowsPositionManager extends BaseContract {
     PERCENTAGE_PRECISION(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    SPEED_BUMP(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -2145,13 +2113,6 @@ export class SeacowsPositionManager extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    seacowsBurnCallback(
-      _token: string,
-      from: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     setApprovalForAll(
       operator_: string,
       approved_: boolean,
@@ -2197,8 +2158,6 @@ export class SeacowsPositionManager extends BaseContract {
       slot_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    speedBump(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     supportsInterface(
       interfaceId: BytesLike,

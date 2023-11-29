@@ -1,6 +1,21 @@
 [
   {
     "inputs": [],
+    "name": "FM_NON_FEE_MANAGER",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FM_NON_ROYALTY_FEE_MANAGER",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RM_NON_ROYALTY_FEE_MANAGER",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
     "type": "error"
   },
@@ -56,6 +71,11 @@
   },
   {
     "inputs": [],
+    "name": "SPM_ONLY_POSITION_MANAGER",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SPM_PAIR_NOT_EXIST",
     "type": "error"
   },
@@ -91,6 +111,11 @@
   },
   {
     "inputs": [],
+    "name": "STPF_PAIR_ALREADY_EXIST",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "STP_EXCEED_NFT_OUT_MAX",
     "type": "error"
   },
@@ -121,6 +146,11 @@
   },
   {
     "inputs": [],
+    "name": "STP_INSUFFICIENT_MIN_FEE",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "STP_INSUFFICIENT_NFT_TO_WITHDRAW",
     "type": "error"
   },
@@ -137,6 +167,11 @@
   {
     "inputs": [],
     "name": "STP_INVALID_TO",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STP_K",
     "type": "error"
   },
   {

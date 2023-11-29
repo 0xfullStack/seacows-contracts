@@ -8,6 +8,5 @@ This repository contains the smart contracts for the Seacows Protocol.
 # Merge Deploy
 `
     chmod +x merge_deploy.sh
-    ./merge_deploy.sh  
+    ./merge_deploy.sh
 `
-

@@ -37,10 +37,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ContextUpgradeable__factory>;
     getContractFactory(
-      name: "IERC165Upgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC165Upgradeable__factory>;
-    getContractFactory(
       name: "IERC2981",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC2981__factory>;
@@ -93,33 +89,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC3525__factory>;
     getContractFactory(
-      name: "ERC3525Upgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC3525Upgradeable__factory>;
-    getContractFactory(
       name: "IERC3525Metadata",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC3525Metadata__factory>;
-    getContractFactory(
-      name: "IERC3525MetadataUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC3525MetadataUpgradeable__factory>;
     getContractFactory(
       name: "IERC721Enumerable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Enumerable__factory>;
     getContractFactory(
-      name: "IERC721EnumerableUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC721EnumerableUpgradeable__factory>;
-    getContractFactory(
       name: "IERC721Metadata",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Metadata__factory>;
-    getContractFactory(
-      name: "IERC721MetadataUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC721MetadataUpgradeable__factory>;
     getContractFactory(
       name: "IERC3525",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -129,14 +109,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC3525Receiver__factory>;
     getContractFactory(
-      name: "IERC3525ReceiverUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC3525ReceiverUpgradeable__factory>;
-    getContractFactory(
-      name: "IERC3525Upgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC3525Upgradeable__factory>;
-    getContractFactory(
       name: "IERC721",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721__factory>;
@@ -145,21 +117,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Receiver__factory>;
     getContractFactory(
-      name: "IERC721ReceiverUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC721ReceiverUpgradeable__factory>;
-    getContractFactory(
-      name: "IERC721Upgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC721Upgradeable__factory>;
-    getContractFactory(
       name: "IERC3525MetadataDescriptor",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC3525MetadataDescriptor__factory>;
-    getContractFactory(
-      name: "IERC3525MetadataDescriptorUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC3525MetadataDescriptorUpgradeable__factory>;
     getContractFactory(
       name: "ISeacowsSwapCallback",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -212,10 +172,6 @@ declare module "hardhat/types/runtime" {
       name: "IRoyaltyRegistry",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IRoyaltyRegistry__factory>;
-    getContractFactory(
-      name: "ISeacowsCallback",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISeacowsCallback__factory>;
     getContractFactory(
       name: "ISeacowsComplement",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -324,11 +280,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ContextUpgradeable>;
     getContractAt(
-      name: "IERC165Upgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC165Upgradeable>;
-    getContractAt(
       name: "IERC2981",
       address: string,
       signer?: ethers.Signer
@@ -394,40 +345,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ERC3525>;
     getContractAt(
-      name: "ERC3525Upgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC3525Upgradeable>;
-    getContractAt(
       name: "IERC3525Metadata",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC3525Metadata>;
-    getContractAt(
-      name: "IERC3525MetadataUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC3525MetadataUpgradeable>;
     getContractAt(
       name: "IERC721Enumerable",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721Enumerable>;
     getContractAt(
-      name: "IERC721EnumerableUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC721EnumerableUpgradeable>;
-    getContractAt(
       name: "IERC721Metadata",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721Metadata>;
-    getContractAt(
-      name: "IERC721MetadataUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC721MetadataUpgradeable>;
     getContractAt(
       name: "IERC3525",
       address: string,
@@ -439,16 +370,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC3525Receiver>;
     getContractAt(
-      name: "IERC3525ReceiverUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC3525ReceiverUpgradeable>;
-    getContractAt(
-      name: "IERC3525Upgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC3525Upgradeable>;
-    getContractAt(
       name: "IERC721",
       address: string,
       signer?: ethers.Signer
@@ -459,25 +380,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721Receiver>;
     getContractAt(
-      name: "IERC721ReceiverUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC721ReceiverUpgradeable>;
-    getContractAt(
-      name: "IERC721Upgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC721Upgradeable>;
-    getContractAt(
       name: "IERC3525MetadataDescriptor",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC3525MetadataDescriptor>;
-    getContractAt(
-      name: "IERC3525MetadataDescriptorUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC3525MetadataDescriptorUpgradeable>;
     getContractAt(
       name: "ISeacowsSwapCallback",
       address: string,
@@ -543,11 +449,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IRoyaltyRegistry>;
-    getContractAt(
-      name: "ISeacowsCallback",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ISeacowsCallback>;
     getContractAt(
       name: "ISeacowsComplement",
       address: string,

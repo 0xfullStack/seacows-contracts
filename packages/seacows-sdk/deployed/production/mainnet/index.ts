@@ -4,8 +4,8 @@ import { address as router } from './SeacowsRouter.json';
 import { address as speedBump } from './SpeedBump.json';
 
 export default {
-  weth: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
-  royaltyRegistry: '0x3D1151dc590ebF5C04501a7d4E1f8921546774eA',
+  weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  royaltyRegistry: '0xad2184fb5dbcfc05d8f056542fb25b04fa32a95d',
   template,
   manager,
   router,
