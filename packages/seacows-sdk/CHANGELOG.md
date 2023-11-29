@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.20.12 (2023-11-29)
+
+
+### Bug Fixes
+
+* use  prod environment instead of production ([88a025c](https://github.com/yolominds/seacows-contracts/commit/88a025cf2c2455ac4903bafeebbd5e8902df4e9d))
+
 ### 1.20.11 (2023-11-29)
 
 
