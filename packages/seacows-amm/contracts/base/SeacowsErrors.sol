@@ -59,6 +59,31 @@ contract SeacowsErrors {
 
     error STP_OVERFLOW();
 
+    error STP_INSUFFICIENT_MIN_FEE();
+
+    error STP_K();
+
+    /**
+     * SeacowsERC721TradePairFactory Errors
+     */
+    error STPF_PAIR_ALREADY_EXIST();
+
+    /**
+     * SeacowsPairMetadata Errors
+     */
+    error SPM_ONLY_POSITION_MANAGER();
+
+    /**
+     * FeeManagement Errors
+     */
+    error FM_NON_FEE_MANAGER();
+    error FM_NON_ROYALTY_FEE_MANAGER();
+
+    /**
+     * RoyaltyManagement Errors
+     */
+    error RM_NON_ROYALTY_FEE_MANAGER();
+
     /**
      * SpeedBump Errors
      */

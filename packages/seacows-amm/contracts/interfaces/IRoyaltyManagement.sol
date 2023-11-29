@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 interface IRoyaltyManagement {
-    function minRoyaltyFeePercent() external view returns (uint);
+    function minRoyaltyFeePercent() external view returns (uint256);
 
     function royaltyRegistry() external view returns (address);
 

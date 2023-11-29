@@ -74,7 +74,7 @@ contract MockRoyaltyRegistry is ERC165, OwnableUpgradeable, IRoyaltyRegistry {
         require(overrideAllowed(tokenAddress), 'Permission denied');
         // look up existing override, if any
         address existingOverride = _overrides[tokenAddress];
-        existingOverride; // silence unused warning
+        existingOverride;
         // set new override and reverse-lookup
         _overrides[tokenAddress] = royaltyLookupAddress;
 

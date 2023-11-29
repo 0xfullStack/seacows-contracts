@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-import '@yolominds/seacows-amm/contracts/interfaces/ISeacowsERC721TradePair.sol';
-import './base/SeacowsSwapCallback.sol';
-import './base/PeripheryImmutableState.sol';
-import './interfaces/ISeacowsRouter.sol';
-import './interfaces/IWETH.sol';
-import './lib/SeacowsLibrary.sol';
+
+import {ISeacowsERC721TradePair} from '@yolominds/seacows-amm/contracts/interfaces/ISeacowsERC721TradePair.sol';
+import {SeacowsSwapCallback} from './base/SeacowsSwapCallback.sol';
+import {PeripheryImmutableState} from './base/PeripheryImmutableState.sol';
+import {ISeacowsRouter} from './interfaces/ISeacowsRouter.sol';
+import {IWETH} from './interfaces/IWETH.sol';
+import {SeacowsLibrary} from './lib/SeacowsLibrary.sol';
 
 contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacowsRouter {
     constructor(address _manager, address _weth) SeacowsSwapCallback(_manager, _weth) {}
 
-    modifier checkDeadline(uint deadline) {
-        require(deadline >= block.timestamp, 'SeacowsRouter: EXPIRED');
+    modifier checkDeadline(uint256 deadline) {
+        if (deadline < block.timestamp) {
+            revert SR_EXPIRED();
+        }
         _;
     }
 
@@ -28,14 +29,14 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function swapTokensForExactNFTs(
         address _pair,
-        uint[] memory idsOut,
-        uint amountInMax,
-        uint royaltyPercent,
+        uint256[] memory idsOut,
+        uint256 amountInMax,
+        uint256 royaltyPercent,
         address to,
-        uint deadline
-    ) public checkDeadline(deadline) returns (uint amountIn) {
+        uint256 deadline
+    ) public checkDeadline(deadline) returns (uint256 amountIn) {
         ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_pair);
-        (uint tokenReserve, uint nftReserve, ) = pair.getReserves();
+        (uint256 tokenReserve, uint256 nftReserve, ) = pair.getReserves();
         amountIn = SeacowsLibrary.getAmountIn(
             idsOut.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,
@@ -43,10 +44,12 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             pair.feePercent() + pair.protocolFeePercent() + royaltyPercent,
             pair.PERCENTAGE_PRECISION()
         );
-        require(amountIn <= amountInMax, 'SeacowsRouter: EXCESSIVE_INPUT_AMOUNT');
+        if (amountIn > amountInMax) {
+            revert SR_EXCESSIVE_INPUT_AMOUNT();
+        }
         SwapCallbackData memory _data = SwapCallbackData({
             payer: msg.sender,
-            idsIn: new uint[](0),
+            idsIn: new uint256[](0),
             tokenAmountIn: amountIn
         });
         pair.swap(0, idsOut, to, abi.encode(_data));
@@ -63,12 +66,12 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function swapETHForExactNFTs(
         address _pair,
-        uint[] memory idsOut,
-        uint amountInMax,
-        uint royaltyPercent,
+        uint256[] memory idsOut,
+        uint256 amountInMax,
+        uint256 royaltyPercent,
         address to,
-        uint deadline
-    ) external payable checkDeadline(deadline) returns (uint amountIn) {
+        uint256 deadline
+    ) external payable checkDeadline(deadline) returns (uint256 amountIn) {
         IWETH(weth).deposit{value: amountIn}();
         IWETH(weth).transfer(_pair, amountIn);
 
@@ -87,14 +90,14 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function swapExactNFTsForTokens(
         address _pair,
-        uint[] memory idsIn,
-        uint amountOutMin,
-        uint royaltyPercent,
+        uint256[] memory idsIn,
+        uint256 amountOutMin,
+        uint256 royaltyPercent,
         address to,
-        uint deadline
-    ) public checkDeadline(deadline) returns (uint amountOut) {
+        uint256 deadline
+    ) public checkDeadline(deadline) returns (uint256 amountOut) {
         ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_pair);
-        (uint tokenReserve, uint nftReserve, ) = pair.getReserves();
+        (uint256 tokenReserve, uint256 nftReserve, ) = pair.getReserves();
         amountOut = SeacowsLibrary.getAmountOut(
             idsIn.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,
@@ -102,9 +105,11 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
             pair.feePercent() + pair.protocolFeePercent() + royaltyPercent,
             pair.PERCENTAGE_PRECISION()
         );
-        require(amountOut >= amountOutMin, 'SeacowsRouter: INSUFFICIENT_OUTPUT_AMOUNT');
+        if (amountOut < amountOutMin) {
+            revert SR_INSUFFICIENT_OUTPUT_AMOUNT();
+        }
         SwapCallbackData memory _data = SwapCallbackData({payer: msg.sender, idsIn: idsIn, tokenAmountIn: 0});
-        pair.swap(amountOut, new uint[](0), to, abi.encode(_data));
+        pair.swap(amountOut, new uint256[](0), to, abi.encode(_data));
     }
 
     /**
@@ -118,12 +123,12 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function swapExactNFTsForETH(
         address _pair,
-        uint[] memory idsIn,
-        uint amountOutMin,
-        uint royaltyPercent,
+        uint256[] memory idsIn,
+        uint256 amountOutMin,
+        uint256 royaltyPercent,
         address to,
-        uint deadline
-    ) external checkDeadline(deadline) returns (uint amountOut) {
+        uint256 deadline
+    ) external checkDeadline(deadline) returns (uint256 amountOut) {
         amountOut = swapExactNFTsForTokens(_pair, idsIn, amountOutMin, royaltyPercent, address(this), deadline);
         IWETH(weth).withdraw(amountOut);
         _sendETH(to, amountOut);
@@ -140,16 +145,15 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function batchSwapTokensForExactNFTs(
         address[] calldata _pairs,
-        uint[][] calldata idsOuts,
-        uint[] calldata amountInMaxs,
-        uint royaltyPercent,
+        uint256[][] calldata idsOuts,
+        uint256[] calldata amountInMaxs,
+        uint256 royaltyPercent,
         address to,
-        uint deadline
-    ) external virtual checkDeadline(deadline) returns (uint amountIn) {
-        require(
-            _pairs.length == idsOuts.length && idsOuts.length == amountInMaxs.length,
-            'SeacowsRouter: INVALID_PARAMS_LENGTH'
-        );
+        uint256 deadline
+    ) external virtual checkDeadline(deadline) returns (uint256 amountIn) {
+        if (_pairs.length != idsOuts.length || idsOuts.length != amountInMaxs.length) {
+            revert SR_INVALID_PARAMS_LENGTH();
+        }
         for (uint256 i = 0; i < _pairs.length; i++) {
             amountIn += swapTokensForExactNFTs(_pairs[i], idsOuts[i], amountInMaxs[i], royaltyPercent, to, deadline);
         }
@@ -166,16 +170,15 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function batchSwapExactNFTsForTokens(
         address[] calldata _pairs,
-        uint[][] calldata idsIns,
-        uint[] calldata amountOutMins,
-        uint royaltyPercent,
+        uint256[][] calldata idsIns,
+        uint256[] calldata amountOutMins,
+        uint256 royaltyPercent,
         address to,
-        uint deadline
-    ) external virtual checkDeadline(deadline) returns (uint amountOut) {
-        require(
-            _pairs.length == idsIns.length && idsIns.length == amountOutMins.length,
-            'SeacowsRouter: INVALID_PARAMS_LENGTH'
-        );
+        uint256 deadline
+    ) external virtual checkDeadline(deadline) returns (uint256 amountOut) {
+        if (_pairs.length != idsIns.length || idsIns.length != amountOutMins.length) {
+            revert SR_INVALID_PARAMS_LENGTH();
+        }
         for (uint256 i = 0; i < _pairs.length; i++) {
             amountOut += swapExactNFTsForTokens(_pairs[i], idsIns[i], amountOutMins[i], royaltyPercent, to, deadline);
         }
@@ -192,16 +195,15 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function batchSwapETHForExactNFTs(
         address[] calldata _pairs,
-        uint[][] calldata idsOuts,
-        uint[] calldata amountInMaxs,
-        uint royaltyPercent,
+        uint256[][] calldata idsOuts,
+        uint256[] calldata amountInMaxs,
+        uint256 royaltyPercent,
         address to,
-        uint deadline
-    ) external payable virtual checkDeadline(deadline) returns (uint amountIn) {
-        require(
-            _pairs.length == idsOuts.length && idsOuts.length == amountInMaxs.length,
-            'SeacowsRouter: INVALID_PARAMS_LENGTH'
-        );
+        uint256 deadline
+    ) external payable virtual checkDeadline(deadline) returns (uint256 amountIn) {
+        if (_pairs.length != idsOuts.length || idsOuts.length != amountInMaxs.length) {
+            revert SR_INVALID_PARAMS_LENGTH();
+        }
 
         IWETH(weth).deposit{value: msg.value}();
 
@@ -231,16 +233,15 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
      */
     function batchSwapExactNFTsForETH(
         address[] calldata _pairs,
-        uint[][] calldata idsIns,
-        uint[] calldata amountOutMins,
-        uint[] calldata royaltyPercent,
+        uint256[][] calldata idsIns,
+        uint256[] calldata amountOutMins,
+        uint256[] calldata royaltyPercent,
         address to,
-        uint deadline
-    ) external virtual checkDeadline(deadline) returns (uint amountOut) {
-        require(
-            _pairs.length == idsIns.length && idsIns.length == amountOutMins.length,
-            'SeacowsRouter: INVALID_PARAMS_LENGTH'
-        );
+        uint256 deadline
+    ) external virtual checkDeadline(deadline) returns (uint256 amountOut) {
+        if (_pairs.length != idsIns.length || idsIns.length != amountOutMins.length) {
+            revert SR_INVALID_PARAMS_LENGTH();
+        }
         for (uint256 i = 0; i < _pairs.length; i++) {
             amountOut += swapExactNFTsForTokens(
                 _pairs[i],
@@ -258,7 +259,9 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
 
     function _sendETH(address to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}('');
-        require(sent, 'Failed to send Ether');
+        if (sent == false) {
+            revert SR_ETH_TRANSFER_FAILED();
+        }
     }
 
     receive() external payable {}

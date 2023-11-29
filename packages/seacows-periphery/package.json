@@ -4,13 +4,14 @@
   "main": "index.ts",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf cache out",
+    "clean": "rimraf cache out \n hardhat clean",
     "compile": "hardhat compile",
     "deploy:dev:goerli": "hardhat deploy --env dev --network goerli",
-    "deploy:dev:mumbai": "hardhat deploy --env dev --network mumbai",
     "test": "hardhat test",
+    "coverage": "hardhat coverage",
     "size": "hardhat size-contracts",
-    "doc": "hardhat docgen",
+    "format": "prettier --write --plugin=prettier-plugin-solidity 'contracts/**/*.sol'",
+    "lint": "solhint 'contracts/**/*.sol'",
     "release": "npx standard-version --message 'chore(release): %s\n\n[skip ci]' --no-verify"
   },
   "devDependencies": {
@@ -55,18 +56,14 @@
     "hardhat-deploy": "^0.11.15",
     "hardhat-gas-reporter": "^1.0.8",
     "husky": "^8.0.3",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.8.8",
     "prettier-plugin-solidity": "^1.1.3",
     "rimraf": "^3.0.2",
-    "solhint": "^3.6.2",
-    "solhint-plugin-prettier": "^0.0.5",
+    "solhint": "^4.0.0",
     "solidity-coverage": "^0.8.4",
     "solmate": "^6.6.1",
     "ts-node": "^10.7.0",
     "typechain": "^8.1.1",
-    "typescript": "^5.2.2",
-    "solidity-docgen": "^0.6.0-beta.36"
+    "typescript": "*"
   },
   "dependencies": {
     "@yolominds/seacows-amm": "*",

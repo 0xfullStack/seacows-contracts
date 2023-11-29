@@ -1,19 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
+import {Initializable} from '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import {IERC3525Receiver} from '@solvprotocol/erc-3525/IERC3525Receiver.sol';
-import '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
-import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
-import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
-
-import {ERC3525} from '@solvprotocol/erc-3525/ERC3525.sol';
-import {IERC3525} from '@solvprotocol/erc-3525/IERC3525.sol';
-import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
+import {ERC721Holder} from '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
+import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import {ERC165} from '@openzeppelin/contracts/utils/introspection/ERC165.sol';
 import {ISeacowsPairMetadata} from '../interfaces/ISeacowsPairMetadata.sol';
 import {ISeacowsPositionManager} from '../interfaces/ISeacowsPositionManager.sol';
+import {SeacowsErrors} from './SeacowsErrors.sol';
 
-contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacowsPairMetadata, Initializable {
+contract SeacowsPairMetadata is
+    ERC165,
+    ERC721Holder,
+    SeacowsErrors,
+    IERC3525Receiver,
+    ISeacowsPairMetadata,
+    Initializable
+{
     address public collection;
     address public token;
 
@@ -25,10 +29,13 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
     address private _positionManager;
 
     modifier onlyPositionManager() {
-        require(_positionManager == msg.sender, 'SeacowsPairMetadata: ONLY_POSITION_MANAGER');
+        if (_positionManager != msg.sender) {
+            revert SPM_ONLY_POSITION_MANAGER();
+        }
         _;
     }
 
+    // solhint-disable-next-line func-name-mixedcase
     function __SeacowsPairMetadata_init(
         address positionManager_,
         address token_,
@@ -43,11 +50,11 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
         return ISeacowsPositionManager(_positionManager);
     }
 
-    function balanceOf(uint _tokenId) public view returns (uint256) {
+    function balanceOf(uint256 _tokenId) public view returns (uint256) {
         return positionManager().balanceOf(_tokenId);
     }
 
-    function ownerOf(uint _tokenId) public view returns (address) {
+    function ownerOf(uint256 _tokenId) public view returns (address) {
         return positionManager().ownerOf(_tokenId);
     }
 
@@ -73,7 +80,6 @@ contract SeacowsPairMetadata is ERC165, ERC721Holder, IERC3525Receiver, ISeacows
         uint256 _value,
         bytes calldata _data
     ) external pure returns (bytes4) {
-        // silence unused warning
         _operator;
         _fromTokenId;
         _toTokenId;

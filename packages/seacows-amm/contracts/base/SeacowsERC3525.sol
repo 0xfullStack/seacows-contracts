@@ -2,10 +2,10 @@
 pragma solidity ^0.8.13;
 
 // import { ERC3525SlotEnumerable } from "@solvprotocol/erc-3525/ERC3525.sol";
-import '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
+import {ERC721Holder} from '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
+import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import {ERC3525} from '@solvprotocol/erc-3525/ERC3525.sol';
-import {IERC3525} from '@solvprotocol/erc-3525/IERC3525.sol';
-import '@openzeppelin/contracts/utils/introspection/IERC165.sol';
+import {IERC165} from '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
 import {ISeacowsERC721TradePair} from '../interfaces/ISeacowsERC721TradePair.sol';
 

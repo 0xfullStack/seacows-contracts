@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 interface ISeacowsComplement {
+    // solhint-disable-next-line func-name-mixedcase
     function COMPLEMENT_PRECISION() external view returns (uint256);
 
     function caculateAssetsOutAfterComplemented(

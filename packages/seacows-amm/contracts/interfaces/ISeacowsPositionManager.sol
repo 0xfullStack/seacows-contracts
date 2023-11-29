@@ -3,10 +3,9 @@ pragma solidity ^0.8.13;
 
 import {ISeacowsERC721TradePairFactory} from './ISeacowsERC721TradePairFactory.sol';
 import {ISeacowsERC3525} from './ISeacowsERC3525.sol';
-import {ISeacowsCallback} from './ISeacowsCallback.sol';
 import {IFeeManagement} from './IFeeManagement.sol';
 
-interface ISeacowsPositionManager is ISeacowsERC3525, ISeacowsCallback, IFeeManagement, ISeacowsERC721TradePairFactory {
+interface ISeacowsPositionManager is ISeacowsERC3525, IFeeManagement, ISeacowsERC721TradePairFactory {
     event PairCreated(
         address indexed token,
         address indexed collection,

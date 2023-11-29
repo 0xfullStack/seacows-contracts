@@ -1,14 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
-import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
-import '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
-
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
+import {ERC721Holder} from '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
 import {SeacowsErrors} from './SeacowsErrors.sol';
-import {IWETH} from '../interfaces/IWETH.sol';
 
 contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
     event RegisterETH(address indexed owner, uint256 amount);
@@ -54,14 +51,14 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
         uint256[] memory tokenIds,
         address owner
     ) public onlyPositionManager nonReentrant {
-        for (uint i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             collections[collection][tokenIds[i]] = NFT(block.number, owner);
         }
         emit RegisterNFTs(owner, collection, tokenIds);
     }
 
     function batchWithdrawNFTs(address collection, uint256[] memory tokenIds) public nonReentrant {
-        for (uint i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             NFT memory nft = collections[collection][tokenId];
             if (nft.owner != msg.sender) {

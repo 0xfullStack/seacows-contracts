@@ -6,7 +6,7 @@ interface ISeacowsRewarder {
 
     function updateSwapFee() external;
 
-    function updatePositionFee(uint tokenId) external;
+    function updatePositionFee(uint256 tokenId) external;
 
-    function updatePositionFeeDebt(uint tokenId) external;
+    function updatePositionFeeDebt(uint256 tokenId) external;
 }

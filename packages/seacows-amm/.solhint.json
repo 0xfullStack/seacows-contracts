@@ -1,15 +1,10 @@
 {
-    "extends": "default",
-    "plugins": ["prettier"],
+    "extends": "solhint:recommended",
+    "plugins": [],
     "rules": {
-      "bracket-align": "warn",
-      "code-complexity": "warn",
-      "const-name-snakecase": "warn",
-      "expression-indent": "warn",
-      "function-max-lines": "warn",
-      "indent": "warn",
-      "max-line-length": "warn",
-      "statement-indent": "warn",
-      "prettier/prettier": "error"
+      "func-visibility": ["warn",{"ignoreConstructors":true}],
+      "quotes": ["error","single"],
+      "avoid-suicide": "error",
+      "avoid-sha3": "warn"
     }
   }

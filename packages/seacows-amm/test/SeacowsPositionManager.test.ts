@@ -119,8 +119,9 @@ describe('SeacowsPositionManager', () => {
       const ONE_PERCENT = 100;
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
 
-      await expect(manager.createPair(erc20.address, erc721.address, ONE_PERCENT)).to.be.revertedWith(
-        'Factory: Pair already exists',
+      await expect(manager.createPair(erc20.address, erc721.address, ONE_PERCENT)).to.revertedWithCustomError(
+        manager,
+        'STPF_PAIR_ALREADY_EXIST',
       );
     });
   });

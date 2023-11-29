@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
-import '@openzeppelin/contracts/interfaces/IERC2981.sol';
+import {IERC2981} from '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import {IRoyaltyManagement} from '../interfaces/IRoyaltyManagement.sol';
 import {IRoyaltyRegistry} from '../interfaces/IRoyaltyRegistry.sol';
 import {SeacowsPairMetadata} from './SeacowsPairMetadata.sol';
@@ -10,7 +10,9 @@ contract RoyaltyManagement is SeacowsPairMetadata, IRoyaltyManagement {
     uint256 public minRoyaltyFeePercent;
 
     modifier onlyRoyaltyFeeManager() {
-        require(msg.sender == royaltyFeeManager(), 'RoyaltyManagement: FORBIDDEN');
+        if (msg.sender != royaltyFeeManager()) {
+            revert RM_NON_ROYALTY_FEE_MANAGER();
+        }
         _;
     }
 

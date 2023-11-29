@@ -1,4 +1,3 @@
-// import chai from 'chai';
 import * as dotenv from 'dotenv';
 import { SupportedChain } from '@yolominds/seacows-sdk';
 
@@ -14,11 +13,9 @@ import 'hardhat-contract-sizer';
 import * as tdly from '@tenderly/hardhat-tenderly';
 import './tasks';
 import 'solidity-coverage';
-import 'solidity-docgen';
 
 tdly.setup();
 dotenv.config();
-// chai.use(solidity);
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -33,7 +30,6 @@ const config: HardhatUserConfig = {
   paths: {
     sources: './contracts',
     tests: './test',
-    // cache: "./cache_hardhat",
   },
   networks: {
     hardhat: {
@@ -42,13 +38,6 @@ const config: HardhatUserConfig = {
         auto: true,
         interval: 5000,
       },
-    },
-    mumbai: {
-      chainId: SupportedChain.MUMBAI,
-      url: process.env.MUMBAI_ALCHEMY_KEY
-        ? `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_ALCHEMY_KEY}`
-        : '',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     goerli: {
       chainId: SupportedChain.GÖRLI,
@@ -62,29 +51,10 @@ const config: HardhatUserConfig = {
     outDir: 'types',
     target: 'ethers-v5',
   },
-  gasReporter: {
-    // enabled: process.env.REPORT_GAS !== undefined,
-    enabled: false,
-    currency: 'USD',
-    token: 'MATIC',
-    gasPriceApi: 'https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice',
-  },
   etherscan: {
     apiKey: {
       goerli: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : '',
-      polygon: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
-      mumbai: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
     },
-    customChains: [
-      {
-        network: 'mumbai',
-        chainId: 80001,
-        urls: {
-          apiURL: 'https://api-testnet.polygonscan.com/api',
-          browserURL: 'https://mumbai.polygonscan.com',
-        },
-      },
-    ],
   },
   abiExporter: {
     path: 'abis',
@@ -106,7 +76,6 @@ const config: HardhatUserConfig = {
     project: 'seacows',
     privateVerification: false, // if true, contracts will be verified privately, if false, contracts will be verified publicly
   },
-  docgen: {},
 };
 
 export default config;

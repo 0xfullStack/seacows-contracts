@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.13;
 
+import {SeacowsErrors} from './SeacowsErrors.sol';
 import {IFeeManagement} from '../interfaces/IFeeManagement.sol';
 
-contract FeeManagement is IFeeManagement {
+contract FeeManagement is SeacowsErrors, IFeeManagement {
     address private _royaltyRegistry;
     address private _feeManager;
     address private _royaltyFeeManager;
-
     address private _feeTo;
 
     constructor() {
@@ -17,29 +17,37 @@ contract FeeManagement is IFeeManagement {
     }
 
     modifier onlyManager() {
-        require(msg.sender == feeManager(), 'FeeManagement: NON_FEE_MANAGER');
+        if (msg.sender != feeManager()) {
+            revert FM_NON_FEE_MANAGER();
+        }
         _;
     }
 
     modifier onlyRoyaltyFeeManager() {
-        require(msg.sender == feeManager(), 'FeeManagement: NON_ROYALTY_FEE_MANAGER');
+        if (msg.sender != royaltyFeeManager()) {
+            revert FM_NON_ROYALTY_FEE_MANAGER();
+        }
         _;
+    }
+
+    function feeTo() public view returns (address) {
+        return _feeTo;
     }
 
     function feeManager() public view returns (address) {
         return _feeManager;
     }
 
-    function royaltyRegistry() public view returns (address) {
-        return _royaltyRegistry;
-    }
-
     function royaltyFeeManager() public view returns (address) {
         return _royaltyFeeManager;
     }
 
-    function feeTo() public view returns (address) {
-        return _feeTo;
+    function royaltyRegistry() public view returns (address) {
+        return _royaltyRegistry;
+    }
+
+    function setFeeTo(address _to) public onlyManager {
+        _feeTo = _to;
     }
 
     function setFeeManager(address _to) public onlyManager {
@@ -47,14 +55,10 @@ contract FeeManagement is IFeeManagement {
     }
 
     function setRoyaltyFeeManager(address _to) public onlyRoyaltyFeeManager {
-        _feeManager = _to;
+        _royaltyFeeManager = _to;
     }
 
     function setRoyaltyRegistry(address _to) public onlyRoyaltyFeeManager {
         _royaltyRegistry = _to;
-    }
-
-    function setFeeTo(address _to) public onlyManager {
-        _feeTo = _to;
     }
 }

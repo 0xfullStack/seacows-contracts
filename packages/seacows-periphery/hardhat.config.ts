@@ -1,4 +1,3 @@
-// import chai from 'chai';
 import * as dotenv from 'dotenv';
 import { SupportedChain } from '@yolominds/seacows-sdk';
 
@@ -10,14 +9,13 @@ import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
+import 'hardhat-contract-sizer';
 import * as tdly from '@tenderly/hardhat-tenderly';
 import './tasks';
 import 'solidity-coverage';
-import 'solidity-docgen';
 
 tdly.setup();
 dotenv.config();
-// chai.use(solidity);
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -32,18 +30,14 @@ const config: HardhatUserConfig = {
   paths: {
     sources: './contracts',
     tests: './test',
-    // cache: "./cache_hardhat",
   },
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
-    },
-    mumbai: {
-      chainId: SupportedChain.MUMBAI,
-      url: process.env.MUMBAI_ALCHEMY_KEY
-        ? `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_ALCHEMY_KEY}`
-        : '',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      mining: {
+        auto: true,
+        interval: 5000,
+      },
     },
     goerli: {
       chainId: SupportedChain.GÖRLI,
@@ -57,45 +51,17 @@ const config: HardhatUserConfig = {
     outDir: 'types',
     target: 'ethers-v5',
   },
-  gasReporter: {
-    // enabled: process.env.REPORT_GAS !== undefined,
-    enabled: false,
-    currency: 'USD',
-    token: 'MATIC',
-    gasPriceApi: 'https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice',
-  },
   etherscan: {
     apiKey: {
       goerli: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : '',
-      polygon: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
-      mumbai: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
     },
-    customChains: [
-      {
-        network: 'mumbai',
-        chainId: 80001,
-        urls: {
-          apiURL: 'https://api-testnet.polygonscan.com/api',
-          browserURL: 'https://mumbai.polygonscan.com',
-        },
-      },
-    ],
   },
   abiExporter: {
     path: 'abis',
-    // path: '../../seacows-sdk/src/abis/amm',
     runOnCompile: true,
     clear: true,
     flat: true,
-    // except: [':@solvprotocol/erc-3525/IERC*'],
     only: [':Seacows*'],
-    // rename: (sourceName: string, contractName: string) => {
-    //   if (sourceName.match(/^@solvprotocol\/erc-3525/) != null) {
-    //     return 'ERC3525/' + contractName;
-    //   } else {
-    //     return contractName;
-    //   }
-    // },
     spacing: 2,
     pretty: false,
   },
@@ -104,7 +70,6 @@ const config: HardhatUserConfig = {
     project: 'seacows',
     privateVerification: false, // if true, contracts will be verified privately, if false, contracts will be verified publicly
   },
-  docgen: {},
 };
 
 export default config;
