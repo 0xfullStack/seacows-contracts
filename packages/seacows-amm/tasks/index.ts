@@ -3,7 +3,7 @@ import { deploy } from './deploy';
 import { mint } from './mint';
 import { initialize } from './initialize';
 
-task('deploy:seacows', 'Deploy Seacows Contracts')
+task('deploy:seacows', 'Deploy Seacows AMM Contracts')
   .addParam('env', 'The env of Seacows Protocol to deploy')
   .setAction(deploy);
 
