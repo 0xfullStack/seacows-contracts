@@ -67,7 +67,7 @@ contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
 
     /**
     @notice Collect Swap fee for Position NFT
-    @param _tokenId The Position NFT ID contract address
+    @param _tokenId The Position NFT tokenID
    */
     function collect(uint256 _tokenId) public returns (uint256 _fee) {
         updateSwapFee();

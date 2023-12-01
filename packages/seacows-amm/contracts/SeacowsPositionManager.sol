@@ -388,7 +388,7 @@ contract SeacowsPositionManager is
 
     /**
         @notice Burn a Position NFT. Only burnable when the liquidity is 0
-        @param tokenId The token ID to be burnt
+        @param tokenId The Position NFT TokenID to be burnt
      */
     function burn(uint256 tokenId) public {
         if (ownerOf(tokenId) != msg.sender) {

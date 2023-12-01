@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity =0.8.13;
 
-// import { ERC3525SlotEnumerable } from "@solvprotocol/erc-3525/ERC3525.sol";
 import {ERC721Holder} from '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
 import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import {ERC3525} from '@solvprotocol/erc-3525/ERC3525.sol';
@@ -9,9 +8,6 @@ import {IERC165} from '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
 import {ISeacowsERC721TradePair} from '../interfaces/ISeacowsERC721TradePair.sol';
 
-/// @title The base contract for an NFT/TOKEN AMM pair
-/// Inspired by 0xmons; Modified from https://github.com/sudoswap/lssvm
-/// @notice This implements the core swap logic from NFT to TOKEN
 contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
     mapping(address => uint256) public pairSlots;
     mapping(address => uint256) public pairTokenIds;
@@ -40,7 +36,7 @@ contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
     ) internal override {
         from_;
         to_;
-        value_; // slience unused warning
+        value_;
         if (slotPairs[slot_] != address(0)) {
             ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(slotPairs[slot_]);
             pair.updateSwapFee();

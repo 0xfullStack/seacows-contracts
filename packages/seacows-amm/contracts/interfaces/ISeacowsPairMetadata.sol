@@ -14,7 +14,6 @@ interface ISeacowsPairMetadata {
     function POINT_FIVE_PERCENT() external view returns (uint64);
 
     function MAX_PROTOCOL_FEE_PERCENT() external view returns (uint64);
-
     /* solhint-enable func-name-mixedcase */
 
     function totalSupply() external view returns (uint256);

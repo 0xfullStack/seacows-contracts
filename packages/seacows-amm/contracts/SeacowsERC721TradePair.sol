@@ -178,29 +178,19 @@ contract SeacowsERC721TradePair is
             }
 
             {
-                // scope avoids stack too deep errors
                 (uint256 balance0, uint256 balance1) = getComplementedBalance();
 
-                // NOTE: Aim to fix loss of precision in solidity when math division
-                // Original Formula:
-                // uint256 _totalFees = (balance0 * balance1 - _reserve0 * _reserve1) / balance1;
-                // absAmountIn = balance0 > reserve0 ? ((balance0 - reserve0) - _totalFees) : 0;
-                // require (absAmount * minTotalFeePercent() / PERCENTAGE_PRECISION <= totalFees, "INSUFFICIENT_MIN_FEE");
-
-                // Fixed Formula
-                // In order to reduce precision effect, we make math division happened in the end
                 uint256 _totalFees = (balance0 * balance1 - _reserve0 * _reserve1);
                 absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * balance1 - _totalFees : 0; //
                 absAmountOut = reserve0 > balance0 ? (reserve0 - balance0) * balance1 + _totalFees : 0;
 
                 {
-                    // scope avoids stack too deep errors
                     uint256 absAmount = Math.max(absAmountIn, absAmountOut);
                     if ((absAmount * minTotalFeePercent()) > (_totalFees * PERCENTAGE_PRECISION)) {
                         revert STP_INSUFFICIENT_MIN_FEE();
                     }
 
-                    // Make math division here
+                    // delay division to here to fix loss of precision
                     _totalFees /= balance1;
                     absAmountIn /= balance1;
                     absAmountOut /= balance1;
