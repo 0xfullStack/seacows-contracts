@@ -8,7 +8,7 @@
     "compile": "hardhat compile",
     "deploy:dev:goerli": "hardhat deploy:seacows --env dev --network goerli",
     "deploy:dev:sepolia": "hardhat deploy:seacows --env dev --network sepolia",
-    "deploy:production:mainnet": "hardhat deploy:seacows --env prod --network mainnet",
+    "deploy:prod:mainnet": "hardhat deploy:seacows --env prod --network mainnet",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "size": "hardhat size-contracts",
