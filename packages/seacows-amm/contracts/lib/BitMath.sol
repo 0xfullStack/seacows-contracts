@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.13;
+pragma solidity =0.8.13;
 
 /// @title BitMath
 /// @dev This library provides functionality for computing bit properties of an unsigned integer

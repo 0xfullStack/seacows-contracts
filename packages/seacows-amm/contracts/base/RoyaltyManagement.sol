@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.13;
+pragma solidity =0.8.13;
 
 import {IERC2981} from '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import {IRoyaltyManagement} from '../interfaces/IRoyaltyManagement.sol';

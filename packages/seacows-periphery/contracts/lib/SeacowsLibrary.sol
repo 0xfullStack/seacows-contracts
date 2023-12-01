@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.13;
+pragma solidity =0.8.13;
 
 library SeacowsLibrary {
     // given some amount of an asset and pair reserves, returns an equivalent amount of the other asset

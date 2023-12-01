@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity =0.8.13;
 
 import {IERC3525} from '@solvprotocol/erc-3525/IERC3525.sol';
 

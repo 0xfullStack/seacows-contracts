@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity =0.8.13;
 
 import {ISeacowsERC721TradePairFactory} from './ISeacowsERC721TradePairFactory.sol';
 import {ISeacowsERC3525} from './ISeacowsERC3525.sol';

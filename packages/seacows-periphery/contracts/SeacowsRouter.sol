@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.13;
+pragma solidity =0.8.13;
 
 import {ISeacowsERC721TradePair} from '@yolominds/seacows-amm/contracts/interfaces/ISeacowsERC721TradePair.sol';
 import {SeacowsSwapCallback} from './base/SeacowsSwapCallback.sol';
