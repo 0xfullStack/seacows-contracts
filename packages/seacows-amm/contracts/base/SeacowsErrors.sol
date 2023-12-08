@@ -71,7 +71,8 @@ contract SeacowsErrors {
     /**
      * SeacowsPairMetadata Errors
      */
-    error SPM_ONLY_POSITION_MANAGER();
+    error SPMD_ONLY_POSITION_MANAGER();
+    error SPMD_PAUSED();
 
     /**
      * FeeManagement Errors

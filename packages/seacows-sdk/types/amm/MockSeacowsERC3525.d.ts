@@ -34,9 +34,13 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     "mintValue(uint256,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
+    "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "pairSlots(address)": FunctionFragment;
     "pairTokenIds(address)": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
+    "renounceOwnership()": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setSlotPair(uint256,address)": FunctionFragment;
@@ -51,6 +55,8 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     "totalSupply()": FunctionFragment;
     "totalValueSupplyOf(uint256)": FunctionFragment;
     "transferFrom(uint256,address,uint256)": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
+    "unpause()": FunctionFragment;
     "valueDecimals()": FunctionFragment;
   };
 
@@ -96,6 +102,7 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     functionFragment: "onERC721Received",
     values: [string, string, BigNumberish, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
@@ -104,6 +111,12 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "pairTokenIds",
     values: [string]
+  ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "renounceOwnership",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -159,6 +172,11 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     values: [BigNumberish, string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "transferOwnership",
+    values: [string]
+  ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(
     functionFragment: "valueDecimals",
     values?: undefined
   ): string;
@@ -190,10 +208,17 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     functionFragment: "onERC721Received",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pairSlots", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pairTokenIds",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -238,6 +263,11 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "valueDecimals",
     data: BytesLike
   ): Result;
@@ -246,19 +276,25 @@ interface MockSeacowsERC3525Interface extends ethers.utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "ApprovalValue(uint256,address,uint256)": EventFragment;
+    "OwnershipTransferred(address,address)": EventFragment;
+    "Paused(address)": EventFragment;
     "SetMetadataDescriptor(address)": EventFragment;
     "SlotChanged(uint256,uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "TransferValue(uint256,uint256,uint256)": EventFragment;
+    "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalValue"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetMetadataDescriptor"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SlotChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferValue"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -284,6 +320,12 @@ export type ApprovalValueEvent = TypedEvent<
     _value: BigNumber;
   }
 >;
+
+export type OwnershipTransferredEvent = TypedEvent<
+  [string, string] & { previousOwner: string; newOwner: string }
+>;
+
+export type PausedEvent = TypedEvent<[string] & { account: string }>;
 
 export type SetMetadataDescriptorEvent = TypedEvent<
   [string] & { metadataDescriptor: string }
@@ -312,6 +354,8 @@ export type TransferValueEvent = TypedEvent<
     _value: BigNumber;
   }
 >;
+
+export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
 export class MockSeacowsERC3525 extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -431,6 +475,8 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
     ownerOf(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
@@ -439,6 +485,16 @@ export class MockSeacowsERC3525 extends BaseContract {
     pairSlots(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
@@ -527,6 +583,15 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     valueDecimals(overrides?: CallOverrides): Promise<[number]>;
   };
 
@@ -604,11 +669,23 @@ export class MockSeacowsERC3525 extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  owner(overrides?: CallOverrides): Promise<string>;
+
   ownerOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
+  renounceOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256)"(
     from_: string,
@@ -691,6 +768,15 @@ export class MockSeacowsERC3525 extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  transferOwnership(
+    newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  unpause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   valueDecimals(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
@@ -768,11 +854,19 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    owner(overrides?: CallOverrides): Promise<string>;
+
     ownerOf(tokenId_: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pause(overrides?: CallOverrides): Promise<void>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
+
+    renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
@@ -861,6 +955,13 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    transferOwnership(
+      newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    unpause(overrides?: CallOverrides): Promise<void>;
+
     valueDecimals(overrides?: CallOverrides): Promise<number>;
   };
 
@@ -918,6 +1019,28 @@ export class MockSeacowsERC3525 extends BaseContract {
       [BigNumber, string, BigNumber],
       { _tokenId: BigNumber; _operator: string; _value: BigNumber }
     >;
+
+    "OwnershipTransferred(address,address)"(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
+    OwnershipTransferred(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
+    "Paused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Paused(account?: null): TypedEventFilter<[string], { account: string }>;
 
     "SetMetadataDescriptor(address)"(
       metadataDescriptor?: string | null
@@ -980,6 +1103,12 @@ export class MockSeacowsERC3525 extends BaseContract {
       [BigNumber, BigNumber, BigNumber],
       { _fromTokenId: BigNumber; _toTokenId: BigNumber; _value: BigNumber }
     >;
+
+    "Unpaused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Unpaused(account?: null): TypedEventFilter<[string], { account: string }>;
   };
 
   estimateGas: {
@@ -1057,6 +1186,8 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     ownerOf(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
@@ -1065,6 +1196,16 @@ export class MockSeacowsERC3525 extends BaseContract {
     pairSlots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     pairTokenIds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
       from_: string,
@@ -1156,6 +1297,15 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     valueDecimals(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
@@ -1236,6 +1386,8 @@ export class MockSeacowsERC3525 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     ownerOf(
       tokenId_: BigNumberish,
       overrides?: CallOverrides
@@ -1249,6 +1401,16 @@ export class MockSeacowsERC3525 extends BaseContract {
     pairTokenIds(
       arg0: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -1342,6 +1504,15 @@ export class MockSeacowsERC3525 extends BaseContract {
       toTokenId_: BigNumberish,
       value_: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     valueDecimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;

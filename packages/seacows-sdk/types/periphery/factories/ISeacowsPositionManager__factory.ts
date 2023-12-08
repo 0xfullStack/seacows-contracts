@@ -417,6 +417,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "isPaused",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",

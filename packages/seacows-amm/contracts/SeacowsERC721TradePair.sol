@@ -63,7 +63,7 @@ contract SeacowsERC721TradePair is
         return (_feeTo != address(0) ? feePercent : 0) + protocolFeePercent + minRoyaltyFeePercent;
     }
 
-    function mint(uint256 toTokenId) public nonReentrant returns (uint256 liquidity) {
+    function mint(uint256 toTokenId) public whenNotPaused nonReentrant returns (uint256 liquidity) {
         (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
         (uint256 balance0, uint256 balance1) = getComplementedBalance();
         uint256 amount0 = uint256(balance0 - _reserve0);
@@ -87,7 +87,12 @@ contract SeacowsERC721TradePair is
         address from,
         address to,
         uint256[] memory _ids
-    ) public nonReentrant returns (uint256 cTokenOut, uint256 cNftOut, uint256 tokenOut, uint256[] memory idsOut) {
+    )
+        public
+        whenNotPaused
+        nonReentrant
+        returns (uint256 cTokenOut, uint256 cNftOut, uint256 tokenOut, uint256[] memory idsOut)
+    {
         from;
         (uint256 balance0, uint256 balance1) = getComplementedBalance();
 
@@ -147,7 +152,7 @@ contract SeacowsERC721TradePair is
         uint256[] memory idsOut,
         address to,
         bytes calldata data
-    ) external nonReentrant {
+    ) external whenNotPaused nonReentrant {
         if (tokenAmountOut <= 0 && idsOut.length <= 0) {
             revert STP_INSUFFICIENT_OUTPUT_AMOUNT();
         }

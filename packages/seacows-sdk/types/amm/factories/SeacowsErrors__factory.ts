@@ -24,6 +24,16 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "SPMD_ONLY_POSITION_MANAGER",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "SPMD_PAUSED",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
     type: "error",
   },
@@ -75,11 +85,6 @@ const _abi = [
   {
     inputs: [],
     name: "SPM_ONLY_PAIR_CAN_MINT",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "SPM_ONLY_POSITION_MANAGER",
     type: "error",
   },
   {
@@ -200,7 +205,7 @@ const _abi = [
 ];
 
 const _bytecode =
-  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220fdf08842d4624d2482042d4a9fb4e226f55e54dc20b5198d4dc24ef74b73df5264736f6c63430008120033";
+  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122023b24ce01f5e5b4edf1f812b60b72b631833c4e3cf049e6bc95a4c5325995c9a64736f6c634300080d0033";
 
 export class SeacowsErrors__factory extends ContractFactory {
   constructor(

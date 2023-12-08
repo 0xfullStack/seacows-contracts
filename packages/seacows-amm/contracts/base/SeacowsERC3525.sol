@@ -7,8 +7,9 @@ import {ERC3525} from '@solvprotocol/erc-3525/ERC3525.sol';
 import {IERC165} from '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
 import {ISeacowsERC721TradePair} from '../interfaces/ISeacowsERC721TradePair.sol';
+import {SeacowsLimitAccessControl} from './SeacowsLimitAccessControl.sol';
 
-contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder {
+contract SeacowsERC3525 is ISeacowsERC3525, ERC3525, ERC721Holder, SeacowsLimitAccessControl {
     mapping(address => uint256) public pairSlots;
     mapping(address => uint256) public pairTokenIds;
     mapping(uint256 => address) public slotPairs;

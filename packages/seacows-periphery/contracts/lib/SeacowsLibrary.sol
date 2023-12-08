@@ -2,7 +2,6 @@
 pragma solidity =0.8.13;
 
 library SeacowsLibrary {
-
     /**
         @notice Calculate another asset amount, based on an asset amount and pair reserves
         @param amountA One asset amount

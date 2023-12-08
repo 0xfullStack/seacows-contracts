@@ -452,4 +452,8 @@ contract SeacowsPositionManager is
         newSlot = _slotGenerator.current();
         pairSlots[_pair] = newSlot;
     }
+
+    function isPaused() external view returns (bool) {
+        return paused();
+    }
 }
