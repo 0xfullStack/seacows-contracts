@@ -1,4 +1,4 @@
-import { AddressZero, MaxUint256 } from '@ethersproject/constants';
+import { MaxUint256 } from '@ethersproject/constants';
 import { deployContract } from 'ethereum-waffle';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { getWithdrawAssetsOutMin, getSwapTokenInMax, getSwapTokenOutMin } from '@yolominds/seacows-sdk';
@@ -15,7 +15,7 @@ import {
   type MockRoyaltyRegistry,
   type SpeedBump,
 } from 'types';
-import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
+import { ONE_PERCENT } from './constants';
 import { type BigNumber } from 'ethers';
 
 describe('SeacowsLimitAccessControl', () => {
