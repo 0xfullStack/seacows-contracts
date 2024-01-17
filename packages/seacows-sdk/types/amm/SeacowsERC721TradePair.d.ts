@@ -52,8 +52,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "paused()": FunctionFragment;
     "positionInfos(uint256)": FunctionFragment;
     "positionManager()": FunctionFragment;
-    "price0CumulativeLast()": FunctionFragment;
-    "price1CumulativeLast()": FunctionFragment;
     "protocolFeePercent()": FunctionFragment;
     "royaltyFeeManager()": FunctionFragment;
     "royaltyRegistry()": FunctionFragment;
@@ -187,14 +185,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "positionManager",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "price0CumulativeLast",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "price1CumulativeLast",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -341,14 +331,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "positionManager",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "price0CumulativeLast",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "price1CumulativeLast",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -564,11 +546,7 @@ export class SeacowsERC721TradePair extends BaseContract {
     getReserves(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, number] & {
-        _reserve0: BigNumber;
-        _reserve1: BigNumber;
-        _blockTimestampLast: number;
-      }
+      [BigNumber, BigNumber] & { _reserve0: BigNumber; _reserve1: BigNumber }
     >;
 
     getRoyaltyRecipient(
@@ -628,10 +606,6 @@ export class SeacowsERC721TradePair extends BaseContract {
     >;
 
     positionManager(overrides?: CallOverrides): Promise<[string]>;
-
-    price0CumulativeLast(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    price1CumulativeLast(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     protocolFeePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -754,11 +728,7 @@ export class SeacowsERC721TradePair extends BaseContract {
   getReserves(
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, number] & {
-      _reserve0: BigNumber;
-      _reserve1: BigNumber;
-      _blockTimestampLast: number;
-    }
+    [BigNumber, BigNumber] & { _reserve0: BigNumber; _reserve1: BigNumber }
   >;
 
   getRoyaltyRecipient(
@@ -815,10 +785,6 @@ export class SeacowsERC721TradePair extends BaseContract {
   >;
 
   positionManager(overrides?: CallOverrides): Promise<string>;
-
-  price0CumulativeLast(overrides?: CallOverrides): Promise<BigNumber>;
-
-  price1CumulativeLast(overrides?: CallOverrides): Promise<BigNumber>;
 
   protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -953,11 +919,7 @@ export class SeacowsERC721TradePair extends BaseContract {
     getReserves(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, number] & {
-        _reserve0: BigNumber;
-        _reserve1: BigNumber;
-        _blockTimestampLast: number;
-      }
+      [BigNumber, BigNumber] & { _reserve0: BigNumber; _reserve1: BigNumber }
     >;
 
     getRoyaltyRecipient(
@@ -1014,10 +976,6 @@ export class SeacowsERC721TradePair extends BaseContract {
     >;
 
     positionManager(overrides?: CallOverrides): Promise<string>;
-
-    price0CumulativeLast(overrides?: CallOverrides): Promise<BigNumber>;
-
-    price1CumulativeLast(overrides?: CallOverrides): Promise<BigNumber>;
 
     protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1326,10 +1284,6 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     positionManager(overrides?: CallOverrides): Promise<BigNumber>;
 
-    price0CumulativeLast(overrides?: CallOverrides): Promise<BigNumber>;
-
-    price1CumulativeLast(overrides?: CallOverrides): Promise<BigNumber>;
-
     protocolFeePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
     royaltyFeeManager(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1522,14 +1476,6 @@ export class SeacowsERC721TradePair extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    price0CumulativeLast(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    price1CumulativeLast(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     protocolFeePercent(
       overrides?: CallOverrides

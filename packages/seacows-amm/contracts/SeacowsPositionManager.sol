@@ -85,7 +85,7 @@ contract SeacowsPositionManager is
         if (pair == address(0)) {
             revert SPM_PAIR_NOT_EXIST();
         }
-        (uint256 tokenReserve, uint256 nftReserve, ) = ISeacowsERC721TradePair(pair).getReserves();
+        (uint256 tokenReserve, uint256 nftReserve) = ISeacowsERC721TradePair(pair).getReserves();
         if (tokenReserve == 0 && nftReserve == 0) {
             if (idsDesired.length < 2) {
                 revert SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT();

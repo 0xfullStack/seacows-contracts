@@ -384,11 +384,6 @@ const _abi = [
         name: "_reserve1",
         type: "uint256",
       },
-      {
-        internalType: "uint32",
-        name: "_blockTimestampLast",
-        type: "uint32",
-      },
     ],
     stateMutability: "view",
     type: "function",

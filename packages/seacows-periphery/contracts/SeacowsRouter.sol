@@ -36,7 +36,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         uint256 deadline
     ) public checkDeadline(deadline) returns (uint256 amountIn) {
         ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_pair);
-        (uint256 tokenReserve, uint256 nftReserve, ) = pair.getReserves();
+        (uint256 tokenReserve, uint256 nftReserve) = pair.getReserves();
         amountIn = SeacowsLibrary.getAmountIn(
             idsOut.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,
@@ -99,7 +99,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         uint256 deadline
     ) public checkDeadline(deadline) returns (uint256 amountOut) {
         ISeacowsERC721TradePair pair = ISeacowsERC721TradePair(_pair);
-        (uint256 tokenReserve, uint256 nftReserve, ) = pair.getReserves();
+        (uint256 tokenReserve, uint256 nftReserve) = pair.getReserves();
         amountOut = SeacowsLibrary.getAmountOut(
             idsIn.length * pair.COMPLEMENT_PRECISION(),
             tokenReserve,

@@ -41,7 +41,7 @@ interface ISeacowsERC721TradePair is
 
     function initialize(address _collection, address _token, uint256 _fee) external;
 
-    function getReserves() external view returns (uint256 _reserve0, uint256 _reserve1, uint32 _blockTimestampLast);
+    function getReserves() external view returns (uint256 _reserve0, uint256 _reserve1);
 
     function mint(uint256 toTokenId) external returns (uint256 liquidity);
 

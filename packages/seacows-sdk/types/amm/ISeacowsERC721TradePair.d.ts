@@ -405,11 +405,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
     getReserves(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, number] & {
-        _reserve0: BigNumber;
-        _reserve1: BigNumber;
-        _blockTimestampLast: number;
-      }
+      [BigNumber, BigNumber] & { _reserve0: BigNumber; _reserve1: BigNumber }
     >;
 
     getRoyaltyRecipient(
@@ -529,11 +525,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
   getReserves(
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, number] & {
-      _reserve0: BigNumber;
-      _reserve1: BigNumber;
-      _blockTimestampLast: number;
-    }
+    [BigNumber, BigNumber] & { _reserve0: BigNumber; _reserve1: BigNumber }
   >;
 
   getRoyaltyRecipient(
@@ -660,11 +652,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
     getReserves(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, number] & {
-        _reserve0: BigNumber;
-        _reserve1: BigNumber;
-        _blockTimestampLast: number;
-      }
+      [BigNumber, BigNumber] & { _reserve0: BigNumber; _reserve1: BigNumber }
     >;
 
     getRoyaltyRecipient(

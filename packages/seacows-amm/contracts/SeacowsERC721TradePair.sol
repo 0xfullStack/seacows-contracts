@@ -27,10 +27,6 @@ contract SeacowsERC721TradePair is
     uint256 private reserve0;
     uint256 private reserve1;
 
-    uint32 private blockTimestampLast;
-    uint256 public price0CumulativeLast;
-    uint256 public price1CumulativeLast;
-
     function initialize(address token_, address collection_, uint256 fee_) public initializer {
         if (fee_ != ONE_PERCENT && fee_ != POINT_FIVE_PERCENT) {
             revert STP_INVALID_FEE();
@@ -46,10 +42,9 @@ contract SeacowsERC721TradePair is
         nftBalance = IERC721(collection).balanceOf(address(this)) * COMPLEMENT_PRECISION;
     }
 
-    function getReserves() public view returns (uint256 _reserve0, uint256 _reserve1, uint32 _blockTimestampLast) {
+    function getReserves() public view returns (uint256 _reserve0, uint256 _reserve1) {
         _reserve0 = reserve0;
         _reserve1 = reserve1;
-        _blockTimestampLast = blockTimestampLast;
     }
 
     function supportsInterface(
@@ -64,7 +59,7 @@ contract SeacowsERC721TradePair is
     }
 
     function mint(uint256 toTokenId) public whenNotPaused nonReentrant returns (uint256 liquidity) {
-        (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
+        (uint256 _reserve0, uint256 _reserve1) = getReserves();
         (uint256 balance0, uint256 balance1) = getComplementedBalance();
         uint256 amount0 = uint256(balance0 - _reserve0);
         uint256 amount1 = uint256(balance1 - _reserve1);
@@ -79,7 +74,7 @@ contract SeacowsERC721TradePair is
             revert STP_INSUFFICIENT_LIQUIDITY_MINTED();
         }
         _mint(toTokenId, liquidity);
-        _update(balance0, balance1, _reserve0, _reserve1);
+        _update(balance0, balance1);
         emit Mint(msg.sender, amount0, amount1);
     }
 
@@ -141,8 +136,7 @@ contract SeacowsERC721TradePair is
         (balance0, balance1) = getComplementedBalance();
 
         {
-            (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
-            _update(balance0, balance1, _reserve0, _reserve1);
+            _update(balance0, balance1);
         }
         emit Burn(msg.sender, cTokenOut, cNftOut, tokenOut, idsOut, to);
     }
@@ -161,7 +155,7 @@ contract SeacowsERC721TradePair is
         uint256 absAmountOut;
         uint256[] memory idsIn;
         {
-            (uint256 _reserve0, uint256 _reserve1, ) = getReserves();
+            (uint256 _reserve0, uint256 _reserve1) = getReserves();
             if (tokenAmountOut >= _reserve0 || idsOut.length * COMPLEMENT_PRECISION >= _reserve1) {
                 revert STP_INSUFFICIENT_LIQUIDITY();
             }
@@ -209,7 +203,7 @@ contract SeacowsERC721TradePair is
                 if (balance0 * balance1 < _reserve0 * _reserve1) {
                     revert STP_K();
                 }
-                _update(balance0, balance1, _reserve0, _reserve1);
+                _update(balance0, balance1);
             }
         }
         emit Swap(
@@ -245,22 +239,15 @@ contract SeacowsERC721TradePair is
 
     function sync() external nonReentrant {
         (uint256 balance0, uint256 balance1) = getComplementedBalance();
-        _update(balance0, balance1, reserve0, reserve1);
+        _update(balance0, balance1);
     }
 
-    function _update(uint256 balance0, uint256 balance1, uint256 _reserve0, uint256 _reserve1) private {
+    function _update(uint256 balance0, uint256 balance1) private {
         if (balance0 > type(uint256).max || balance1 > type(uint256).max) {
             revert STP_OVERFLOW();
         }
-        uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
-        uint32 timeElapsed = blockTimestamp - blockTimestampLast;
-        if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
-            price0CumulativeLast += (_reserve1 / _reserve0) * timeElapsed;
-            price1CumulativeLast += (_reserve0 / _reserve1) * timeElapsed;
-        }
         reserve0 = uint256(balance0);
         reserve1 = uint256(balance1);
-        blockTimestampLast = blockTimestamp;
         emit Sync(reserve0, reserve1);
     }
 
