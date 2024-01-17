@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.21.0 (2024-01-17)
+
+
+### Features
+
+* require condition to avoid user add/remove liquidity to not owned position ([#26](https://github.com/yolominds/seacows-contracts/issues/26)) ([b3f77f8](https://github.com/yolominds/seacows-contracts/commit/b3f77f8df210cdc0b3de71dd7da62d8b78abbee6))
+
 ### 1.20.17 (2023-12-11)
 
 ### 1.20.16 (2023-12-08)
