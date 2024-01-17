@@ -523,6 +523,8 @@ describe('SeacowsPositionManager', () => {
 
     it('Should revert for invalid token ID', async () => {
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('1'));
+
+      // use a non-existed tokenID
       await expect(
         manager
           .connect(alice)
@@ -534,6 +536,22 @@ describe('SeacowsPositionManager', () => {
             [4],
             ethers.utils.parseEther('1'),
             10,
+            MaxUint256,
+          ),
+      ).to.revertedWith('ERC3525: invalid token ID');
+
+      // use a existed tokenID, but belong to other users' or pool's
+      await expect(
+        manager
+          .connect(alice)
+          .addLiquidity(
+            erc20.address,
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            [4],
+            ethers.utils.parseEther('1'),
+            1,
             MaxUint256,
           ),
       ).to.revertedWithCustomError(manager, 'SPM_INVALID_TOKEN_ID');
@@ -616,10 +634,20 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('Should revert for invalid token ID', async () => {
+      // use a non-existed tokenID
       await expect(
         manager
           .connect(alice)
           .addLiquidityETH(erc721.address, ONE_PERCENT, [4], ethers.utils.parseEther('1'), 10, MaxUint256, {
+            value: ethers.utils.parseEther('1'),
+          }),
+      ).to.revertedWith('ERC3525: invalid token ID');
+
+      // use a existed tokenID, but belong to other users' or pool's
+      await expect(
+        manager
+          .connect(alice)
+          .addLiquidityETH(erc721.address, ONE_PERCENT, [4], ethers.utils.parseEther('1'), 1, MaxUint256, {
             value: ethers.utils.parseEther('1'),
           }),
       ).to.revertedWithCustomError(manager, 'SPM_INVALID_TOKEN_ID');
@@ -802,6 +830,8 @@ describe('SeacowsPositionManager', () => {
         100,
         alice,
       );
+
+      // use a non-existed tokenID
       await expect(
         manager
           .connect(alice)
@@ -812,6 +842,22 @@ describe('SeacowsPositionManager', () => {
             ethers.utils.parseEther('1'),
             { cTokenOutMin, cNftOutMin, nftIds: [2] },
             5,
+            alice.address,
+            MaxUint256,
+          ),
+      ).to.revertedWith('ERC3525: invalid token ID');
+
+      // use a existed tokenID, but belong to other users' or pool's
+      await expect(
+        manager
+          .connect(alice)
+          .removeLiquidity(
+            erc20.address,
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            { cTokenOutMin, cNftOutMin, nftIds: [2] },
+            1,
             alice.address,
             MaxUint256,
           ),
@@ -975,6 +1021,8 @@ describe('SeacowsPositionManager', () => {
         100,
         alice,
       );
+
+      // use a non-existed tokenID
       await expect(
         manager
           .connect(alice)
@@ -984,6 +1032,21 @@ describe('SeacowsPositionManager', () => {
             ethers.utils.parseEther('1'),
             { cTokenOutMin, cNftOutMin, nftIds: [2] },
             5,
+            alice.address,
+            MaxUint256,
+          ),
+      ).to.revertedWith('ERC3525: invalid token ID');
+
+      // use a existed tokenID, but belong to other users' or pool's
+      await expect(
+        manager
+          .connect(alice)
+          .removeLiquidityETH(
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            { cTokenOutMin, cNftOutMin, nftIds: [2] },
+            1,
             alice.address,
             MaxUint256,
           ),

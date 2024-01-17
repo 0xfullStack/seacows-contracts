@@ -129,9 +129,10 @@ contract SeacowsPositionManager is
         uint256 toTokenId,
         uint256 deadline
     ) public checkDeadline(deadline) returns (uint256 tokenAmount, uint256[] memory ids, uint256 liquidity) {
-        if (_exists(toTokenId) == false) {
+        if (ownerOf(toTokenId) != msg.sender) {
             revert SPM_INVALID_TOKEN_ID();
         }
+
         (tokenAmount, ids) = _addLiquidity(token, collection, fee, tokenDesired, idsDesired, tokenMin);
         address pair = getPair(token, collection, fee);
 
@@ -163,7 +164,7 @@ contract SeacowsPositionManager is
         uint256 toTokenId,
         uint256 deadline
     ) external payable checkDeadline(deadline) returns (uint256 tokenAmount, uint256[] memory ids, uint256 liquidity) {
-        if (_exists(toTokenId) == false) {
+        if (ownerOf(toTokenId) != msg.sender) {
             revert SPM_INVALID_TOKEN_ID();
         }
         (tokenAmount, ids) = _addLiquidity(WETH, collection, fee, msg.value, idsDesired, tokenMin);
@@ -287,7 +288,7 @@ contract SeacowsPositionManager is
         checkDeadline(deadline)
         returns (uint256 cTokenOut, uint256 cNftOut, uint256 tokenOut, uint256[] memory idsOut)
     {
-        if (_exists(fromTokenId) == false) {
+        if (ownerOf(fromTokenId) != msg.sender) {
             revert SPM_INVALID_TOKEN_ID();
         }
         address pair = getPair(token, collection, fee);

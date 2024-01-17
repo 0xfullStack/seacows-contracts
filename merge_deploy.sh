@@ -107,4 +107,4 @@ npx copyfiles -u 3 ../seacows-periphery/types/**/*.d.ts ../seacows-periphery/typ
 # - build
 rm -rf dist && npx tsc && npx copyfiles -u 1 types/**/*.d.ts dist/types
 
-echo "############################## Update Seacows SDK Once Finish ##############################"
+echo "############################## Update Seacows SDK Twice Finish ##############################"
