@@ -237,7 +237,7 @@ contract SeacowsERC721TradePair is
         if (balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) {
             revert STP_SKIM_QUANTITY_MISMATCH();
         }
-        IERC20(token).transfer(to, balance0 / reserve0);
+        IERC20(token).transfer(to, balance0 - reserve0);
         for (uint256 i = 0; i < ids.length; i++) {
             IERC721(collection).safeTransferFrom(address(this), to, ids[i]);
         }
