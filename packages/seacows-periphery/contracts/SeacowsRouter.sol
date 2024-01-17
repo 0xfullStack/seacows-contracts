@@ -72,11 +72,13 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         address to,
         uint256 deadline
     ) external payable checkDeadline(deadline) returns (uint256 amountIn) {
-        IWETH(weth).deposit{value: amountIn}();
-        IWETH(weth).transfer(_pair, amountIn);
-
+        IWETH(weth).deposit{value: msg.value}();
         amountIn = this.swapTokensForExactNFTs(_pair, idsOut, amountInMax, royaltyPercent, to, deadline);
-        _sendETH(msg.sender, msg.value - amountIn);
+        uint256 surplus = msg.value - amountIn;
+        if (surplus > 0) {
+            IWETH(weth).withdraw(surplus);
+            _sendETH(msg.sender, surplus);
+        }
     }
 
     /**
@@ -204,9 +206,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         if (_pairs.length != idsOuts.length || idsOuts.length != amountInMaxs.length) {
             revert SR_INVALID_PARAMS_LENGTH();
         }
-
         IWETH(weth).deposit{value: msg.value}();
-
         for (uint256 i = 0; i < _pairs.length; i++) {
             amountIn += this.swapTokensForExactNFTs(
                 _pairs[i],
@@ -217,10 +217,11 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
                 deadline
             );
         }
-
-        uint256 remainingAmount = msg.value - amountIn;
-        IWETH(weth).withdraw(remainingAmount);
-        _sendETH(msg.sender, remainingAmount);
+        uint256 surplus = msg.value - amountIn;
+        if (surplus > 0) {
+            IWETH(weth).withdraw(surplus);
+            _sendETH(msg.sender, surplus);
+        }
     }
 
     /**
