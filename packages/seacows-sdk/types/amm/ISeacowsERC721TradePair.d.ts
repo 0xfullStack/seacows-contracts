@@ -267,14 +267,12 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "CollectFee(uint256,uint256)": EventFragment;
     "Mint(address,uint256,uint256)": EventFragment;
     "Swap(address,uint256,uint256,uint256,uint256,address)": EventFragment;
-    "Sync(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Burn"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CollectFee"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Swap"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Sync"): EventFragment;
 }
 
 export type BurnEvent = TypedEvent<
@@ -309,10 +307,6 @@ export type SwapEvent = TypedEvent<
     nftOut: BigNumber;
     to: string;
   }
->;
-
-export type SyncEvent = TypedEvent<
-  [BigNumber, BigNumber] & { reserve0: BigNumber; reserve1: BigNumber }
 >;
 
 export class ISeacowsERC721TradePair extends BaseContract {
@@ -833,22 +827,6 @@ export class ISeacowsERC721TradePair extends BaseContract {
         nftOut: BigNumber;
         to: string;
       }
-    >;
-
-    "Sync(uint256,uint256)"(
-      reserve0?: null,
-      reserve1?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { reserve0: BigNumber; reserve1: BigNumber }
-    >;
-
-    Sync(
-      reserve0?: null,
-      reserve1?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { reserve0: BigNumber; reserve1: BigNumber }
     >;
   };
 

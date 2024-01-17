@@ -31,7 +31,6 @@ interface ISeacowsERC721TradePair is
         uint256 nftOut,
         address indexed to
     );
-    event Sync(uint256 reserve0, uint256 reserve1);
 
     function feePercent() external view returns (uint256);
 

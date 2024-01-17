@@ -181,11 +181,6 @@
   },
   {
     "inputs": [],
-    "name": "STP_OVERFLOW",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "STP_SKIM_QUANTITY_MISMATCH",
     "type": "error"
   },

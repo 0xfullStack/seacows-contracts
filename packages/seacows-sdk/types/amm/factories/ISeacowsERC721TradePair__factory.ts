@@ -141,25 +141,6 @@ const _abi = [
     type: "event",
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "reserve0",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "reserve1",
-        type: "uint256",
-      },
-    ],
-    name: "Sync",
-    type: "event",
-  },
-  {
     inputs: [],
     name: "COMPLEMENT_PRECISION",
     outputs: [

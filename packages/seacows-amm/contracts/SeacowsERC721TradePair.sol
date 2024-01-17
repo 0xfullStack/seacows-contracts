@@ -236,19 +236,10 @@ contract SeacowsERC721TradePair is
             IERC721(collection).safeTransferFrom(address(this), to, ids[i]);
         }
     }
-
-    function sync() external nonReentrant {
-        (uint256 balance0, uint256 balance1) = getComplementedBalance();
-        _update(balance0, balance1);
-    }
-
+    
     function _update(uint256 balance0, uint256 balance1) private {
-        if (balance0 > type(uint256).max || balance1 > type(uint256).max) {
-            revert STP_OVERFLOW();
-        }
         reserve0 = uint256(balance0);
         reserve1 = uint256(balance1);
-        emit Sync(reserve0, reserve1);
     }
 
     function _mint(uint256 toTokenId, uint256 _liquidity) private {

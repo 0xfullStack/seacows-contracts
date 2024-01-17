@@ -181,11 +181,6 @@
   },
   {
     "inputs": [],
-    "name": "STP_OVERFLOW",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "STP_SKIM_QUANTITY_MISMATCH",
     "type": "error"
   },
@@ -335,25 +330,6 @@
       }
     ],
     "name": "Swap",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "reserve0",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "reserve1",
-        "type": "uint256"
-      }
-    ],
-    "name": "Sync",
     "type": "event"
   },
   {
@@ -1069,13 +1045,6 @@
       }
     ],
     "name": "swap",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "sync",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

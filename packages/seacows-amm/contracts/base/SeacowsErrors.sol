@@ -57,8 +57,6 @@ contract SeacowsErrors {
 
     error STP_SKIM_QUANTITY_MISMATCH();
 
-    error STP_OVERFLOW();
-
     error STP_INSUFFICIENT_MIN_FEE();
 
     error STP_K();

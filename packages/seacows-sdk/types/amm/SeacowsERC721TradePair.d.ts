@@ -61,7 +61,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "slot()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "swap(uint256,uint256[],address,bytes)": FunctionFragment;
-    "sync()": FunctionFragment;
     "token()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "updatePositionFee(uint256)": FunctionFragment;
@@ -220,7 +219,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     functionFragment: "swap",
     values: [BigNumberish, BigNumberish[], string, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "sync", values?: undefined): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -360,7 +358,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "sync", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -385,7 +382,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "Initialized(uint8)": EventFragment;
     "Mint(address,uint256,uint256)": EventFragment;
     "Swap(address,uint256,uint256,uint256,uint256,address)": EventFragment;
-    "Sync(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Burn"): EventFragment;
@@ -393,7 +389,6 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Swap"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Sync"): EventFragment;
 }
 
 export type BurnEvent = TypedEvent<
@@ -430,10 +425,6 @@ export type SwapEvent = TypedEvent<
     nftOut: BigNumber;
     to: string;
   }
->;
-
-export type SyncEvent = TypedEvent<
-  [BigNumber, BigNumber] & { reserve0: BigNumber; reserve1: BigNumber }
 >;
 
 export class SeacowsERC721TradePair extends BaseContract {
@@ -644,10 +635,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    sync(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     token(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -820,10 +807,6 @@ export class SeacowsERC721TradePair extends BaseContract {
     idsOut: BigNumberish[],
     to: string,
     data: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  sync(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1014,8 +997,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    sync(overrides?: CallOverrides): Promise<void>;
-
     token(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1150,22 +1131,6 @@ export class SeacowsERC721TradePair extends BaseContract {
         nftOut: BigNumber;
         to: string;
       }
-    >;
-
-    "Sync(uint256,uint256)"(
-      reserve0?: null,
-      reserve1?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { reserve0: BigNumber; reserve1: BigNumber }
-    >;
-
-    Sync(
-      reserve0?: null,
-      reserve1?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { reserve0: BigNumber; reserve1: BigNumber }
     >;
   };
 
@@ -1318,10 +1283,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       idsOut: BigNumberish[],
       to: string,
       data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    sync(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1513,10 +1474,6 @@ export class SeacowsERC721TradePair extends BaseContract {
       idsOut: BigNumberish[],
       to: string,
       data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    sync(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
