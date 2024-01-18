@@ -5,6 +5,7 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {ERC721} from '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {Counters} from '@openzeppelin/contracts/utils/Counters.sol';
 import {SeacowsERC3525} from './base/SeacowsERC3525.sol';
 import {SeacowsERC721TradePairFactory} from './base/SeacowsERC721TradePairFactory.sol';
@@ -22,6 +23,7 @@ contract SeacowsPositionManager is
     ISeacowsPositionManager
 {
     using Counters for Counters.Counter;
+    using SafeERC20 for IERC20;
 
     uint256 public constant PERCENTAGE_PRECISION = 10 ** 4;
 
@@ -54,7 +56,7 @@ contract SeacowsPositionManager is
     }
 
     receive() external payable {
-        assert(msg.sender == WETH);
+        require(msg.sender == WETH);
     }
 
     /**
@@ -135,8 +137,8 @@ contract SeacowsPositionManager is
 
         (tokenAmount, ids) = _addLiquidity(token, collection, fee, tokenDesired, idsDesired, tokenMin);
         address pair = getPair(token, collection, fee);
-
-        IERC20(token).transferFrom(msg.sender, pair, tokenAmount);
+        IERC20 _token = IERC20(token); // solve stack too deep
+        _token.safeTransferFrom(msg.sender, pair, tokenAmount);
         for (uint256 i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
             unchecked {
@@ -170,7 +172,10 @@ contract SeacowsPositionManager is
         (tokenAmount, ids) = _addLiquidity(WETH, collection, fee, msg.value, idsDesired, tokenMin);
         address pair = getPair(WETH, collection, fee);
         IWETH(WETH).deposit{value: tokenAmount}();
-        assert(IWETH(WETH).transfer(pair, tokenAmount));
+
+        if (IWETH(WETH).transfer(pair, tokenAmount) == false) {
+            revert SPM_TOKEN_TRANSFER_FAILED();
+        }
 
         for (uint256 i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
@@ -181,10 +186,7 @@ contract SeacowsPositionManager is
 
         liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
         if (msg.value > tokenAmount) {
-            (bool success, ) = msg.sender.call{value: msg.value - tokenAmount}('');
-            if (success == false) {
-                revert SPM_ETH_TRANSFER_FAILED();
-            }
+            _sendETH(msg.sender, msg.value - tokenAmount);
         }
     }
 
@@ -263,12 +265,7 @@ contract SeacowsPositionManager is
         }
 
         IWETH(WETH).withdraw(tokenOut);
-
-        (bool success, ) = address(SPEED_BUMP).call{value: tokenOut}(new bytes(0));
-        if (success == false) {
-            revert SPM_ETH_TRANSFER_FAILED();
-        }
-
+        _sendETH(address(SPEED_BUMP), tokenOut);
         SPEED_BUMP.batchRegisterNFTs(collection, idsOut, to);
         SPEED_BUMP.registerETH(tokenOut, to);
         return (cTokenOut, cNftOut, tokenOut, idsOut);
@@ -320,12 +317,12 @@ contract SeacowsPositionManager is
         uint256[] memory idsDesired,
         uint256 tokenMin,
         uint256 deadline
-    ) external returns (uint256 tokenAmount, uint256[] memory ids, uint256 liquidity) {
+    ) external returns (uint256 newTokenId, uint256 tokenAmount, uint256[] memory ids, uint256 liquidity) {
         address pair = getPair(token, collection, fee);
         if (pair == address(0)) {
             pair = createPair(token, collection, fee);
         }
-        uint256 tokenId = _mint(msg.sender, pairSlots[pair], 0);
+        newTokenId = _mint(msg.sender, pairSlots[pair], 0);
         (tokenAmount, ids, liquidity) = addLiquidity(
             token,
             collection,
@@ -333,7 +330,7 @@ contract SeacowsPositionManager is
             tokenDesired,
             idsDesired,
             tokenMin,
-            tokenId,
+            newTokenId,
             deadline
         );
     }
@@ -353,15 +350,22 @@ contract SeacowsPositionManager is
         uint256[] memory idsDesired,
         uint256 tokenMin,
         uint256 deadline
-    ) external payable checkDeadline(deadline) returns (uint256 tokenAmount, uint256[] memory ids, uint256 liquidity) {
+    )
+        external
+        payable
+        checkDeadline(deadline)
+        returns (uint256 newTokenId, uint256 tokenAmount, uint256[] memory ids, uint256 liquidity)
+    {
         address pair = getPair(WETH, collection, fee);
         if (pair == address(0)) {
             pair = createPair(WETH, collection, fee);
         }
-        uint256 toTokenId = _mint(msg.sender, pairSlots[pair], 0);
+        newTokenId = _mint(msg.sender, pairSlots[pair], 0);
         (tokenAmount, ids) = _addLiquidity(WETH, collection, fee, msg.value, idsDesired, tokenMin);
         IWETH(WETH).deposit{value: tokenAmount}();
-        assert(IWETH(WETH).transfer(pair, tokenAmount));
+        if (IWETH(WETH).transfer(pair, tokenAmount) == false) {
+            revert SPM_TOKEN_TRANSFER_FAILED();
+        }
 
         for (uint256 i; i < idsDesired.length; ) {
             IERC721(collection).safeTransferFrom(msg.sender, pair, idsDesired[i]);
@@ -371,12 +375,9 @@ contract SeacowsPositionManager is
             }
         }
 
-        liquidity = ISeacowsERC721TradePair(pair).mint(toTokenId);
+        liquidity = ISeacowsERC721TradePair(pair).mint(newTokenId);
         if (msg.value > tokenAmount) {
-            (bool success, ) = msg.sender.call{value: msg.value - tokenAmount}('');
-            if (success == false) {
-                revert SPM_ETH_TRANSFER_FAILED();
-            }
+            _sendETH(msg.sender, msg.value - tokenAmount);
         }
     }
 
@@ -452,6 +453,13 @@ contract SeacowsPositionManager is
         _slotGenerator.increment();
         newSlot = _slotGenerator.current();
         pairSlots[_pair] = newSlot;
+    }
+
+    function _sendETH(address to, uint256 amount) internal {
+        (bool sent, ) = to.call{value: amount}('');
+        if (sent == false) {
+            revert SPM_ETH_TRANSFER_FAILED();
+        }
     }
 
     function isPaused() external view returns (bool) {

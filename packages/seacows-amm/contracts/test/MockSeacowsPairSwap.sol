@@ -3,11 +3,14 @@ pragma solidity =0.8.13;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {ISeacowsSwapCallback} from '@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol';
 import {ISeacowsERC721TradePair} from '../interfaces/ISeacowsERC721TradePair.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 contract MockSeacowsPairSwap is ISeacowsSwapCallback {
+    using SafeERC20 for IERC20;
+
     function swap(
         address pair,
         uint tokenAmountOut,
@@ -25,7 +28,7 @@ contract MockSeacowsPairSwap is ISeacowsSwapCallback {
         address _token = ISeacowsERC721TradePair(msg.sender).token();
         address _collection = ISeacowsERC721TradePair(msg.sender).collection();
 
-        if (tokenAmountIn > 0) IERC20(_token).transferFrom(sender, msg.sender, tokenAmountIn);
+        if (tokenAmountIn > 0) IERC20(_token).safeTransferFrom(sender, msg.sender, tokenAmountIn);
         if (idsIn.length > 0) {
             for (uint i = 0; i < idsIn.length; i++) {
                 IERC721(_collection).safeTransferFrom(sender, msg.sender, idsIn[i]);

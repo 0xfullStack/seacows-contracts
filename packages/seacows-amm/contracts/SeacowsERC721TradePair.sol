@@ -3,6 +3,7 @@ pragma solidity =0.8.13;
 import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import {Math} from '@openzeppelin/contracts/utils/math/Math.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {IERC165} from '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import {ISeacowsSwapCallback} from '@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol';
@@ -21,9 +22,10 @@ contract SeacowsERC721TradePair is
     RoyaltyManagement,
     ISeacowsERC721TradePair
 {
+    using SafeERC20 for IERC20;
+
     uint256 public feePercent;
     uint256 public protocolFeePercent;
-
     uint256 private reserve0;
     uint256 private reserve1;
 
@@ -114,7 +116,7 @@ contract SeacowsERC721TradePair is
         if (_ids.length < nftAmountOut) {
             revert STP_EXCEED_NFT_OUT_MAX();
         }
-        IERC20(token).transfer(to, tokenOut);
+        IERC20(token).safeTransfer(to, tokenOut);
 
         {
             idsOut = new uint256[](nftAmountOut);
@@ -168,7 +170,7 @@ contract SeacowsERC721TradePair is
             if (to == token || to == collection) {
                 revert STP_INVALID_TO();
             }
-            if (tokenAmountOut > 0) IERC20(token).transfer(to, tokenAmountOut);
+            if (tokenAmountOut > 0) IERC20(token).safeTransfer(to, tokenAmountOut);
             if (idsOut.length > 0) {
                 for (uint256 i = 0; i < idsOut.length; i++) {
                     IERC721(collection).safeTransferFrom(address(this), to, idsOut[i]);
@@ -231,12 +233,12 @@ contract SeacowsERC721TradePair is
         if (balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) {
             revert STP_SKIM_QUANTITY_MISMATCH();
         }
-        IERC20(token).transfer(to, balance0 - reserve0);
+        IERC20(token).safeTransfer(to, balance0 - reserve0);
         for (uint256 i = 0; i < ids.length; i++) {
             IERC721(collection).safeTransferFrom(address(this), to, ids[i]);
         }
     }
-    
+
     function _update(uint256 balance0, uint256 balance1) private {
         reserve0 = uint256(balance0);
         reserve1 = uint256(balance1);
@@ -254,7 +256,7 @@ contract SeacowsERC721TradePair is
         address _feeTo = positionManager().feeTo();
         protocolFee = (_amount * protocolFeePercent) / PERCENTAGE_PRECISION;
         if (_feeTo != address(0)) {
-            IERC20(token).transfer(_feeTo, protocolFee);
+            IERC20(token).safeTransfer(_feeTo, protocolFee);
         }
     }
 
@@ -267,10 +269,10 @@ contract SeacowsERC721TradePair is
         if (_amount != 0 && isRoyaltySupported()) {
             uint256 feePerToken = _amount / (idsOut.length + idsIn.length);
             for (uint256 i = 0; i < idsOut.length; i++) {
-                IERC20(token).transfer(getRoyaltyRecipient(idsOut[i]), feePerToken);
+                IERC20(token).safeTransfer(getRoyaltyRecipient(idsOut[i]), feePerToken);
             }
             for (uint256 i = 0; i < idsIn.length; i++) {
-                IERC20(token).transfer(getRoyaltyRecipient(idsIn[i]), feePerToken);
+                IERC20(token).safeTransfer(getRoyaltyRecipient(idsIn[i]), feePerToken);
             }
         }
     }

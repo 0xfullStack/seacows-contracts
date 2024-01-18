@@ -2,12 +2,15 @@
 pragma solidity =0.8.13;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {ReentrancyGuardUpgradeable} from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import {ERC721Holder} from '@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol';
 import {SeacowsErrors} from './SeacowsErrors.sol';
 
 contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
+    using SafeERC20 for IERC20;
+
     event RegisterETH(address indexed owner, uint256 amount);
     event RegisterToken(address indexed owner, address indexed token, uint256 amount);
     event RegisterNFTs(address indexed owner, address indexed collection, uint256[] tokenIds);
@@ -91,10 +94,7 @@ contract SpeedBump is ReentrancyGuardUpgradeable, ERC721Holder, SeacowsErrors {
             revert SSB_INSUFFICIENT_AMOUNT();
         }
         delete tokens[token][msg.sender];
-        bool success = IERC20(token).transfer(msg.sender, _token.amount);
-        if (success == false) {
-            revert SSB_TOKEN_TRANSFER_FAILED();
-        }
+        IERC20(token).safeTransfer(msg.sender, _token.amount);
         emit WithdrawToken(msg.sender, token, _token.amount);
     }
 

@@ -2,6 +2,7 @@
 pragma solidity =0.8.13;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {ISeacowsERC721TradePair} from '@yolominds/seacows-amm/contracts/interfaces/ISeacowsERC721TradePair.sol';
 import {ISeacowsPositionManager} from '@yolominds/seacows-amm/contracts/interfaces/ISeacowsPositionManager.sol';
@@ -10,6 +11,8 @@ import {PeripheryImmutableState} from './PeripheryImmutableState.sol';
 import {SeacowsErrors} from './SeacowsErrors.sol';
 
 contract SeacowsSwapCallback is PeripheryImmutableState, SeacowsErrors, ISeacowsSwapCallback {
+    using SafeERC20 for IERC20;
+
     struct SwapCallbackData {
         address payer;
         uint256[] idsIn;
@@ -33,9 +36,7 @@ contract SeacowsSwapCallback is PeripheryImmutableState, SeacowsErrors, ISeacows
         if (ISeacowsPositionManager(manager).getPair(_token, _collection, _pair.feePercent()) != msg.sender) {
             revert SSC_PAIR_MISMATCH();
         }
-        if (tokenAmountIn > 0) {
-            IERC20(_token).transferFrom(callback.payer, msg.sender, tokenAmountIn);
-        }
+        if (tokenAmountIn > 0) IERC20(_token).safeTransferFrom(callback.payer, msg.sender, tokenAmountIn);
         if (idsIn.length > 0) {
             for (uint256 i = 0; i < idsIn.length; i++) {
                 IERC721(_collection).safeTransferFrom(callback.payer, msg.sender, idsIn[i]);

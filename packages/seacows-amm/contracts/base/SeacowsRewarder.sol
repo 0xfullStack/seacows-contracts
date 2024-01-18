@@ -2,12 +2,14 @@
 pragma solidity =0.8.13;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {ISeacowsRewarder} from '../interfaces/ISeacowsRewarder.sol';
 import {SeacowsPairMetadata} from './SeacowsPairMetadata.sol';
 
 contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
-    uint256 public accRewardPerShare;
+    using SafeERC20 for IERC20;
 
+    uint256 public accRewardPerShare;
     uint256 public feeBalance;
     uint256 public lastFeeBalance;
 
@@ -81,7 +83,7 @@ contract SeacowsRewarder is ISeacowsRewarder, SeacowsPairMetadata {
         _fee = _feeAmount > feeBalance ? feeBalance : _feeAmount;
         lastFeeBalance -= _fee;
         feeBalance -= _fee;
-        IERC20(token).transfer(ownerOf(_tokenId), _fee);
+        IERC20(token).safeTransfer(ownerOf(_tokenId), _fee);
 
         emit CollectFee(_tokenId, _fee);
     }

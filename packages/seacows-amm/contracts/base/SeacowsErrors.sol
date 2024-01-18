@@ -22,6 +22,7 @@ contract SeacowsErrors {
     error SPM_INSUFFICIENT_LIQUIDITY();
 
     error SPM_ETH_TRANSFER_FAILED();
+    error SPM_TOKEN_TRANSFER_FAILED();
 
     error SPM_BELOW_TOKEN_OUT_MIN_CONSTRAINT();
 
@@ -93,6 +94,4 @@ contract SeacowsErrors {
     error SSB_INSUFFICIENT_AMOUNT();
 
     error SSB_ETH_TRANSFER_FAILED();
-
-    error SSB_TOKEN_TRANSFER_FAILED();
 }
