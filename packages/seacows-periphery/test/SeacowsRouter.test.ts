@@ -165,7 +165,7 @@ describe('SeacowsRouter', () => {
       );
 
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('3'));
-      expect((await pair.getComplementedBalance())[0]).to.be.equal(ethers.utils.parseEther('3'));
+      expect((await pair.getBalances())[0]).to.be.equal(ethers.utils.parseEther('3'));
       expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('1.545754500000000001'));
 
       await router
@@ -175,7 +175,7 @@ describe('SeacowsRouter', () => {
         });
 
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4.530450000000000001'));
-      expect((await pair.getComplementedBalance())[0]).to.be.equal(ethers.utils.parseEther('4.515450000000000001'));
+      expect((await pair.getBalances())[0]).to.be.equal(ethers.utils.parseEther('4.515450000000000001'));
       expect(await erc721.ownerOf(1)).to.be.equal(bob.address);
     });
 
@@ -205,7 +205,7 @@ describe('SeacowsRouter', () => {
         );
 
       expect(await weth.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('9.137563635000000003'));
-      expect((await pair.getComplementedBalance())[0]).to.be.equal(ethers.utils.parseEther('9.077409135000000003'));
+      expect((await pair.getBalances())[0]).to.be.equal(ethers.utils.parseEther('9.077409135000000003'));
       expect(await erc721.ownerOf(2)).to.be.equal(bob.address);
     });
 
@@ -349,7 +349,7 @@ describe('SeacowsRouter', () => {
         );
 
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('4.530450000000000001'));
-      const [tokenBalance] = await pair.getComplementedBalance();
+      const [tokenBalance] = await pair.getBalances();
       expect(tokenBalance).to.be.equal(ethers.utils.parseEther('4.515450000000000001'));
 
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('8.4695499999999999990'));
@@ -380,7 +380,7 @@ describe('SeacowsRouter', () => {
         );
 
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('9.137563635000000003'));
-      const [tokenBalance] = await pair.getComplementedBalance();
+      const [tokenBalance] = await pair.getBalances();
       expect(tokenBalance).to.be.equal(ethers.utils.parseEther('9.077409135000000003'));
 
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('3.862436364999999997'));
@@ -831,7 +831,7 @@ describe('SeacowsRouter', () => {
         );
 
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('9.121800000000000001'));
-      const [tokenBalance] = await pair.getComplementedBalance();
+      const [tokenBalance] = await pair.getBalances();
       expect(tokenBalance).to.be.equal(ethers.utils.parseEther('9.061800000000000001'));
 
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('3.878199999999999999'));

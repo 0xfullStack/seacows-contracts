@@ -36,7 +36,7 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "collection()": FunctionFragment;
     "feeBalance()": FunctionFragment;
     "feePercent()": FunctionFragment;
-    "getComplementedBalance()": FunctionFragment;
+    "getBalances()": FunctionFragment;
     "getPendingFee(uint256)": FunctionFragment;
     "getReserves()": FunctionFragment;
     "getRoyaltyRecipient(uint256)": FunctionFragment;
@@ -129,7 +129,7 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getComplementedBalance",
+    functionFragment: "getBalances",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -280,7 +280,7 @@ interface SeacowsERC721TradePairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "feeBalance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feePercent", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getComplementedBalance",
+    functionFragment: "getBalances",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -520,13 +520,10 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getComplementedBalance(
+    getBalances(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & {
-        tokenBalance: BigNumber;
-        nftBalance: BigNumber;
-      }
+      [BigNumber, BigNumber] & { _balance0: BigNumber; _balance1: BigNumber }
     >;
 
     getPendingFee(
@@ -701,10 +698,10 @@ export class SeacowsERC721TradePair extends BaseContract {
 
   feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getComplementedBalance(
+  getBalances(
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber] & { tokenBalance: BigNumber; nftBalance: BigNumber }
+    [BigNumber, BigNumber] & { _balance0: BigNumber; _balance1: BigNumber }
   >;
 
   getPendingFee(
@@ -885,13 +882,10 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getComplementedBalance(
+    getBalances(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & {
-        tokenBalance: BigNumber;
-        nftBalance: BigNumber;
-      }
+      [BigNumber, BigNumber] & { _balance0: BigNumber; _balance1: BigNumber }
     >;
 
     getPendingFee(
@@ -1184,7 +1178,7 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getComplementedBalance(overrides?: CallOverrides): Promise<BigNumber>;
+    getBalances(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPendingFee(
       _tokenId: BigNumberish,
@@ -1365,9 +1359,7 @@ export class SeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getComplementedBalance(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getBalances(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getPendingFee(
       _tokenId: BigNumberish,

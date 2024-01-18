@@ -247,7 +247,7 @@ describe('SeacowsPositionManager', () => {
 
       // Verify Position NFT owned by Alice
       expect(await manager.ownerOf(2)).to.be.equal(alice.address);
-      const [balance0, balance1] = await pair.getComplementedBalance();
+      const [balance0, balance1] = await pair.getBalances();
       const liquidity = sqrt(balance0.mul(balance1));
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(liquidity);
 
@@ -391,7 +391,7 @@ describe('SeacowsPositionManager', () => {
 
       // Verify Position NFT owned by Alice
       expect(await manager.ownerOf(2)).to.be.equal(alice.address);
-      const [balance0, balance1] = await pair.getComplementedBalance();
+      const [balance0, balance1] = await pair.getBalances();
       const liquidity = sqrt(balance0.mul(balance1));
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(liquidity);
 

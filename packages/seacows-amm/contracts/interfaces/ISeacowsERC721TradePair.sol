@@ -36,7 +36,7 @@ interface ISeacowsERC721TradePair is
 
     function protocolFeePercent() external view returns (uint256);
 
-    function getComplementedBalance() external view returns (uint256 tokenBalance, uint256 nftBalance);
+    function getBalances() external view returns (uint256 _balance0, uint256 _balance1);
 
     function initialize(address _collection, address _token, uint256 _fee) external;
 

@@ -136,7 +136,7 @@ describe('SeacowsERC721TradePair', () => {
 
       const totalSupply = await pair.totalSupply();
       const [reserve0, reserve1] = await pair.getReserves();
-      const [balance0, balance1] = await pair.getComplementedBalance();
+      const [balance0, balance1] = await pair.getBalances();
       const liquidity1 = balance0.sub(reserve0).mul(totalSupply).div(reserve0);
       const liquidity2 = balance1.sub(reserve1).mul(totalSupply).div(reserve1);
       const expectedLiquidityToMint = liquidity1.lte(liquidity2) ? liquidity1 : liquidity2;

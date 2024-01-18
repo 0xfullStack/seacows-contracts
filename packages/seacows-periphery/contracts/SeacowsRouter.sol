@@ -26,6 +26,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountIn The amount of ERC20 token user input
      */
     function swapTokensForExactNFTs(
         address _pair,
@@ -63,6 +64,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountIn The amount of eth user input
      */
     function swapETHForExactNFTs(
         address _pair,
@@ -89,6 +91,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the ERC20 swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountOut The amount of ERC20 token user got
      */
     function swapExactNFTsForTokens(
         address _pair,
@@ -122,6 +125,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the ETH swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountOut The amount of eth user got
      */
     function swapExactNFTsForETH(
         address _pair,
@@ -144,6 +148,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountIn The total amount of ERC20 token user input
      */
     function batchSwapTokensForExactNFTs(
         address[] calldata _pairs,
@@ -169,6 +174,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the ERC20 swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountOut The total amount of ERC20 token user got
      */
     function batchSwapExactNFTsForTokens(
         address[] calldata _pairs,
@@ -194,6 +200,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param royaltyPercent The Royalty Percentage. The percentage is based on the PERCENTAGE_PRECISION
         @param to The address that receive the NFTs swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountIn The total amount of eth user input
      */
     function batchSwapETHForExactNFTs(
         address[] calldata _pairs,
@@ -231,6 +238,7 @@ contract SeacowsRouter is PeripheryImmutableState, SeacowsSwapCallback, ISeacows
         @param amountOutMins The array of min amount of ETH to swap out
         @param to The address that receive the ETH swapped out
         @param deadline The timestamp of deadline in seconds
+        @return amountOut The total amount of eth user got
      */
     function batchSwapExactNFTsForETH(
         address[] calldata _pairs,

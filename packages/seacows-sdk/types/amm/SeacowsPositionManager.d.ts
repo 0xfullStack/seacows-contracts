@@ -1354,7 +1354,8 @@ export class SeacowsPositionManager extends BaseContract {
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber[], BigNumber] & {
+      [BigNumber, BigNumber, BigNumber[], BigNumber] & {
+        newTokenId: BigNumber;
         tokenAmount: BigNumber;
         ids: BigNumber[];
         liquidity: BigNumber;
@@ -1375,7 +1376,8 @@ export class SeacowsPositionManager extends BaseContract {
       deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber[], BigNumber] & {
+      [BigNumber, BigNumber, BigNumber[], BigNumber] & {
+        newTokenId: BigNumber;
         tokenAmount: BigNumber;
         ids: BigNumber[];
         liquidity: BigNumber;

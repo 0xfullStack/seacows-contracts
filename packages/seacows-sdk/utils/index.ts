@@ -189,7 +189,7 @@ const getWithdrawAssetsOutMin = async (
   const pairContract =
     typeof pair === 'string' ? (new Contract(pair, PAIR_ABI, signerOrProvider) as SeacowsERC721TradePair) : pair;
 
-  const [tokenBalance, nftBalance] = await pairContract.getComplementedBalance();
+  const [tokenBalance, nftBalance] = await pairContract.getBalances();
 
   const totalSupply = await pairContract.totalSupply();
 

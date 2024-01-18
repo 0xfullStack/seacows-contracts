@@ -220,7 +220,7 @@ describe('SeacowsRewarder', () => {
      * ERC721: [0, 1, 2, 5, 6, 7]
      */
     expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('24.060000000000000002'));
-    const [tokenBalance] = await pair.getComplementedBalance();
+    const [tokenBalance] = await pair.getBalances();
     expect(tokenBalance).to.be.equal(ethers.utils.parseEther('24.000000000000000002'));
 
     expect(await erc721.balanceOf(pair.address)).to.be.equal(6);

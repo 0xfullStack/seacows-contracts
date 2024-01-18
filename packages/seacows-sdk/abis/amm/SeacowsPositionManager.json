@@ -107,6 +107,11 @@
   },
   {
     "inputs": [],
+    "name": "SPM_TOKEN_TRANSFER_FAILED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SPM_UNAUTHORIZED",
     "type": "error"
   },
@@ -123,11 +128,6 @@
   {
     "inputs": [],
     "name": "SSB_ONE_MORE_BLOCK_AT_LEAST",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "SSB_TOKEN_TRANSFER_FAILED",
     "type": "error"
   },
   {
@@ -954,6 +954,11 @@
     "outputs": [
       {
         "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "tokenAmount",
         "type": "uint256"
       },
@@ -1019,6 +1024,11 @@
     ],
     "name": "mintWithETH",
     "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "tokenAmount",

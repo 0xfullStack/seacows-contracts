@@ -64,6 +64,7 @@ contract SeacowsPositionManager is
         @param _token The ERC20 contract address
         @param _collection The ERC721 contract address
         @param _fee The fee tier. Please check TradePair for the fee tiers.
+        @return _pair The new created pair address
      */
     function createPair(address _token, address _collection, uint256 _fee) public returns (address _pair) {
         _pair = _createPair(_token, _collection, _fee);
@@ -120,6 +121,9 @@ contract SeacowsPositionManager is
         @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
         @param toTokenId The position NFT that is used to store the liquidity.
         @param deadline The timestamp of deadline in seconds
+        @return tokenAmount The amount of ERC20 token user added
+        @return ids The nft tokenIDs array of collection user added
+        @return liquidity The liquidity value user received
      */
     function addLiquidity(
         address token,
@@ -157,6 +161,9 @@ contract SeacowsPositionManager is
         @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
         @param toTokenId The Position NFT that is used to store the liquidity.
         @param deadline The timestamp of deadline in seconds
+        @return tokenAmount The amount of eth user added
+        @return ids The nft tokenIDs array of collection user added
+        @return liquidity The liquidity value user received
      */
     function addLiquidityETH(
         address collection,
@@ -200,6 +207,10 @@ contract SeacowsPositionManager is
         @param fromTokenId The Position NFT that is used to burn the liquidity and redeem the assets.
         @param to The address that will receive the withdrawn assets
         @param deadline The timestamp of deadline in seconds
+        @return cTokenOut The estimated amount of token user will receive
+        @return cNftOut The estimated amount of nft user will receive
+        @return tokenOut The actual amount of token user received by algorithm compensation
+        @return idsOut The actual nft tokenIDs array user received by algorithm compensation
      */
     function removeLiquidity(
         address token,
@@ -236,6 +247,10 @@ contract SeacowsPositionManager is
         @param fromTokenId The position NFT that is used to burn the liquidity and redeem the assets.
         @param to The address that will receive the withdrawn assets
         @param deadline The timestamp of deadline in seconds
+        @return cTokenOut The estimated amount of eth user will receive
+        @return cNftOut The estimated amount of nft user will receive
+        @return tokenOut The actual amount of eth user received by algorithm compensation
+        @return idsOut The actual nft tokenIDs array user received by algorithm compensation
      */
     function removeLiquidityETH(
         address collection,
@@ -308,6 +323,10 @@ contract SeacowsPositionManager is
         @param idsDesired The ids of ERC721 NFT to add
         @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
         @param deadline The timestamp of deadline in seconds
+        @return newTokenId The new minted user tokenID in the pair, also stand for user's position ID
+        @return tokenAmount The amount of ERC20 token user added
+        @return ids The nft tokenIDs array of collection user added
+        @return liquidity The liquidity value user received
      */
     function mint(
         address token,
@@ -343,6 +362,10 @@ contract SeacowsPositionManager is
         @param idsDesired The ids of ERC721 NFT to add
         @param tokenMin The min. amount of ERC20 token wanted to add. Scenario: the txn is processed after a long waiting time.
         @param deadline The timestamp of deadline in seconds
+        @return newTokenId The new minted user tokenID in the pair, also stand for user's position ID
+        @return tokenAmount The amount of eth user added
+        @return ids The nft tokenIDs array of collection user added
+        @return liquidity The liquidity value user received
      */
     function mintWithETH(
         address collection,

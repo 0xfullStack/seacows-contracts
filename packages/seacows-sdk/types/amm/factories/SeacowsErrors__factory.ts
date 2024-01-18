@@ -94,6 +94,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "SPM_TOKEN_TRANSFER_FAILED",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "SPM_UNAUTHORIZED",
     type: "error",
   },
@@ -110,11 +115,6 @@ const _abi = [
   {
     inputs: [],
     name: "SSB_ONE_MORE_BLOCK_AT_LEAST",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "SSB_TOKEN_TRANSFER_FAILED",
     type: "error",
   },
   {
@@ -200,7 +200,7 @@ const _abi = [
 ];
 
 const _bytecode =
-  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212206b8311788add4de4379c7cc531aa5e4f41cdc6ef5da4461fd58e6b86c675135164736f6c634300080d0033";
+  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122085c7614ac58814371323f38390c34e5f58c90f85e7bfffb8d2103682577e6d9f64736f6c634300080d0033";
 
 export class SeacowsErrors__factory extends ContractFactory {
   constructor(

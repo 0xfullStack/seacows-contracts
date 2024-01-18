@@ -335,16 +335,16 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "getComplementedBalance",
+    name: "getBalances",
     outputs: [
       {
         internalType: "uint256",
-        name: "tokenBalance",
+        name: "_balance0",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "nftBalance",
+        name: "_balance1",
         type: "uint256",
       },
     ],

@@ -31,7 +31,7 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "caculateAssetsOutAfterComplemented(uint256,uint256,uint256,uint256)": FunctionFragment;
     "collection()": FunctionFragment;
     "feePercent()": FunctionFragment;
-    "getComplementedBalance()": FunctionFragment;
+    "getBalances()": FunctionFragment;
     "getReserves()": FunctionFragment;
     "getRoyaltyRecipient(uint256)": FunctionFragment;
     "initialize(address,address,uint256)": FunctionFragment;
@@ -94,7 +94,7 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getComplementedBalance",
+    functionFragment: "getBalances",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -197,7 +197,7 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "collection", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feePercent", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getComplementedBalance",
+    functionFragment: "getBalances",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -267,14 +267,12 @@ interface ISeacowsERC721TradePairInterface extends ethers.utils.Interface {
     "CollectFee(uint256,uint256)": EventFragment;
     "Mint(address,uint256,uint256)": EventFragment;
     "Swap(address,uint256,uint256,uint256,uint256,address)": EventFragment;
-    "Sync(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Burn"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CollectFee"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Swap"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Sync"): EventFragment;
 }
 
 export type BurnEvent = TypedEvent<
@@ -309,10 +307,6 @@ export type SwapEvent = TypedEvent<
     nftOut: BigNumber;
     to: string;
   }
->;
-
-export type SyncEvent = TypedEvent<
-  [BigNumber, BigNumber] & { reserve0: BigNumber; reserve1: BigNumber }
 >;
 
 export class ISeacowsERC721TradePair extends BaseContract {
@@ -393,13 +387,10 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getComplementedBalance(
+    getBalances(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & {
-        tokenBalance: BigNumber;
-        nftBalance: BigNumber;
-      }
+      [BigNumber, BigNumber] & { _balance0: BigNumber; _balance1: BigNumber }
     >;
 
     getReserves(
@@ -516,10 +507,10 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
   feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getComplementedBalance(
+  getBalances(
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber] & { tokenBalance: BigNumber; nftBalance: BigNumber }
+    [BigNumber, BigNumber] & { _balance0: BigNumber; _balance1: BigNumber }
   >;
 
   getReserves(
@@ -640,13 +631,10 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getComplementedBalance(
+    getBalances(
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber] & {
-        tokenBalance: BigNumber;
-        nftBalance: BigNumber;
-      }
+      [BigNumber, BigNumber] & { _balance0: BigNumber; _balance1: BigNumber }
     >;
 
     getReserves(
@@ -834,22 +822,6 @@ export class ISeacowsERC721TradePair extends BaseContract {
         to: string;
       }
     >;
-
-    "Sync(uint256,uint256)"(
-      reserve0?: null,
-      reserve1?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { reserve0: BigNumber; reserve1: BigNumber }
-    >;
-
-    Sync(
-      reserve0?: null,
-      reserve1?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { reserve0: BigNumber; reserve1: BigNumber }
-    >;
   };
 
   estimateGas: {
@@ -887,7 +859,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getComplementedBalance(overrides?: CallOverrides): Promise<BigNumber>;
+    getBalances(overrides?: CallOverrides): Promise<BigNumber>;
 
     getReserves(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1008,9 +980,7 @@ export class ISeacowsERC721TradePair extends BaseContract {
 
     feePercent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getComplementedBalance(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getBalances(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getReserves(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

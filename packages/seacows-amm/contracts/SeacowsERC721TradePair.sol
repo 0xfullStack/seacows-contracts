@@ -39,9 +39,9 @@ contract SeacowsERC721TradePair is
         __ReentrancyGuard_init();
     }
 
-    function getComplementedBalance() public view returns (uint256 tokenBalance, uint256 nftBalance) {
-        tokenBalance = uint256(int256(IERC20(token).balanceOf(address(this)))) - feeBalance;
-        nftBalance = IERC721(collection).balanceOf(address(this)) * COMPLEMENT_PRECISION;
+    function getBalances() public view returns (uint256 _balance0, uint256 _balance1) {
+        _balance0 = uint256(int256(IERC20(token).balanceOf(address(this)))) - feeBalance;
+        _balance1 = IERC721(collection).balanceOf(address(this)) * COMPLEMENT_PRECISION;
     }
 
     function getReserves() public view returns (uint256 _reserve0, uint256 _reserve1) {
@@ -62,9 +62,9 @@ contract SeacowsERC721TradePair is
 
     function mint(uint256 toTokenId) public whenNotPaused nonReentrant returns (uint256 liquidity) {
         (uint256 _reserve0, uint256 _reserve1) = getReserves();
-        (uint256 balance0, uint256 balance1) = getComplementedBalance();
-        uint256 amount0 = uint256(balance0 - _reserve0);
-        uint256 amount1 = uint256(balance1 - _reserve1);
+        (uint256 _balance0, uint256 _balance1) = getBalances();
+        uint256 amount0 = uint256(_balance0 - _reserve0);
+        uint256 amount1 = uint256(_balance1 - _reserve1);
 
         uint256 _totalSupply = totalSupply();
         if (_totalSupply == 0) {
@@ -76,7 +76,7 @@ contract SeacowsERC721TradePair is
             revert STP_INSUFFICIENT_LIQUIDITY_MINTED();
         }
         _mint(toTokenId, liquidity);
-        _update(balance0, balance1);
+        _update(_balance0, _balance1);
         emit Mint(msg.sender, amount0, amount1);
     }
 
@@ -91,21 +91,21 @@ contract SeacowsERC721TradePair is
         returns (uint256 cTokenOut, uint256 cNftOut, uint256 tokenOut, uint256[] memory idsOut)
     {
         from;
-        (uint256 balance0, uint256 balance1) = getComplementedBalance();
+        (uint256 _balance0, uint256 _balance1) = getBalances();
 
         ISeacowsPositionManager manager = positionManager();
 
         uint256 nftAmountOut;
         {
             uint256 liquidity = manager.balanceOf(manager.tokenOf(address(this)));
-            cTokenOut = (liquidity * balance0) / totalSupply();
-            cNftOut = (liquidity * balance1) / totalSupply();
+            cTokenOut = (liquidity * _balance0) / totalSupply();
+            cNftOut = (liquidity * _balance1) / totalSupply();
             if (cTokenOut <= 0 || cNftOut <= 0) {
                 revert STP_INSUFFICIENT_LIQUIDITY_BURNED();
             }
 
             uint256 nftOut;
-            (tokenOut, nftOut) = _caculateAssetsOutAfterComplemented(balance0, balance1, cTokenOut, cNftOut);
+            (tokenOut, nftOut) = _caculateAssetsOutAfterComplemented(_balance0, _balance1, cTokenOut, cNftOut);
             _burn(manager.tokenOf(address(this)), liquidity);
             nftAmountOut = nftOut / COMPLEMENT_PRECISION;
 
@@ -135,10 +135,10 @@ contract SeacowsERC721TradePair is
             }
         }
 
-        (balance0, balance1) = getComplementedBalance();
+        (_balance0, _balance1) = getBalances();
 
         {
-            _update(balance0, balance1);
+            _update(_balance0, _balance1);
         }
         emit Burn(msg.sender, cTokenOut, cNftOut, tokenOut, idsOut, to);
     }
@@ -178,11 +178,11 @@ contract SeacowsERC721TradePair is
             }
 
             {
-                (uint256 balance0, uint256 balance1) = getComplementedBalance();
+                (uint256 _balance0, uint256 _balance1) = getBalances();
 
-                uint256 _totalFees = (balance0 * balance1 - _reserve0 * _reserve1);
-                absAmountIn = balance0 > reserve0 ? (balance0 - reserve0) * balance1 - _totalFees : 0; //
-                absAmountOut = reserve0 > balance0 ? (reserve0 - balance0) * balance1 + _totalFees : 0;
+                uint256 _totalFees = (_balance0 * _balance1 - _reserve0 * _reserve1);
+                absAmountIn = _balance0 > _reserve0 ? (_balance0 - _reserve0) * _balance1 - _totalFees : 0; //
+                absAmountOut = _reserve0 > _balance0 ? (_reserve0 - _balance0) * _balance1 + _totalFees : 0;
 
                 {
                     uint256 absAmount = Math.max(absAmountIn, absAmountOut);
@@ -191,9 +191,9 @@ contract SeacowsERC721TradePair is
                     }
 
                     // delay division to here to fix loss of precision
-                    _totalFees /= balance1;
-                    absAmountIn /= balance1;
-                    absAmountOut /= balance1;
+                    _totalFees /= _balance1;
+                    absAmountIn /= _balance1;
+                    absAmountOut /= _balance1;
                     absAmount = Math.max(absAmountIn, absAmountOut);
 
                     _totalFees -= _handleProtocolFee(absAmount);
@@ -201,11 +201,11 @@ contract SeacowsERC721TradePair is
                 }
                 _handleRoyaltyFee(_totalFees, idsIn, idsOut);
 
-                (balance0, balance1) = getComplementedBalance();
-                if (balance0 * balance1 < _reserve0 * _reserve1) {
+                (_balance0, _balance1) = getBalances();
+                if (_balance0 * _balance1 < _reserve0 * _reserve1) {
                     revert STP_K();
                 }
-                _update(balance0, balance1);
+                _update(_balance0, _balance1);
             }
         }
         emit Swap(
@@ -229,11 +229,11 @@ contract SeacowsERC721TradePair is
     }
 
     function skim(address to, uint256[] memory ids) external nonReentrant {
-        (uint256 balance0, uint256 balance1) = getComplementedBalance();
-        if (balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) {
+        (uint256 _balance0, uint256 _balance1) = getBalances();
+        if (_balance1 - reserve1 != ids.length * COMPLEMENT_PRECISION) {
             revert STP_SKIM_QUANTITY_MISMATCH();
         }
-        IERC20(token).safeTransfer(to, balance0 - reserve0);
+        IERC20(token).safeTransfer(to, _balance0 - reserve0);
         for (uint256 i = 0; i < ids.length; i++) {
             IERC721(collection).safeTransferFrom(address(this), to, ids[i]);
         }
