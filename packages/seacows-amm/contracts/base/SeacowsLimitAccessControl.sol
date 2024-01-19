@@ -2,9 +2,9 @@
 pragma solidity =0.8.13;
 
 import {Pausable} from '@openzeppelin/contracts/security/Pausable.sol';
-import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {Ownable2Step} from '@openzeppelin/contracts/access/Ownable2Step.sol';
 
-contract SeacowsLimitAccessControl is Pausable, Ownable {
+contract SeacowsLimitAccessControl is Pausable, Ownable2Step {
     function pause() public onlyOwner whenNotPaused {
         _pause();
     }
