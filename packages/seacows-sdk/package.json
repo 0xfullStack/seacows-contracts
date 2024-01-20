@@ -1,6 +1,6 @@
 {
   "name": "@yolominds/seacows-sdk",
-  "version": "1.21.7",
+  "version": "1.21.8",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
