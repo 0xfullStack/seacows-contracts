@@ -25,6 +25,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "PERCENTAGE_PRECISION()": FunctionFragment;
     "SPEED_BUMP()": FunctionFragment;
     "WETH()": FunctionFragment;
+    "acceptOwnership()": FunctionFragment;
     "addLiquidity(address,address,uint256,uint256,uint256[],uint256,uint256,uint256)": FunctionFragment;
     "addLiquidityETH(address,uint256,uint256[],uint256,uint256,uint256)": FunctionFragment;
     "allowance(uint256,address)": FunctionFragment;
@@ -53,6 +54,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "pairTokenIds(address)": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
+    "pendingOwner()": FunctionFragment;
     "removeLiquidity(address,address,uint256,uint256,(uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
     "removeLiquidityETH(address,uint256,uint256,(uint256,uint256,uint256[]),uint256,address,uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -92,6 +94,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "acceptOwnership",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "addLiquidity",
     values: [
@@ -201,6 +207,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pendingOwner",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "removeLiquidity",
     values: [
@@ -328,6 +338,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "SPEED_BUMP", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "acceptOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "addLiquidity",
     data: BytesLike
   ): Result;
@@ -382,6 +396,10 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pendingOwner",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "removeLiquidity",
     data: BytesLike
@@ -469,6 +487,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "ApprovalValue(uint256,address,uint256)": EventFragment;
+    "OwnershipTransferStarted(address,address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PairCreated(address,address,uint256,uint256,address)": EventFragment;
     "Paused(address)": EventFragment;
@@ -482,6 +501,7 @@ interface SeacowsPositionManagerInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalValue"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferStarted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PairCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
@@ -514,6 +534,10 @@ export type ApprovalValueEvent = TypedEvent<
     _operator: string;
     _value: BigNumber;
   }
+>;
+
+export type OwnershipTransferStartedEvent = TypedEvent<
+  [string, string] & { previousOwner: string; newOwner: string }
 >;
 
 export type OwnershipTransferredEvent = TypedEvent<
@@ -611,6 +635,10 @@ export class SeacowsPositionManager extends BaseContract {
     SPEED_BUMP(overrides?: CallOverrides): Promise<[string]>;
 
     WETH(overrides?: CallOverrides): Promise<[string]>;
+
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     addLiquidity(
       token: string,
@@ -766,6 +794,8 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<ContractTransaction>;
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<[string]>;
 
     removeLiquidity(
       token: string,
@@ -931,6 +961,10 @@ export class SeacowsPositionManager extends BaseContract {
 
   WETH(overrides?: CallOverrides): Promise<string>;
 
+  acceptOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   addLiquidity(
     token: string,
     collection: string,
@@ -1079,6 +1113,8 @@ export class SeacowsPositionManager extends BaseContract {
   ): Promise<ContractTransaction>;
 
   paused(overrides?: CallOverrides): Promise<boolean>;
+
+  pendingOwner(overrides?: CallOverrides): Promise<string>;
 
   removeLiquidity(
     token: string,
@@ -1237,6 +1273,8 @@ export class SeacowsPositionManager extends BaseContract {
     SPEED_BUMP(overrides?: CallOverrides): Promise<string>;
 
     WETH(overrides?: CallOverrides): Promise<string>;
+
+    acceptOwnership(overrides?: CallOverrides): Promise<void>;
 
     addLiquidity(
       token: string,
@@ -1407,6 +1445,8 @@ export class SeacowsPositionManager extends BaseContract {
     pause(overrides?: CallOverrides): Promise<void>;
 
     paused(overrides?: CallOverrides): Promise<boolean>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<string>;
 
     removeLiquidity(
       token: string,
@@ -1616,6 +1656,22 @@ export class SeacowsPositionManager extends BaseContract {
       { _tokenId: BigNumber; _operator: string; _value: BigNumber }
     >;
 
+    "OwnershipTransferStarted(address,address)"(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
+    OwnershipTransferStarted(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -1747,6 +1803,10 @@ export class SeacowsPositionManager extends BaseContract {
     SPEED_BUMP(overrides?: CallOverrides): Promise<BigNumber>;
 
     WETH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     addLiquidity(
       token: string,
@@ -1902,6 +1962,8 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<BigNumber>;
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<BigNumber>;
 
     removeLiquidity(
       token: string,
@@ -2073,6 +2135,10 @@ export class SeacowsPositionManager extends BaseContract {
 
     WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     addLiquidity(
       token: string,
       collection: string,
@@ -2235,6 +2301,8 @@ export class SeacowsPositionManager extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     removeLiquidity(
       token: string,

@@ -98,7 +98,7 @@ describe('NFTRenderer', () => {
     pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
   });
 
-  it('Should render NFT SVG correctly', async () => {
+  it('it should render NFT SVG correctly', async () => {
     // Only log it to debug
     // console.log(await manager.tokenURI(1));
   });

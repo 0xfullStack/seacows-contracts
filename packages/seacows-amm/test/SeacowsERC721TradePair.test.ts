@@ -73,7 +73,7 @@ describe('SeacowsERC721TradePair', () => {
     await speedBump.initialize(manager.address);
   });
 
-  describe('Mint', () => {
+  describe('When Mint', () => {
     before(async () => {
       // Create a pair
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
@@ -93,13 +93,13 @@ describe('SeacowsERC721TradePair', () => {
       await erc20.mint(alice.address, ethers.utils.parseEther('10'));
     });
 
-    it('Should have 0 balance initially', async () => {
+    it('it should have 0 balance initially', async () => {
       const [tokenReserve, nftReserve] = await pair.getReserves();
       expect(tokenReserve).to.be.equal(0);
       expect(nftReserve).to.be.equal(0);
     });
 
-    it('Should mint 2 Position NFTs the Pair and 1 for Alice using SeacowsPositionManager', async () => {
+    it('it should mint 2 Position NFTs the Pair and 1 for Alice using SeacowsPositionManager', async () => {
       // await pair.mint(erc20.address, erc721.address, ONE_PERCENT);
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('2'));
       await erc721.connect(alice).setApprovalForAll(manager.address, true);
@@ -121,7 +121,7 @@ describe('SeacowsERC721TradePair', () => {
       );
     });
 
-    it('Should mint liqidity correctly even not using SeacowsPositionManager', async () => {
+    it('it should mint liqidity correctly even not using SeacowsPositionManager', async () => {
       const aliceLiquidityBefore = await manager['balanceOf(uint256)'](2);
       /**
        * @notes transfer assets from Alice to Pair
@@ -148,7 +148,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(aliceLiquidityBefore.add(expectedLiquidityToMint));
     });
 
-    it('Should have the correct final state', async () => {
+    it('it should have the correct final state', async () => {
       /**
        * @notes Summary of Alice at this stage
        * ERC721: [4]
@@ -171,7 +171,7 @@ describe('SeacowsERC721TradePair', () => {
     });
   });
 
-  describe('Burn', () => {
+  describe('When Burn', () => {
     before(async () => {
       /**
        * @notes Prepare assets for Bob
@@ -191,14 +191,14 @@ describe('SeacowsERC721TradePair', () => {
         .mint(erc20.address, erc721.address, ONE_PERCENT, ethers.utils.parseEther('1'), [5], 0, MaxUint256);
     });
 
-    it('Should have correct initial state for Bob', async () => {
+    it('it should have correct initial state for Bob', async () => {
       expect(await erc721.ownerOf(5)).to.be.equal(pair.address);
       expect(await erc721.ownerOf(6)).to.be.equal(bob.address);
       expect(await erc20.balanceOf(pair.address)).to.be.equal(ethers.utils.parseEther('5'));
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('9'));
     });
 
-    it('Should burn liqidity correctly even not using SeacowsPositionManager', async () => {
+    it('it should burn liqidity correctly even not using SeacowsPositionManager', async () => {
       // Owner of ERC721 ID = 1 is the Pair
       expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
       const bobLiquidity = await manager['balanceOf(uint256)'](3);
@@ -222,7 +222,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('10'));
     });
 
-    it('Should have the correct final state', async () => {
+    it('it should have the correct final state', async () => {
       /**
        * @notes Summary of Alice at this stage
        * ERC721: [4]
@@ -260,7 +260,7 @@ describe('SeacowsERC721TradePair', () => {
     });
   });
 
-  describe('Swap', () => {
+  describe('When Swap', () => {
     let feePercent: BigNumber;
     let protocolFeePercent: BigNumber;
     let precision: BigNumber;
@@ -275,7 +275,7 @@ describe('SeacowsERC721TradePair', () => {
       precision = await pair.PERCENTAGE_PRECISION();
     });
 
-    it('should have correct initial state', async () => {
+    it('it should have correct initial state', async () => {
       /**
        * FeeTo address
        * ERC20 balance: 0 ethers
@@ -286,7 +286,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(protocolFeePercent).to.be.equal(await pair.MAX_PROTOCOL_FEE_PERCENT());
     });
 
-    it('Should swap out ERC20 token successfully, and keep K no change approximatly', async () => {
+    it('it should swap out ERC20 token successfully, and keep K no change approximately', async () => {
       /**
        * @notes Summary of Alice before swap
        * ERC721: [0]
@@ -330,7 +330,7 @@ describe('SeacowsERC721TradePair', () => {
       expect(newReserve0.mul(newReserve1)).to.be.greaterThanOrEqual(oldReserve0.mul(oldReserve1)); // 4 * 4 = 3.2 * 5
     });
 
-    it('Should swap out NFT successfully, and keep K no change approximatly', async () => {
+    it('it should swap out NFT successfully, and keep K no change approximately', async () => {
       /**
        * @notes Summary of Bob before swap
        * ERC721: [1, 6]

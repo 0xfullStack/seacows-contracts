@@ -1,9 +1,6 @@
 import { AddressZero, MaxUint256 } from '@ethersproject/constants';
-import { deployContract } from 'ethereum-waffle';
 import { type SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { getWithdrawAssetsOutMin, BI_ZERO } from '@yolominds/seacows-sdk';
-import { type SeacowsRouter } from '@yolominds/seacows-sdk/types/periphery';
-import SeacowsRouterArtifact from '@yolominds/seacows-periphery/artifacts/contracts/SeacowsRouter.sol/SeacowsRouter.json';
+import { getWithdrawAssetsOutMin } from '@yolominds/seacows-sdk';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import {
@@ -30,7 +27,6 @@ describe('SeacowsPositionManager', () => {
   let rendererLib;
 
   let registry: MockRoyaltyRegistry;
-  let router: SeacowsRouter;
   before(async () => {
     [owner, alice, bob] = await ethers.getSigners();
     const nftFactoryLibraryFactory = await ethers.getContractFactory('NFTRenderer');
@@ -61,7 +57,7 @@ describe('SeacowsPositionManager', () => {
     registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
   });
 
-  describe('Create Pair', () => {
+  describe('When Create Pair', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     beforeEach(async () => {
@@ -78,12 +74,11 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       speedBump = await SpeedBumpFC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
-      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
     });
 
-    it('Should have correct initial configuration after create pair', async () => {
+    it('it should have correct initial configuration after create pair', async () => {
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
 
       const pairAddress = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
@@ -98,7 +93,7 @@ describe('SeacowsPositionManager', () => {
       expect(await pair.totalSupply()).to.be.equal(0);
     });
 
-    it('Should mint 2 NFTs for the Pair', async () => {
+    it('it should mint 2 NFTs for the Pair', async () => {
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
 
       const pairAddress = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
@@ -107,7 +102,7 @@ describe('SeacowsPositionManager', () => {
       expect(await manager.tokenOf(pair.address)).to.be.equal(1);
     });
 
-    it('Should create same pair with different fee', async () => {
+    it('it should create same pair with different fee', async () => {
       await expect(manager.createPair(erc20.address, erc721.address, ONE_PERCENT)).to.be.emit(manager, 'PairCreated');
       await expect(manager.createPair(erc20.address, erc721.address, POINT_FIVE_PERCENT)).to.be.emit(
         manager,
@@ -115,7 +110,7 @@ describe('SeacowsPositionManager', () => {
       );
     });
 
-    it('Should not create same pair with the same fee that created before', async () => {
+    it('it should not create same pair with the same fee that created before', async () => {
       const ONE_PERCENT = 100;
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
 
@@ -126,7 +121,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('Mint', () => {
+  describe('When Mint', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     before(async () => {
@@ -142,7 +137,6 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       speedBump = await SpeedBumpFC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
-      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
       /**
@@ -156,7 +150,7 @@ describe('SeacowsPositionManager', () => {
       await erc20.mint(alice.address, ethers.utils.parseEther('10'));
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity failure if initial nfts mininum liquidy amount < 2', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity failure if initial nfts mininum liquidity amount < 2', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ERC20: 1 Ethers
@@ -203,7 +197,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(5);
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity success if initial nfts mininum liquidy amount >= 2', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity success if initial nfts mininum liquidity amount >= 2', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ERC20: 3 Ethers
@@ -256,7 +250,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
     });
 
-    it('Should mint anonther Position NFT and add liquidity', async () => {
+    it('it should mint another Position NFT and add liquidity', async () => {
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('1'));
 
       const pair = await ethers.getContractAt(
@@ -292,7 +286,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('Mint ETH', () => {
+  describe('When Mint With ETH', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
@@ -305,7 +299,6 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       speedBump = await SpeedBumpFC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
-      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
       /**
@@ -317,7 +310,7 @@ describe('SeacowsPositionManager', () => {
       }
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity failure if initial nfts mininum liquidy amount < 2', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity failure if initial nfts mininum liquidity amount < 2', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ETH: 3 Ethers
@@ -354,7 +347,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(5);
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity success if initial nfts mininum liquidy amount >= 2', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity success if initial nfts mininum liquidity amount >= 2', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ETH: 3 Ethers
@@ -399,7 +392,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
     });
 
-    it('Should mint anonther Position NFT and add liquidity with ETH', async () => {
+    it('it should mint another Position NFT and add liquidity with ETH', async () => {
       const pair = await ethers.getContractAt(
         'SeacowsERC721TradePair',
         await manager.getPair(weth.address, erc721.address, ONE_PERCENT),
@@ -425,7 +418,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('Add Liquidity', () => {
+  describe('When Add Liquidity', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     before(async () => {
@@ -441,7 +434,6 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       speedBump = await SpeedBumpFC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
-      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
       /**
@@ -478,7 +470,7 @@ describe('SeacowsPositionManager', () => {
         );
     });
 
-    it('Should add liquidity to existing NFT IDs', async () => {
+    it('it should add liquidity to existing NFT IDs', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -521,7 +513,7 @@ describe('SeacowsPositionManager', () => {
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('4'));
     });
 
-    it('Should revert for invalid token ID', async () => {
+    it('it should revert for invalid token ID', async () => {
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('1'));
 
       // use a non-existed tokenID
@@ -558,7 +550,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('Add Liquidity ETH', () => {
+  describe('When Add Liquidity With ETH', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
@@ -598,7 +590,7 @@ describe('SeacowsPositionManager', () => {
         });
     });
 
-    it('Should add liquidity with ETH to existing NFT IDs', async () => {
+    it('it should add liquidity with ETH to existing NFT IDs', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -633,7 +625,7 @@ describe('SeacowsPositionManager', () => {
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('4'));
     });
 
-    it('Should revert for invalid token ID', async () => {
+    it('it should revert for invalid token ID', async () => {
       // use a non-existed tokenID
       await expect(
         manager
@@ -654,7 +646,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('Remove Liquidity', () => {
+  describe('When Remove Liquidity', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
@@ -671,7 +663,6 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       speedBump = await SpeedBumpFC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
-      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
 
@@ -721,7 +712,7 @@ describe('SeacowsPositionManager', () => {
       pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
     });
 
-    it('Should remove liquidity from Pool to SpeedBump', async () => {
+    it('it should remove liquidity from Pool to SpeedBump', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -787,7 +778,7 @@ describe('SeacowsPositionManager', () => {
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
     });
 
-    it('Should withdraw to be reverted when sender is not owner', async () => {
+    it('it should withdraw to be reverted when sender is not owner', async () => {
       expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
       expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('100'));
@@ -802,7 +793,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(bob.address)).to.be.equal(5);
     });
 
-    it('Should withdraw assets when sender is owner', async () => {
+    it('it should withdraw assets when sender is owner', async () => {
       expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
       expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
@@ -822,7 +813,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
     });
 
-    it('Should revert for invalid token ID', async () => {
+    it('it should revert for invalid token ID', async () => {
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
@@ -865,7 +856,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('Remove Liquidity ETH', () => {
+  describe('When Remove Liquidity With ETH', () => {
     let erc721: MockERC721;
     let pair: SeacowsERC721TradePair;
     before(async () => {
@@ -879,7 +870,6 @@ describe('SeacowsPositionManager', () => {
       erc721 = await erc721FC.deploy();
       speedBump = await SpeedBumpFC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
-      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
 
@@ -920,7 +910,7 @@ describe('SeacowsPositionManager', () => {
       pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
     });
 
-    it('Should remove liquidity from Pool to SpeedBump', async () => {
+    it('it should remove liquidity from Pool to SpeedBump', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -982,7 +972,7 @@ describe('SeacowsPositionManager', () => {
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
     });
 
-    it('Should withdraw to be reverted when sender is not owner', async () => {
+    it('it should withdraw to be reverted when sender is not owner', async () => {
       expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
       expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
       expect(await erc721.balanceOf(bob.address)).to.be.equal(10);
@@ -995,7 +985,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(bob.address)).to.be.equal(10);
     });
 
-    it('Should withdraw assets when sender is owner', async () => {
+    it('it should withdraw assets when sender is owner', async () => {
       expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
       expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
@@ -1013,7 +1003,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
     });
 
-    it('Should revert for invalid token ID', async () => {
+    it('it should revert for invalid token ID', async () => {
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
@@ -1054,7 +1044,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('Burn', () => {
+  describe('When Burn', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
@@ -1071,7 +1061,6 @@ describe('SeacowsPositionManager', () => {
       erc20 = await erc20FC.deploy();
       speedBump = await SpeedBumpFC.deploy();
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
-      router = (await deployContract(owner, SeacowsRouterArtifact, [manager.address, weth.address])) as SeacowsRouter;
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
       /**
@@ -1110,7 +1099,7 @@ describe('SeacowsPositionManager', () => {
       pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
     });
 
-    it('Should not burn liquidity when liquidity > 0 in the NFT', async () => {
+    it('it should not burn liquidity when liquidity > 0 in the NFT', async () => {
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('3'));
       await expect(manager.connect(alice).burn(2)).to.revertedWithCustomError(
         manager,
@@ -1118,7 +1107,7 @@ describe('SeacowsPositionManager', () => {
       );
     });
 
-    it('Should burn liquidity when liquidity = 0 in the NFT', async () => {
+    it('it should burn liquidity when liquidity = 0 in the NFT', async () => {
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('3'),

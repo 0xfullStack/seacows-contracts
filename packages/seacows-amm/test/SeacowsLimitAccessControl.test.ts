@@ -61,7 +61,7 @@ describe('SeacowsLimitAccessControl', () => {
     registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
   });
 
-  describe('Mint Under Access Control', () => {
+  describe('When Mint Under Access Control', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     before(async () => {
@@ -91,13 +91,13 @@ describe('SeacowsLimitAccessControl', () => {
       await erc20.mint(alice.address, ethers.utils.parseEther('10'));
     });
 
-    it('Should only owner can change contracts paused/unpaused state', async () => {
+    it('it should only owner can change contracts paused/unpaused state', async () => {
       await expect(manager.connect(alice).pause()).to.revertedWith('Ownable: caller is not the owner');
       await expect(manager.connect(owner).pause()).to.emit(manager, 'Paused');
       await expect(manager.connect(owner).unpause()).to.emit(manager, 'Unpaused');
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity failure if contracts is paused', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity failure if contracts is paused', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ERC20: 1 Ethers
@@ -137,7 +137,7 @@ describe('SeacowsLimitAccessControl', () => {
       ).to.revertedWithCustomError(manager, 'SPMD_PAUSED');
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity success if contracts is not paused', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity success if contracts is not paused', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ERC20: 3 Ethers
@@ -183,7 +183,7 @@ describe('SeacowsLimitAccessControl', () => {
     });
   });
 
-  describe('Mint ETH Under Access Control', () => {
+  describe('When Mint With ETH Under Access Control', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
@@ -208,7 +208,7 @@ describe('SeacowsLimitAccessControl', () => {
       }
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity failure if contracts is paused', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity failure if contracts is paused', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ETH: 3 Ethers
@@ -241,7 +241,7 @@ describe('SeacowsLimitAccessControl', () => {
       ).to.revertedWithCustomError(manager, 'SPMD_PAUSED');
     });
 
-    it('Should create a new pair, mint Position NFT and add liquidity success if contracts is not paused', async () => {
+    it('it should create a new pair, mint Position NFT and add liquidity success if contracts is not paused', async () => {
       /**
        * @notes Mint Position NFTs
        * Input ETH: 3 Ethers
@@ -280,7 +280,7 @@ describe('SeacowsLimitAccessControl', () => {
     });
   });
 
-  describe('Add Liquidity Under Access Control', () => {
+  describe('When Add Liquidity Under Access Control', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     before(async () => {
@@ -333,7 +333,7 @@ describe('SeacowsLimitAccessControl', () => {
         );
     });
 
-    it('Should add liquidity to existing NFT IDs failure if contracts if paused', async () => {
+    it('it should add liquidity to existing NFT IDs failure if contracts if paused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -369,7 +369,7 @@ describe('SeacowsLimitAccessControl', () => {
       ).to.revertedWithCustomError(manager, 'SPMD_PAUSED');
     });
 
-    it('Should add liquidity to existing NFT IDs success if contracts not paused', async () => {
+    it('it should add liquidity to existing NFT IDs success if contracts not paused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -404,7 +404,7 @@ describe('SeacowsLimitAccessControl', () => {
     });
   });
 
-  describe('Add Liquidity ETH Under Access Control', () => {
+  describe('When Add Liquidity With ETH Under Access Control', () => {
     let erc721: MockERC721;
     before(async () => {
       const erc721FC = await ethers.getContractFactory('MockERC721');
@@ -443,7 +443,7 @@ describe('SeacowsLimitAccessControl', () => {
           value: ethers.utils.parseEther('3'),
         });
     });
-    it('Should add liquidity with ETH to existing NFT IDs failure if contracts if paused', async () => {
+    it('it should add liquidity with ETH to existing NFT IDs failure if contracts if paused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -471,7 +471,7 @@ describe('SeacowsLimitAccessControl', () => {
       ).to.revertedWithCustomError(manager, 'SPMD_PAUSED');
     });
 
-    it('Should add liquidity with ETH to existing NFT IDs success if contracts not paused', async () => {
+    it('it should add liquidity with ETH to existing NFT IDs success if contracts not paused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -496,7 +496,7 @@ describe('SeacowsLimitAccessControl', () => {
     });
   });
 
-  describe('Remove Liquidity Under Access Control', () => {
+  describe('When Remove Liquidity Under Access Control', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
@@ -563,7 +563,7 @@ describe('SeacowsLimitAccessControl', () => {
       pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
     });
 
-    it('Should remove liquidity from Pool to SpeedBump failure if contracts is paused', async () => {
+    it('it should remove liquidity from Pool to SpeedBump failure if contracts is paused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -609,7 +609,7 @@ describe('SeacowsLimitAccessControl', () => {
       ).to.revertedWithCustomError(manager, 'SPMD_PAUSED');
     });
 
-    it('Should remove liquidity from Pool to SpeedBump success if contracts not unpaused', async () => {
+    it('it should remove liquidity from Pool to SpeedBump success if contracts not unpaused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -660,7 +660,7 @@ describe('SeacowsLimitAccessControl', () => {
     });
   });
 
-  describe('Remove Liquidity ETH Under Access Control', () => {
+  describe('When Remove Liquidity With ETH Under Access Control', () => {
     let erc721: MockERC721;
     let pair: SeacowsERC721TradePair;
     before(async () => {
@@ -715,7 +715,7 @@ describe('SeacowsLimitAccessControl', () => {
       pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
     });
 
-    it('Should remove liquidity from Pool to SpeedBump failure if contracts is paused', async () => {
+    it('it should remove liquidity from Pool to SpeedBump failure if contracts is paused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -758,7 +758,7 @@ describe('SeacowsLimitAccessControl', () => {
       ).to.revertedWithCustomError(manager, 'SPMD_PAUSED');
     });
 
-    it('Should remove liquidity from Pool to SpeedBump success if contracts is not paused', async () => {
+    it('it should remove liquidity from Pool to SpeedBump success if contracts is not paused', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -823,7 +823,7 @@ describe('SeacowsLimitAccessControl', () => {
     });
   });
 
-  describe('Swap Tokens For Exact NFTs Under Access Control', () => {
+  describe('When Swap Tokens For Exact NFTs Under Access Control', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
@@ -892,7 +892,7 @@ describe('SeacowsLimitAccessControl', () => {
       minRoyaltyFeePercent = await pair.minRoyaltyFeePercent();
     });
 
-    it('swapTokensForExactNFTs should be failure if contracts is paused', async () => {
+    it('it should be failure if contracts is paused', async () => {
       // Caculate how much need to be paid
       const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
         pair.address,
@@ -926,7 +926,7 @@ describe('SeacowsLimitAccessControl', () => {
       ).to.revertedWithCustomError(manager, 'SPMD_PAUSED');
     });
 
-    it('swapTokensForExactNFTs should be success if contracts is not paused', async () => {
+    it('it should be success if contracts is not paused', async () => {
       // Caculate how much need to be paid
       const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
         pair.address,

@@ -22,6 +22,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SeacowsERC3525Interface extends ethers.utils.Interface {
   functions: {
+    "acceptOwnership()": FunctionFragment;
     "allowance(uint256,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -37,6 +38,7 @@ interface SeacowsERC3525Interface extends ethers.utils.Interface {
     "pairTokenIds(address)": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
+    "pendingOwner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -56,6 +58,10 @@ interface SeacowsERC3525Interface extends ethers.utils.Interface {
     "valueDecimals()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "acceptOwnership",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "allowance",
     values: [BigNumberish, string]
@@ -98,6 +104,10 @@ interface SeacowsERC3525Interface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pendingOwner",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -161,6 +171,10 @@ interface SeacowsERC3525Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "acceptOwnership",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -194,6 +208,10 @@ interface SeacowsERC3525Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pendingOwner",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -249,6 +267,7 @@ interface SeacowsERC3525Interface extends ethers.utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "ApprovalValue(uint256,address,uint256)": EventFragment;
+    "OwnershipTransferStarted(address,address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
     "SetMetadataDescriptor(address)": EventFragment;
@@ -261,6 +280,7 @@ interface SeacowsERC3525Interface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalValue"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferStarted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetMetadataDescriptor"): EventFragment;
@@ -292,6 +312,10 @@ export type ApprovalValueEvent = TypedEvent<
     _operator: string;
     _value: BigNumber;
   }
+>;
+
+export type OwnershipTransferStartedEvent = TypedEvent<
+  [string, string] & { previousOwner: string; newOwner: string }
 >;
 
 export type OwnershipTransferredEvent = TypedEvent<
@@ -374,6 +398,10 @@ export class SeacowsERC3525 extends BaseContract {
   interface: SeacowsERC3525Interface;
 
   functions: {
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     allowance(
       tokenId_: BigNumberish,
       operator_: string,
@@ -444,6 +472,8 @@ export class SeacowsERC3525 extends BaseContract {
     ): Promise<ContractTransaction>;
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -542,6 +572,10 @@ export class SeacowsERC3525 extends BaseContract {
     valueDecimals(overrides?: CallOverrides): Promise<[number]>;
   };
 
+  acceptOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   allowance(
     tokenId_: BigNumberish,
     operator_: string,
@@ -609,6 +643,8 @@ export class SeacowsERC3525 extends BaseContract {
   ): Promise<ContractTransaction>;
 
   paused(overrides?: CallOverrides): Promise<boolean>;
+
+  pendingOwner(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -701,6 +737,8 @@ export class SeacowsERC3525 extends BaseContract {
   valueDecimals(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
+    acceptOwnership(overrides?: CallOverrides): Promise<void>;
+
     allowance(
       tokenId_: BigNumberish,
       operator_: string,
@@ -766,6 +804,8 @@ export class SeacowsERC3525 extends BaseContract {
     pause(overrides?: CallOverrides): Promise<void>;
 
     paused(overrides?: CallOverrides): Promise<boolean>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -915,6 +955,22 @@ export class SeacowsERC3525 extends BaseContract {
       { _tokenId: BigNumber; _operator: string; _value: BigNumber }
     >;
 
+    "OwnershipTransferStarted(address,address)"(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
+    OwnershipTransferStarted(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -1007,6 +1063,10 @@ export class SeacowsERC3525 extends BaseContract {
   };
 
   estimateGas: {
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     allowance(
       tokenId_: BigNumberish,
       operator_: string,
@@ -1077,6 +1137,8 @@ export class SeacowsERC3525 extends BaseContract {
     ): Promise<BigNumber>;
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1179,6 +1241,10 @@ export class SeacowsERC3525 extends BaseContract {
   };
 
   populateTransaction: {
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     allowance(
       tokenId_: BigNumberish,
       operator_: string,
@@ -1257,6 +1323,8 @@ export class SeacowsERC3525 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    pendingOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }

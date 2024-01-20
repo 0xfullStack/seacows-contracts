@@ -92,7 +92,7 @@ describe('RoyaltyManagement', () => {
     POINT_FIVE_PERCENT = await template.POINT_FIVE_PERCENT();
   });
 
-  it('should prepare assets for initialization', async () => {
+  it('it should prepare assets for initialization', async () => {
     /**
      * @notes Alice assets
      * ERC721: [0, 1, 2, 3, 4]
@@ -130,7 +130,7 @@ describe('RoyaltyManagement', () => {
     expect(await erc20.balanceOf(carol.address)).to.be.equal(ethers.utils.parseEther('100'));
   });
 
-  it('should mint correctly for initialization', async () => {
+  it('it should mint correctly for initialization', async () => {
     await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
     await erc721.connect(alice).setApprovalForAll(manager.address, true);
     await manager
@@ -170,18 +170,18 @@ describe('RoyaltyManagement', () => {
     await pair.setProtocolFeePercent(1000);
   });
 
-  it('should have 0% min royalty fee intially', async () => {
+  it('it should have 0% min royalty fee intially', async () => {
     minRoyaltyFeePercent = await pair.minRoyaltyFeePercent();
     expect(minRoyaltyFeePercent).to.be.equal(0);
   });
 
-  it('should set min royalty fee correctly', async () => {
+  it('it should set min royalty fee correctly', async () => {
     await pair.connect(owner).setMinRoyaltyFeePercent(100);
     minRoyaltyFeePercent = await pair.minRoyaltyFeePercent();
     expect(minRoyaltyFeePercent).to.be.equal(100);
   });
 
-  it('should have fee calculated correctly', async () => {
+  it('it should have fee calculated correctly', async () => {
     const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
       pair.address,
       [0, 1, 2],
@@ -215,7 +215,7 @@ describe('RoyaltyManagement', () => {
     expect(await erc20.balanceOf(feeTo.address)).to.be.equal(ethers.utils.parseEther('0.6'));
   });
 
-  it('should keep fee remain the same after adding liquidity', async () => {
+  it('it should keep fee remain the same after adding liquidity', async () => {
     const { tokenInMaxWithSlippage } = await getDepositTokenInMax(pair.address, [0, 1, 2], 0, 100, owner);
 
     // Note: in order to solve precision problem(same as uniswap's solution), we had .add(1) to SeacowsLibrary.getAmountIn result. And in sdk we also .add(1) to getTokenInMax() result
@@ -259,7 +259,7 @@ describe('RoyaltyManagement', () => {
     expect(await erc721.ownerOf(7)).to.be.equal(pair.address);
   });
 
-  it('should have fee calculated after previous added liquidity', async () => {
+  it('it should have fee calculated after previous added liquidity', async () => {
     const { tokenInMaxWithSlippage } = await getSwapTokenInMax(
       pair.address,
       [0, 1, 2],
@@ -294,7 +294,7 @@ describe('RoyaltyManagement', () => {
     expect(await erc20.balanceOf(feeTo.address)).to.be.equal(ethers.utils.parseEther('3'));
   });
 
-  it('should collect fee correctly', async () => {
+  it('it should collect fee correctly', async () => {
     const prevAliceBalance = await erc20.balanceOf(alice.address);
     expect(prevAliceBalance).to.be.equal(ethers.utils.parseEther('97'));
 
@@ -307,7 +307,7 @@ describe('RoyaltyManagement', () => {
     expect(await pair.getPendingFee(4)).to.be.equal(ethers.utils.parseEther('0.12'));
   });
 
-  it('should have correct fee state after user selling NFTs', async () => {
+  it('it should have correct fee state after user selling NFTs', async () => {
     const { tokenOutMinWithSlippage } = await getSwapTokenOutMin(
       pair.address,
       [4],

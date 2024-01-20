@@ -92,7 +92,7 @@ describe('SeacowsRewarder', () => {
     POINT_FIVE_PERCENT = await template.POINT_FIVE_PERCENT();
   });
 
-  it('should prepare assets for initialization', async () => {
+  it('it should prepare assets for initialization', async () => {
     /**
      * @notes Alice assets
      * ERC721: [0, 1, 2, 3, 4]
@@ -130,7 +130,7 @@ describe('SeacowsRewarder', () => {
     expect(await erc20.balanceOf(carol.address)).to.be.equal(ethers.utils.parseEther('100'));
   });
 
-  it('should mint correctly for initialization', async () => {
+  it('it should mint correctly for initialization', async () => {
     await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
     await erc721.connect(alice).setApprovalForAll(manager.address, true);
     await manager
@@ -170,7 +170,7 @@ describe('SeacowsRewarder', () => {
     await pair.setProtocolFeePercent(1000);
   });
 
-  it('should have fee calculated correctly', async () => {
+  it('it should have fee calculated correctly', async () => {
     const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 1, 100, owner);
     expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.726600000000000001'));
 
@@ -190,7 +190,7 @@ describe('SeacowsRewarder', () => {
     expect(await erc20.balanceOf(feeTo.address)).to.be.equal(ethers.utils.parseEther('0.6'));
   });
 
-  it('should keep fee remain the same after adding liquidity', async () => {
+  it('it should keep fee remain the same after adding liquidity', async () => {
     const { tokenInMaxWithSlippage } = await getDepositTokenInMax(pair.address, [0, 1, 2], 0, 100, owner);
     expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('12.000000000000000001'));
 
@@ -232,7 +232,7 @@ describe('SeacowsRewarder', () => {
     expect(await erc721.ownerOf(7)).to.be.equal(pair.address);
   });
 
-  it('should have fee calculated after previous added liquidity', async () => {
+  it('it should have fee calculated after previous added liquidity', async () => {
     const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 1, 100, owner);
     expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('26.906400000000000003'));
 
@@ -253,7 +253,7 @@ describe('SeacowsRewarder', () => {
     expect(await erc20.balanceOf(feeTo.address)).to.be.equal(ethers.utils.parseEther('3'));
   });
 
-  it('should collect fee correctly', async () => {
+  it('it should collect fee correctly', async () => {
     const prevAliceBalance = await erc20.balanceOf(alice.address);
     expect(prevAliceBalance).to.be.equal(ethers.utils.parseEther('97'));
 
@@ -266,7 +266,7 @@ describe('SeacowsRewarder', () => {
     expect(await pair.getPendingFee(4)).to.be.equal(ethers.utils.parseEther('0.12'));
   });
 
-  it('should have correct fee state after user selling NFTs', async () => {
+  it('it should have correct fee state after user selling NFTs', async () => {
     const { tokenOutMinWithSlippage } = await getSwapTokenOutMin(pair.address, [4], BI_ZERO, 0, 100, owner);
     expect(tokenOutMinWithSlippage).to.be.equal(ethers.utils.parseEther('10.68'));
 
