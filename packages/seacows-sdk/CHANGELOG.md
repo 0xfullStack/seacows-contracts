@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.22.0 (2024-01-23)
+
+
+### Features
+
+* subgraph metadata in sdk ([#30](https://github.com/yolominds/seacows-contracts/issues/30)) ([51a3eab](https://github.com/yolominds/seacows-contracts/commit/51a3eab4977176d99c5cd7ca1741d38aeba024df))
+
 ### 1.21.9 (2024-01-23)
 
 ### 1.21.8 (2024-01-20)
