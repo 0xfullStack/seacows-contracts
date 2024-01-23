@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.22.1 (2024-01-23)
+
+
+### Features
+
+* Mumbai test network part one ([#29](https://github.com/yolominds/seacows-contracts/issues/29)) ([546ca21](https://github.com/yolominds/seacows-contracts/commit/546ca21b7ec89ca3cc0df9858ea32965d1389631))
+
 ## 1.22.0 (2024-01-23)
 
 
