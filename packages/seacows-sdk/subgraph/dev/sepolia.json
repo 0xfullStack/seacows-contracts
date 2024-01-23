@@ -1,0 +1,11 @@
+{
+  "network": "sepolia",
+  "manager": {
+    "address": "0x329c1a6E81Cfd3D7A137a6ecE2CCA6976c7E606c",
+    "startBlock": 4863100
+  },
+  "speedbump": {
+    "address": "0x4e6A98865646740fbcf62bd9C5dfbb6B3633d622",
+    "startBlock": 4863100
+  }
+}
