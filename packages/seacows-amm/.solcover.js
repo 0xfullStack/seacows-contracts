@@ -1,3 +1,3 @@
 module.exports = {
-    skipFiles: ['test']
+    skipFiles: ['test', 'lib/NFTRenderer.sol', 'lib/FixidityLib.sol']
   };

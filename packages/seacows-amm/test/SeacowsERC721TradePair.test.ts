@@ -25,12 +25,14 @@ describe('SeacowsERC721TradePair', () => {
 
   let weth: WETH;
   let erc721: MockERC721;
+  let erc721a: MockERC721;
   let erc20: MockERC20;
 
   let speedBump: SpeedBump;
   let template: SeacowsERC721TradePair;
   let manager: SeacowsPositionManager;
   let pair: SeacowsERC721TradePair;
+  let minRoyaltyFeePercent: BigNumber;
 
   // Prepare contracts
   before(async () => {
@@ -42,6 +44,7 @@ describe('SeacowsERC721TradePair', () => {
     const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
     weth = await WETHFC.deploy();
     erc721 = await MockERC721FC.deploy();
+    erc721a = await MockERC721FC.deploy();
     erc20 = await MockERC20FC.deploy();
 
     const nftFactoryLibraryFactory = await ethers.getContractFactory('NFTRenderer');
@@ -379,6 +382,169 @@ describe('SeacowsERC721TradePair', () => {
       expect(newReserve0).to.be.equal(ethers.utils.parseEther('4.008880000000000001'));
       expect(newReserve1).to.be.equal(ethers.utils.parseEther('4'));
       expect(newReserve0.mul(newReserve1)).to.be.greaterThanOrEqual(oldReserve0.mul(oldReserve1)); // 3.2 * 5 = 4.008880000000000001 * 4
+    });
+  });
+
+  describe('When Skim', () => {
+    before(async () => {
+      for (let i = 0; i < 5; i++) {
+        await erc721a.mint(carol.address);
+      }
+
+      const startingERC20Balance = ethers.utils.parseEther('10000000');
+      await erc20.mint(carol.address, startingERC20Balance);
+      await erc721a.connect(carol).setApprovalForAll(manager.address, true);
+      await erc20.connect(carol).approve(manager.address, startingERC20Balance);
+
+      // Create a pair
+      const tokenAmount = ethers.utils.parseEther('2');
+
+      await manager
+        .connect(carol)
+        .mint(erc20.address, erc721a.address, ONE_PERCENT, tokenAmount, [1, 2], tokenAmount, MaxUint256);
+    });
+
+    it('it should keep reserve0 and balance0 balance after skimming ', async () => {
+      const pairAddress = await manager.getPair(erc20.address, erc721a.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+      await pair.setProtocolFeePercent(await pair.MAX_PROTOCOL_FEE_PERCENT());
+
+      // // Verify Position NFT owned by Carol
+      expect(await manager.ownerOf(5)).to.be.equal(carol.address);
+      const [balance0, balance1] = await pair.getBalances();
+      const liquidity = sqrt(balance0.mul(balance1));
+      expect(await manager['balanceOf(uint256)'](5)).to.be.equal(liquidity);
+
+      const previousCarolERC20Balance = await erc20.balanceOf(carol.address);
+      //   console.log('carol balance', previousCarolERC20Balance);
+
+      expect((await pair.getBalances())._balance0).to.be.equal((await pair.getReserves())._reserve0);
+
+      await erc20.connect(carol).transfer(pair.address, ethers.utils.parseEther('1000000'));
+      //   console.log('carol balance after transfer', await erc20.balanceOf(carol.address));
+      expect(await erc20.balanceOf(carol.address)).to.be.equal(
+        previousCarolERC20Balance.sub(ethers.utils.parseEther('1000000')),
+      );
+      expect((await pair.getBalances())._balance0.sub((await pair.getReserves())._reserve0)).to.be.equal(
+        ethers.utils.parseEther('1000000'),
+      );
+
+      await pair.skim(carol.address, []);
+      const latestCarolERC20Balance = await erc20.balanceOf(carol.address);
+      //   console.log('carol balance after skim', latestCarolERC20Balance);
+      expect(latestCarolERC20Balance).to.be.equal(previousCarolERC20Balance);
+
+      expect((await pair.getBalances())._balance0).to.be.equal((await pair.getReserves())._reserve0);
+    });
+
+    it('it should keep reserve1 and balance1 balance after skimming ', async () => {
+      const pairAddress = await manager.getPair(erc20.address, erc721a.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+      await pair.setProtocolFeePercent(await pair.MAX_PROTOCOL_FEE_PERCENT());
+      // // Verify Position NFT owned by Carol
+      expect(await manager.ownerOf(5)).to.be.equal(carol.address);
+      const [balance0, balance1] = await pair.getBalances();
+      const liquidity = sqrt(balance0.mul(balance1));
+      expect(await manager['balanceOf(uint256)'](5)).to.be.equal(liquidity);
+
+      const previousCarolERC721Balance = await erc721a.balanceOf(carol.address);
+      //   console.log('carol balance', previousCarolERC721Balance);
+
+      expect((await pair.getBalances())._balance1).to.be.equal((await pair.getReserves())._reserve1);
+
+      await erc721a.connect(carol)['safeTransferFrom(address,address,uint256)'](carol.address, pair.address, 4);
+      //   console.log('carol balance after transfer', await erc721a.balanceOf(carol.address));
+      expect(await erc721a.balanceOf(carol.address)).to.be.equal(previousCarolERC721Balance.sub(1));
+      expect((await pair.getBalances())._balance1.sub((await pair.getReserves())._reserve1)).to.be.equal(
+        ethers.utils.parseEther('1'),
+      );
+
+      await pair.skim(carol.address, [4]);
+      const latestCarolERC721Balance = await erc721a.balanceOf(carol.address);
+      //   console.log('carol balance after skim', latestCarolERC721Balance);
+      expect(latestCarolERC721Balance).to.be.equal(previousCarolERC721Balance);
+      expect((await pair.getBalances())._balance1).to.be.equal((await pair.getReserves())._reserve1);
+    });
+
+    it('it should skim to be reverted when pair is balanced as it meant to be', async () => {
+      const pairAddress = await manager.getPair(erc20.address, erc721a.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+      await pair.setProtocolFeePercent(await pair.MAX_PROTOCOL_FEE_PERCENT());
+      // // Verify Position NFT owned by Carol
+      expect(await manager.ownerOf(5)).to.be.equal(carol.address);
+      const [balance0, balance1] = await pair.getBalances();
+      const liquidity = sqrt(balance0.mul(balance1));
+
+      expect(await manager['balanceOf(uint256)'](5)).to.be.equal(liquidity);
+      expect((await pair.getBalances())._balance1).to.be.equal((await pair.getReserves())._reserve1);
+      await expect(pair.skim(carol.address, [4])).to.be.revertedWithCustomError(pair, 'STP_SKIM_QUANTITY_MISMATCH');
+    });
+  });
+
+  describe('When Set Protocol Fee Percent', () => {
+    before(async () => {
+      for (let i = 0; i < 5; i++) {
+        await erc721a.mint(carol.address);
+      }
+
+      const startingERC20Balance = ethers.utils.parseEther('10000000');
+      await erc20.mint(carol.address, startingERC20Balance);
+      await erc721a.connect(carol).setApprovalForAll(manager.address, true);
+      await erc20.connect(carol).approve(manager.address, startingERC20Balance);
+    });
+
+    it('it should set fee percent when caller is fee manager', async () => {
+      const pairAddress = await manager.getPair(erc20.address, erc721a.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+
+      expect(await pair.protocolFeePercent()).to.be.eql(BigNumber.from(1000));
+      await pair.connect(owner).setProtocolFeePercent(await pair.MAX_PROTOCOL_FEE_PERCENT());
+      expect(await pair.protocolFeePercent()).to.be.eql(await pair.MAX_PROTOCOL_FEE_PERCENT());
+    });
+
+    it('it should to be reverted when caller is not fee manager', async () => {
+      const pairAddress = await manager.getPair(erc20.address, erc721a.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+      await expect(
+        pair.connect(alice).setProtocolFeePercent(await pair.MAX_PROTOCOL_FEE_PERCENT()),
+      ).to.be.revertedWithCustomError(pair, 'STP_UNAUTHORIZED');
+    });
+
+    it('it should to be reverted when protocol fee is out of range', async () => {
+      const pairAddress = await manager.getPair(erc20.address, erc721a.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
+
+      const currentFeePercent = await pair.MAX_PROTOCOL_FEE_PERCENT();
+      const newFeePercent = currentFeePercent.mul(10);
+      await expect(pair.connect(owner).setProtocolFeePercent(newFeePercent)).to.be.revertedWithCustomError(
+        pair,
+        'STP_FEE_OUT_OF_RANGE',
+      );
+    });
+  });
+
+  describe('When Set Min Royalty Fee Percent', () => {
+    before(async () => {
+      const address = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
+      pair = await ethers.getContractAt('SeacowsERC721TradePair', address);
+    });
+
+    it('it should have 0% min royalty fee intially', async () => {
+      minRoyaltyFeePercent = await pair.minRoyaltyFeePercent();
+      expect(minRoyaltyFeePercent).to.be.equal(0);
+    });
+
+    it('it should set min royalty fee correctly', async () => {
+      await pair.connect(owner).setMinRoyaltyFeePercent(100);
+      minRoyaltyFeePercent = await pair.minRoyaltyFeePercent();
+      expect(minRoyaltyFeePercent).to.be.equal(100);
+    });
+
+    it('it should set min royalty to be reverted when called is not royalty fee manager', async () => {
+      await expect(pair.connect(carol).setMinRoyaltyFeePercent(100)).to.be.revertedWithCustomError(
+        pair,
+        'RM_NON_ROYALTY_FEE_MANAGER',
+      );
     });
   });
 });

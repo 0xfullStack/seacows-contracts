@@ -170,6 +170,18 @@ describe('SeacowsRewarder', () => {
     await pair.setProtocolFeePercent(1000);
   });
 
+  it('it should be reverted when caller is not position manager', async () => {
+    await expect(pair.connect(alice).updatePositionFee(2)).to.be.revertedWithCustomError(
+      pair,
+      'SPMD_ONLY_POSITION_MANAGER',
+    );
+
+    await expect(pair.connect(alice).updatePositionFeeDebt(2)).to.be.revertedWithCustomError(
+      pair,
+      'SPMD_ONLY_POSITION_MANAGER',
+    );
+  });
+
   it('it should have fee calculated correctly', async () => {
     const { tokenInMaxWithSlippage } = await getSwapTokenInMax(pair.address, [0, 1, 2], BI_ZERO, 1, 100, owner);
     expect(tokenInMaxWithSlippage).to.be.equal(ethers.utils.parseEther('6.726600000000000001'));
