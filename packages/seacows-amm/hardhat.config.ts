@@ -60,6 +60,20 @@ const config: HardhatUserConfig = {
         : '',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    mumbai: {
+      chainId: SupportedChain.MUMBAI,
+      url: process.env.MUMBAI_ALCHEMY_KEY
+        ? `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_ALCHEMY_KEY}`
+        : '',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    polygon: {
+      chainId: SupportedChain.POLYGON,
+      url: process.env.POLYGON_ALCHEMY_KEY
+        ? `https://polygon-mainnet.g.alchemy.com/v2/${process.env.POLYGON_ALCHEMY_KEY}`
+        : '',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
   },
   typechain: {
     outDir: 'types',
@@ -70,7 +84,27 @@ const config: HardhatUserConfig = {
       goerli: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : '',
       sepolia: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : '',
       mainnet: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : '',
+      polygon: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
+      mumbai: process.env.POLYSCAN_API_KEY ? process.env.POLYSCAN_API_KEY : '',
     },
+    customChains: [
+      {
+        network: 'mumbai',
+        chainId: SupportedChain.MUMBAI,
+        urls: {
+          apiURL: 'https://api-testnet.polygonscan.com/api',
+          browserURL: 'https://mumbai.polygonscan.com',
+        },
+      },
+      {
+        network: 'polygon',
+        chainId: SupportedChain.POLYGON,
+        urls: {
+          apiURL: 'https://api.polygonscan.com/api',
+          browserURL: 'https://polygonscan.com/',
+        },
+      },
+    ],
   },
   abiExporter: {
     path: 'abis',

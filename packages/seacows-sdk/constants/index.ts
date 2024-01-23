@@ -11,4 +11,6 @@ export enum SupportedChain {
   MAINNET = 1,
   GÖRLI = 5,
   SEPOLIA = 11155111,
+  MUMBAI = 80001,
+  POLYGON = 137,
 }
