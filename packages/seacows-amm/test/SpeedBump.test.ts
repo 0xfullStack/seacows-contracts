@@ -14,6 +14,7 @@ import {
   type SpeedBump,
 } from 'types';
 import { ONE_PERCENT } from './constants';
+import { ZERO } from './utils';
 
 describe('SpeedBump', () => {
   let owner: SignerWithAddress;
@@ -55,6 +56,33 @@ describe('SpeedBump', () => {
     // Prepare Royalty Registry
     const MockRoyaltyRegistryFC = await ethers.getContractFactory('MockRoyaltyRegistry');
     registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
+  });
+
+  describe('Before Each', () => {
+    let erc721: MockERC721;
+    let erc20: MockERC20;
+    before(async () => {
+      const erc721FC = await ethers.getContractFactory('MockERC721');
+      const erc20FC = await ethers.getContractFactory('MockERC20');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
+      erc721 = await erc721FC.deploy();
+      erc20 = await erc20FC.deploy();
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
+      await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
+    });
+
+    it('it should support payable to receive Ethers correctly', async () => {
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ZERO);
+      await alice.sendTransaction({ to: speedBump.address, value: ethers.utils.parseEther('12.0') });
+      expect(await ethers.provider.getBalance(speedBump.address)).to.be.equal(ethers.utils.parseEther('12.0'));
+    });
   });
 
   describe('When register to SpeedBump', () => {

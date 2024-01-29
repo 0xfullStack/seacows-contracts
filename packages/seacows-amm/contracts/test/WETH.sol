@@ -32,6 +32,13 @@ contract WETH {
         emit Withdrawal(msg.sender, wad);
     }
 
+    function withdraw(address dst, uint256 wad) public {
+        require(balanceOf[msg.sender] >= wad);
+        balanceOf[msg.sender] -= wad;
+        payable(dst).transfer(wad);
+        emit Withdrawal(msg.sender, wad);
+    }
+
     function totalSupply() public view returns (uint256) {
         return address(this).balance;
     }

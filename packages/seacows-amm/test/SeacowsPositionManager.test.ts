@@ -13,7 +13,7 @@ import {
   type SpeedBump,
 } from 'types';
 import { ONE_PERCENT, POINT_FIVE_PERCENT } from './constants';
-import { sqrt } from './utils';
+import { ONE, TWO, ZERO, ZERO_ADDRESS, sqrt } from './utils';
 
 describe('SeacowsPositionManager', () => {
   let owner: SignerWithAddress;
@@ -57,6 +57,43 @@ describe('SeacowsPositionManager', () => {
     registry = await MockRoyaltyRegistryFC.deploy(ethers.constants.AddressZero);
   });
 
+  describe('Before Each', () => {
+    let erc721: MockERC721;
+    let erc20: MockERC20;
+    beforeEach(async () => {
+      const erc721FC = await ethers.getContractFactory('MockERC721');
+      const erc20FC = await ethers.getContractFactory('MockERC20');
+      const SpeedBumpFC = await ethers.getContractFactory('SpeedBump');
+      const SeacowsPositionManagerFC = await ethers.getContractFactory('SeacowsPositionManager', {
+        libraries: {
+          NFTRenderer: rendererLib.address,
+        },
+      });
+
+      erc721 = await erc721FC.deploy();
+      erc20 = await erc20FC.deploy();
+      speedBump = await SpeedBumpFC.deploy();
+      manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
+      await manager.setRoyaltyRegistry(registry.address);
+      await speedBump.initialize(manager.address);
+    });
+
+    it('it should support payable to receive Ethers only from WETH', async () => {
+      expect(await ethers.provider.getBalance(manager.address)).to.be.equal(ZERO);
+
+      // sender is not WETH, failure
+      await expect(
+        alice.sendTransaction({ to: manager.address, value: ethers.utils.parseEther('12.0') }),
+      ).to.be.revertedWithoutReason();
+      expect(await ethers.provider.getBalance(manager.address)).to.be.equal(ZERO);
+
+      // sender is WETH, successful
+      await weth.connect(alice).deposit({ value: ethers.utils.parseEther('12') });
+      await weth.connect(alice)['withdraw(address,uint256)'](manager.address, ethers.utils.parseEther('12'));
+      expect(await ethers.provider.getBalance(manager.address)).to.be.equal(ethers.utils.parseEther('12.0'));
+    });
+  });
+
   describe('When Create Pair', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
@@ -95,11 +132,51 @@ describe('SeacowsPositionManager', () => {
 
     it('it should mint 2 NFTs for the Pair', async () => {
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
-
       const pairAddress = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
       const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
-
       expect(await manager.tokenOf(pair.address)).to.be.equal(1);
+    });
+
+    it('it should create multiple pairs without any interference between them', async () => {
+      const erc721FC = await ethers.getContractFactory('MockERC721');
+      const erc20FC = await ethers.getContractFactory('MockERC20');
+      const erc721One = await erc721FC.deploy();
+      const erc20One = await erc20FC.deploy();
+      const erc721Two = await erc721FC.deploy();
+      const erc20Two = await erc20FC.deploy();
+      const erc721Three = await erc721FC.deploy();
+      const erc20Three = await erc20FC.deploy();
+
+      await manager.createPair(erc20One.address, erc721One.address, ONE_PERCENT);
+      await manager.createPair(erc20Two.address, erc721Three.address, ONE_PERCENT);
+      await manager.createPair(erc20Three.address, erc721Two.address, ONE_PERCENT);
+      await manager.createPair(erc20Two.address, erc721One.address, ONE_PERCENT);
+      await manager.createPair(erc20Two.address, erc721Three.address, POINT_FIVE_PERCENT);
+
+      const pairAddress1 = await manager.getPair(erc20One.address, erc721One.address, ONE_PERCENT);
+      const pairAddress2 = await manager.getPair(erc20Two.address, erc721Three.address, ONE_PERCENT);
+      const pairAddress3 = await manager.getPair(erc20Three.address, erc721Two.address, ONE_PERCENT);
+      const pairAddress4 = await manager.getPair(erc20Two.address, erc721One.address, ONE_PERCENT);
+      const pairAddress5 = await manager.getPair(erc20Two.address, erc721Three.address, POINT_FIVE_PERCENT);
+
+      const pair1 = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress1);
+      const pair2 = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress2);
+      const pair3 = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress3);
+      const pair4 = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress4);
+      const pair5 = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress5);
+
+      expect(await manager.tokenOf(pair1.address)).to.be.equal(1);
+      expect(await manager.tokenOf(pair2.address)).to.be.equal(2);
+      expect(await manager.tokenOf(pair3.address)).to.be.equal(3);
+      expect(await manager.tokenOf(pair4.address)).to.be.equal(4);
+      expect(await manager.tokenOf(pair5.address)).to.be.equal(5);
+    });
+
+    it('it should not create pair when use unsupported fee rule', async () => {
+      await expect(manager.createPair(erc20.address, erc721.address, 500)).to.be.revertedWithCustomError(
+        manager,
+        'STP_INVALID_FEE',
+      );
     });
 
     it('it should create same pair with different fee', async () => {
@@ -209,6 +286,12 @@ describe('SeacowsPositionManager', () => {
        */
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
       await erc721.connect(alice).setApprovalForAll(manager.address, true);
+
+      // use minimum amount as token amount: 0
+      await expect(
+        manager.connect(alice).mint(erc20.address, erc721.address, ONE_PERCENT, ZERO, [1, 2, 3], ZERO, MaxUint256),
+      ).to.be.revertedWithCustomError(manager, 'STP_INSUFFICIENT_LIQUIDITY_MINTED');
+
       const txn = await manager
         .connect(alice)
         .mint(
@@ -497,11 +580,13 @@ describe('SeacowsPositionManager', () => {
        * Position NFT ID of Alice: 3
        */
       const pairAddress = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
+      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
       expect(await erc20.balanceOf(pairAddress)).to.be.equal(ethers.utils.parseEther('3'));
       expect(await erc721.balanceOf(pairAddress)).to.be.equal(3);
 
       await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('1'));
-      await manager
+
+      const txn = await manager
         .connect(alice)
         .addLiquidity(
           erc20.address,
@@ -513,6 +598,11 @@ describe('SeacowsPositionManager', () => {
           2,
           MaxUint256,
         );
+
+      await expect(txn)
+        .to.emit(pair, 'Mint')
+        .withArgs(manager.address, ethers.utils.parseEther('1'), ethers.utils.parseEther('1'));
+
       /**
        * @notes Pair State after add liqudity
        * Input ETH: 4 Ethers
@@ -636,6 +726,16 @@ describe('SeacowsPositionManager', () => {
       expect(await weth.balanceOf(pairAddress)).to.be.equal(ethers.utils.parseEther('3'));
       expect(await erc721.balanceOf(pairAddress)).to.be.equal(3);
 
+      // use insufficient amount
+      await expect(
+        manager
+          .connect(alice)
+          .addLiquidityETH(erc721.address, ONE_PERCENT, [4], ethers.utils.parseEther('1'), 2, MaxUint256, {
+            value: ethers.utils.parseEther('0.5'),
+          }),
+      ).to.be.revertedWithCustomError(manager, 'SPM_INSUFFICIENT_AMOUNT');
+
+      // use enough amount
       await manager
         .connect(alice)
         .addLiquidityETH(erc721.address, ONE_PERCENT, [4], ethers.utils.parseEther('1'), 2, MaxUint256, {
@@ -727,7 +827,7 @@ describe('SeacowsPositionManager', () => {
        * Position NFT ID of Pair Lock Position: 2
        * Position NFT ID of Alice: 3
        */
-      await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('3'));
+      await erc20.connect(alice).approve(manager.address, ethers.utils.parseEther('1000'));
       await erc721.connect(alice).setApprovalForAll(manager.address, true);
       await manager
         .connect(alice)
@@ -766,7 +866,7 @@ describe('SeacowsPositionManager', () => {
       ).to.be.revertedWithCustomError(manager, 'SPM_EXPIRED');
     });
 
-    it('it should remove liquidity from Pool to SpeedBump', async () => {
+    it('it should remove liquidity partial from Pool to SpeedBump', async () => {
       /**
        * @notes Inital Pair State
        * Input ETH: 3 Ethers
@@ -783,7 +883,7 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
       expect(await erc721.ownerOf(1)).to.be.equal(pair.address);
 
-      const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
+      const { cTokenOutMin: cTokenOutMin1, cNftOutMin: cNftOutMin1 } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
         0,
@@ -791,6 +891,7 @@ describe('SeacowsPositionManager', () => {
         alice,
       );
 
+      // Partial Liquidity Removal
       await expect(
         manager
           .connect(alice)
@@ -799,7 +900,7 @@ describe('SeacowsPositionManager', () => {
             erc721.address,
             ONE_PERCENT,
             ethers.utils.parseEther('1'),
-            { cTokenOutMin, cNftOutMin, nftIds: [1] },
+            { cTokenOutMin: cTokenOutMin1, cNftOutMin: cNftOutMin1, nftIds: [1] },
             2,
             alice.address,
             MaxUint256,
@@ -830,44 +931,101 @@ describe('SeacowsPositionManager', () => {
 
       // Check liqudity balance of Alice Position NFT
       expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('2'));
+
+      // Remove all left
+      const { cTokenOutMin: cTokenOutMin2, cNftOutMin: cNftOutMin2 } = await getWithdrawAssetsOutMin(
+        pair.address,
+        ethers.utils.parseEther('2'),
+        0,
+        100,
+        alice,
+      );
+      await expect(
+        manager
+          .connect(alice)
+          .removeLiquidity(
+            erc20.address,
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('2'),
+            { cTokenOutMin: cTokenOutMin2, cNftOutMin: cNftOutMin2, nftIds: [2, 3] },
+            2,
+            alice.address,
+            MaxUint256,
+          ),
+      )
+        .to.emit(speedBump, 'RegisterNFTs')
+        .withArgs(alice.address, erc721.address, [2, 3])
+        .to.emit(speedBump, 'RegisterToken')
+        .withArgs(alice.address, erc20.address, ethers.utils.parseEther('2'));
+
+      // Check liqudity balance of Alice Position NFT
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ZERO);
+
+      // check it will warning with MINIMUM LIQUIDITY required.
+      await expect(
+        manager
+          .connect(alice)
+          .mint(
+            erc20.address,
+            erc721.address,
+            ONE_PERCENT,
+            ethers.utils.parseEther('1'),
+            [1],
+            ethers.utils.parseEther('1'),
+            MaxUint256,
+          ),
+      ).to.be.revertedWithCustomError(manager, 'SPM_INSUFFICIENT_MINIMUM_LIQUIDITY_AMOUNT');
     });
 
     it('it should withdraw from SpeedBump to be reverted when sender is not owner', async () => {
-      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
-      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('3'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(3);
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('100'));
       expect(await erc721.balanceOf(bob.address)).to.be.equal(5);
 
       await expect(speedBump.connect(bob).batchWithdrawNFTs(erc721.address, [1])).to.be.reverted;
       await expect(speedBump.connect(bob).withdrawToken(erc20.address)).to.be.reverted;
 
-      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
-      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('3'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(3);
       expect(await erc20.balanceOf(bob.address)).to.be.equal(ethers.utils.parseEther('100'));
       expect(await erc721.balanceOf(bob.address)).to.be.equal(5);
     });
 
     it('it should withdraw assets from SpeedBump when sender is owner', async () => {
-      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('1'));
-      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(1);
+      expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('3'));
+      expect(await erc721.balanceOf(speedBump.address)).to.be.equal(3);
       expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('7'));
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
 
-      await expect(await speedBump.connect(alice).batchWithdrawNFTs(erc721.address, [1]))
+      await expect(await speedBump.connect(alice).batchWithdrawNFTs(erc721.address, [1, 2, 3]))
         .to.emit(speedBump, 'WithdrawNFTs')
-        .withArgs(alice.address, erc721.address, [1]);
+        .withArgs(alice.address, erc721.address, [1, 2, 3]);
 
       await expect(speedBump.connect(alice).withdrawToken(erc20.address))
         .to.emit(speedBump, 'WithdrawToken')
-        .withArgs(alice.address, erc20.address, ethers.utils.parseEther('1'));
+        .withArgs(alice.address, erc20.address, ethers.utils.parseEther('3'));
 
       expect(await erc20.balanceOf(speedBump.address)).to.be.equal(ethers.utils.parseEther('0'));
       expect(await erc721.balanceOf(speedBump.address)).to.be.equal(0);
-      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('8'));
-      expect(await erc721.balanceOf(alice.address)).to.be.equal(3);
+      expect(await erc20.balanceOf(alice.address)).to.be.equal(ethers.utils.parseEther('10'));
+      expect(await erc721.balanceOf(alice.address)).to.be.equal(5);
     });
 
     it('it should revert for invalid token ID', async () => {
+      await manager
+        .connect(alice)
+        .mint(
+          erc20.address,
+          erc721.address,
+          ONE_PERCENT,
+          ethers.utils.parseEther('3'),
+          [1, 2, 3],
+          ethers.utils.parseEther('3'),
+          MaxUint256,
+        );
+
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
@@ -885,7 +1043,7 @@ describe('SeacowsPositionManager', () => {
             erc721.address,
             ONE_PERCENT,
             ethers.utils.parseEther('1'),
-            { cTokenOutMin, cNftOutMin, nftIds: [2] },
+            { cTokenOutMin, cNftOutMin, nftIds: [1] },
             5,
             alice.address,
             MaxUint256,
@@ -901,7 +1059,7 @@ describe('SeacowsPositionManager', () => {
             erc721.address,
             ONE_PERCENT,
             ethers.utils.parseEther('1'),
-            { cTokenOutMin, cNftOutMin, nftIds: [2] },
+            { cTokenOutMin, cNftOutMin, nftIds: [1] },
             1,
             alice.address,
             MaxUint256,
@@ -1000,7 +1158,28 @@ describe('SeacowsPositionManager', () => {
       expect(await erc721.balanceOf(alice.address)).to.be.equal(2);
       expect(await erc721.ownerOf(2)).to.be.equal(pair.address);
 
-      const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
+      // exceed the available liquidity.
+      const { cTokenOutMin: cTokenOutMin1, cNftOutMin: cNftOutMin1 } = await getWithdrawAssetsOutMin(
+        pair.address,
+        ethers.utils.parseEther('100'),
+        0,
+        100,
+        alice,
+      );
+      await expect(
+        manager.connect(alice).removeLiquidityETH(
+          erc721.address,
+          ONE_PERCENT,
+          ethers.utils.parseEther('100'), // 100 liquidity
+          { cTokenOutMin: cTokenOutMin1, cNftOutMin: cNftOutMin1, nftIds: [2] },
+          2,
+          alice.address,
+          MaxUint256,
+        ),
+      ).to.be.revertedWith('ERC3525: insufficient balance for transfer');
+
+      // available liquidity.
+      const { cTokenOutMin: cTokenOutMin2, cNftOutMin: cNftOutMin2 } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('1'),
         0,
@@ -1015,7 +1194,7 @@ describe('SeacowsPositionManager', () => {
             erc721.address,
             ONE_PERCENT,
             ethers.utils.parseEther('1'),
-            { cTokenOutMin, cNftOutMin, nftIds: [2] },
+            { cTokenOutMin: cTokenOutMin2, cNftOutMin: cNftOutMin2, nftIds: [2] },
             2,
             alice.address,
             MaxUint256,
@@ -1119,7 +1298,7 @@ describe('SeacowsPositionManager', () => {
     });
   });
 
-  describe('When Burn', () => {
+  describe('When Burn NFT / Burn Value', () => {
     let erc721: MockERC721;
     let erc20: MockERC20;
     let pair: SeacowsERC721TradePair;
@@ -1182,7 +1361,20 @@ describe('SeacowsPositionManager', () => {
       );
     });
 
+    it('it should not burn liquidity NFT when msg sender is not owner', async () => {
+      await expect(manager.connect(bob).burn(2)).to.revertedWithCustomError(manager, 'SPM_UNAUTHORIZED');
+    });
+
+    it('it should not burn liquidity value when msg sender is not pair', async () => {
+      await expect(manager.connect(bob).burnValue(2, ethers.utils.parseEther('1'))).to.revertedWithCustomError(
+        manager,
+        'SPM_ONLY_PAIR_CAN_BURN',
+      );
+    });
+
     it('it should burn liquidity when liquidity = 0 in the NFT', async () => {
+      expect(await manager['balanceOf(uint256)'](2)).to.be.equal(ethers.utils.parseEther('3'));
+      expect(await manager.totalSupply()).to.be.eq(TWO);
       const { cTokenOutMin, cNftOutMin } = await getWithdrawAssetsOutMin(
         pair.address,
         ethers.utils.parseEther('3'),
@@ -1207,6 +1399,12 @@ describe('SeacowsPositionManager', () => {
         .withArgs(alice.address, ethers.constants.AddressZero, 2)
         .to.emit(manager, 'TransferValue')
         .withArgs(2, 0, 0);
+
+      // check this tokenId is erased
+      await expect(manager['balanceOf(uint256)'](2)).to.be.revertedWith('ERC3525: invalid token ID');
+
+      // total supply reduces as expected, from TWO => ONE
+      expect(await manager.totalSupply()).to.be.eq(ONE);
     });
   });
 
@@ -1229,21 +1427,7 @@ describe('SeacowsPositionManager', () => {
       manager = await SeacowsPositionManagerFC.deploy(template.address, weth.address, speedBump.address);
       await manager.setRoyaltyRegistry(registry.address);
       await speedBump.initialize(manager.address);
-    });
-
-    it('it should have correct initial configuration after create pair', async () => {
       await manager.createPair(erc20.address, erc721.address, ONE_PERCENT);
-
-      const pairAddress = await manager.getPair(erc20.address, erc721.address, ONE_PERCENT);
-      const pair = await ethers.getContractAt('SeacowsERC721TradePair', pairAddress);
-
-      expect(await pair.positionManager()).to.be.equal(manager.address);
-      expect(await pair.feePercent()).to.be.equal(ONE_PERCENT);
-      expect(await pair.PERCENTAGE_PRECISION()).to.be.equal(10000);
-      expect(await pair.ONE_PERCENT()).to.be.equal(ONE_PERCENT);
-      expect(await pair.POINT_FIVE_PERCENT()).to.be.equal(POINT_FIVE_PERCENT);
-      expect(await pair.slot()).to.be.equal(1);
-      expect(await pair.totalSupply()).to.be.equal(0);
     });
 
     it('it should set fee manager to be reverted when caller is not owner', async () => {
@@ -1257,6 +1441,16 @@ describe('SeacowsPositionManager', () => {
       expect(await manager.feeManager()).to.be.eql(owner.address);
       expect(await manager.connect(owner).setFeeManager(alice.address));
       expect(await manager.feeManager()).to.be.eql(alice.address);
+
+      // restricted to the old manager.
+      await expect(manager.connect(owner).setFeeManager(bob.address)).to.be.revertedWithCustomError(
+        manager,
+        'FM_NON_FEE_MANAGER',
+      );
+
+      // available to new manager.
+      expect(await manager.connect(alice).setFeeManager(owner.address));
+      expect(await manager.feeManager()).to.be.eql(owner.address);
     });
 
     it('it should set royalty fee manager to be reverted when caller is not owner', async () => {
@@ -1270,6 +1464,16 @@ describe('SeacowsPositionManager', () => {
       expect(await manager.royaltyFeeManager()).to.be.eql(owner.address);
       expect(await manager.connect(owner).setRoyaltyFeeManager(alice.address));
       expect(await manager.royaltyFeeManager()).to.be.eql(alice.address);
+
+      // restricted to the old manager.
+      await expect(manager.connect(owner).setRoyaltyFeeManager(bob.address)).to.be.revertedWithCustomError(
+        manager,
+        'FM_NON_ROYALTY_FEE_MANAGER',
+      );
+
+      // available to new manager.
+      expect(await manager.connect(alice).setRoyaltyFeeManager(owner.address));
+      expect(await manager.royaltyFeeManager()).to.be.eql(owner.address);
     });
   });
 });
