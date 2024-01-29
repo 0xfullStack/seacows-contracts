@@ -172,6 +172,12 @@ describe('SeacowsPositionManager', () => {
       expect(await manager.tokenOf(pair5.address)).to.be.equal(5);
     });
 
+    it('it should create pair when use zero address', async () => {
+      await manager.createPair(erc20.address, ZERO_ADDRESS, ONE_PERCENT);
+      await manager.createPair(ZERO_ADDRESS, erc721.address, ONE_PERCENT);
+      await manager.createPair(ZERO_ADDRESS, ZERO_ADDRESS, ONE_PERCENT);
+    });
+
     it('it should not create pair when use unsupported fee rule', async () => {
       await expect(manager.createPair(erc20.address, erc721.address, 500)).to.be.revertedWithCustomError(
         manager,
