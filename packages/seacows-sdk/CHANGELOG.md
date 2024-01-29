@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.23.0 (2024-01-29)
+
+
+### Features
+
+* unit test support zero address when create pair ([903ac38](https://github.com/yolominds/seacows-contracts/commit/903ac381c740d307a23dc5f7c47c633c2fec7448))
+
 ### 1.22.2 (2024-01-29)
 
 ### 1.22.1 (2024-01-23)
