@@ -12,6 +12,7 @@ library PricingKernel {
      * @param Y0: the initial amount of token Y (ERC-721)
      * @param E: the amount of token X (ERC-20) to be withdrawn
      * @param N: the amount of token Y (ERC-721) to be withdrawn
+     * @return : the amount of token X should compensating
      */
     function partialCompensation(int256 X0, int256 Y0, int256 E, int256 N) public pure returns (int256) {
         require(E >= 0, 'PricingKernel: E must be non-negative.');
@@ -52,6 +53,7 @@ library PricingKernel {
      * @param E: the amount of token X (ERC-20) to be withdrawn
      * @param N: the amount of token Y (ERC-721) to be withdrawn
      * @param DIGITS: caller used digits
+     * @return : the compensated amount of token X and token Y
      */
     function partialCompensated(
         uint256 X0,
@@ -73,8 +75,14 @@ library PricingKernel {
     }
 
     /**
-     * @notice convert from caller used digits to library used digits (18 -> 24)
+     * @notice convert from caller used digits to library used digits 
+     * @dev for example: seacows digits is 18, pricing-kernel digits is 24, this function transfer it from 18 to 24
+     * @param X0: the initial amount of token X (ERC-20)
+     * @param Y0: the initial amount of token Y (ERC-721)
+     * @param E: the amount of token X (ERC-20) to be withdrawn
+     * @param N: the amount of token Y (ERC-721) to be withdrawn
      * @param DIGITS: caller used digits
+     * @return : converted values
      */
     function convertFromCallerDigitsToLibDigits(
         uint256 X0,
@@ -92,8 +100,12 @@ library PricingKernel {
     }
 
     /**
-     * @notice convert from lib used digits to caller used digits (24 -> 18)
+     * @notice convert from lib used digits to caller used digits
+     * @dev for example: seacows digits is 18, pricing-kernel digits is 24, this function transfer it from 24 to 18
+     * @param compensatedE: the amount of token X (ERC-20) to be withdrawn, pluse compensated part
+     * @param compensatedN: the amount of token Y (ERC-721) to be withdrawn, pluse compensated part
      * @param DIGITS: caller used digits
+     * @return : converted values
      */
     function convertFromLibDigitsToCallerDigits(
         int256 compensatedE,

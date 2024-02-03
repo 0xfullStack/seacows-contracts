@@ -11,7 +11,7 @@
     "deploy:dev:mumbai": "hardhat deploy:seacows --env dev --network mumbai",
     "deploy:prod:mainnet": "hardhat deploy:seacows --env prod --network mainnet",
     "deploy:prod:polygon": "hardhat deploy:seacows --env prod --network polygon",
-    "test": "hardhat test",
+    "test": "REPORT_GAS=true hardhat test",
     "coverage": "hardhat coverage",
     "size": "hardhat size-contracts",
     "format": "prettier --write --plugin=prettier-plugin-solidity 'contracts/**/*.sol'",

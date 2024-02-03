@@ -25,11 +25,14 @@ contract SeacowsERC721TradePairFactory is SeacowsErrors, ISeacowsERC721TradePair
     }
 
     function _createPair(address _token, address _collection, uint256 _fee) internal returns (address _pair) {
+        if (_token == address(0) || _collection == address(0)) {
+            revert STPF_ZERO_ADDRESS();
+        }
         if (_pairs[_token][_collection][_fee] != address(0)) {
             revert STPF_PAIR_ALREADY_EXIST();
         }
         _pair = Clones.clone(template());
-        ISeacowsERC721TradePair(_pair).initialize(_token, _collection, _fee);
         _pairs[_token][_collection][_fee] = _pair;
+        ISeacowsERC721TradePair(_pair).initialize(_token, _collection, _fee);
     }
 }

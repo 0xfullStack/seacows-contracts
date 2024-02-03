@@ -7,8 +7,6 @@ contract SeacowsErrors {
      */
     error SPM_INVALID_TOKEN_ID();
 
-    error SPM_UNAUTHORIZED();
-
     error SPM_EXPIRED();
 
     error SPM_PAIR_NOT_EXIST();
@@ -66,6 +64,7 @@ contract SeacowsErrors {
      * SeacowsERC721TradePairFactory Errors
      */
     error STPF_PAIR_ALREADY_EXIST();
+    error STPF_ZERO_ADDRESS();
 
     /**
      * SeacowsPairMetadata Errors

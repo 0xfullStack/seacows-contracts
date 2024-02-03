@@ -16,18 +16,16 @@ contract FeeManagement is SeacowsErrors, IFeeManagement {
         _feeTo = msg.sender;
     }
 
-    modifier onlyManager() {
+    function _onlyManager() internal view {
         if (msg.sender != feeManager()) {
             revert FM_NON_FEE_MANAGER();
         }
-        _;
     }
 
-    modifier onlyRoyaltyFeeManager() {
+    function _onlyRoyaltyFeeManager() internal view {
         if (msg.sender != royaltyFeeManager()) {
             revert FM_NON_ROYALTY_FEE_MANAGER();
         }
-        _;
     }
 
     function feeTo() public view returns (address) {
@@ -46,19 +44,23 @@ contract FeeManagement is SeacowsErrors, IFeeManagement {
         return _royaltyRegistry;
     }
 
-    function setFeeTo(address _to) public onlyManager {
+    function setFeeTo(address _to) public {
+        _onlyManager();
         _feeTo = _to;
     }
 
-    function setFeeManager(address _to) public onlyManager {
+    function setFeeManager(address _to) public {
+        _onlyManager();
         _feeManager = _to;
     }
 
-    function setRoyaltyFeeManager(address _to) public onlyRoyaltyFeeManager {
+    function setRoyaltyFeeManager(address _to) public {
+        _onlyRoyaltyFeeManager();
         _royaltyFeeManager = _to;
     }
 
-    function setRoyaltyRegistry(address _to) public onlyRoyaltyFeeManager {
+    function setRoyaltyRegistry(address _to) public {
+        _onlyRoyaltyFeeManager();
         _royaltyRegistry = _to;
     }
 }

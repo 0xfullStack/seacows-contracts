@@ -172,10 +172,19 @@ describe('SeacowsPositionManager', () => {
       expect(await manager.tokenOf(pair5.address)).to.be.equal(5);
     });
 
-    it('it should create pair when use zero address', async () => {
-      await manager.createPair(erc20.address, ZERO_ADDRESS, ONE_PERCENT);
-      await manager.createPair(ZERO_ADDRESS, erc721.address, ONE_PERCENT);
-      await manager.createPair(ZERO_ADDRESS, ZERO_ADDRESS, ONE_PERCENT);
+    it('it should not create pair when use zero address', async () => {
+      await expect(manager.createPair(ZERO_ADDRESS, ZERO_ADDRESS, 500)).to.be.revertedWithCustomError(
+        manager,
+        'STPF_ZERO_ADDRESS',
+      );
+      await expect(manager.createPair(erc20.address, ZERO_ADDRESS, 500)).to.be.revertedWithCustomError(
+        manager,
+        'STPF_ZERO_ADDRESS',
+      );
+      await expect(manager.createPair(ZERO_ADDRESS, erc721.address, 500)).to.be.revertedWithCustomError(
+        manager,
+        'STPF_ZERO_ADDRESS',
+      );
     });
 
     it('it should not create pair when use unsupported fee rule', async () => {
@@ -1368,7 +1377,7 @@ describe('SeacowsPositionManager', () => {
     });
 
     it('it should not burn liquidity NFT when msg sender is not owner', async () => {
-      await expect(manager.connect(bob).burn(2)).to.revertedWithCustomError(manager, 'SPM_UNAUTHORIZED');
+      await expect(manager.connect(bob).burn(2)).to.revertedWithCustomError(manager, 'SPM_INVALID_TOKEN_ID');
     });
 
     it('it should not burn liquidity value when msg sender is not pair', async () => {
