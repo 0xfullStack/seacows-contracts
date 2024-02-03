@@ -162,6 +162,10 @@ contract SeacowsPositionManager is
 
     /**
         @notice Remove liquidity from the Pair based on the ERC20 address, ERC721 address and fee tier
+        @dev cTokenOut and cNftOut are calculated based on the user's actual share, 
+        representing the expected quantities the user can receive, including floating points. 
+        However, due to the indivisibility of NFTs, we must adjust through the core compensation algorithm to ensure the obtained NFT quantity is an integer, 
+        namely tokenOut and idsOut.
         @param token The ERC20 contract address
         @param collection The ERC721 contract address
         @param fee The fee tier. Please check TradePair for the fee tiers.
@@ -170,10 +174,10 @@ contract SeacowsPositionManager is
         @param fromTokenId The Position NFT that is used to burn the liquidity and redeem the assets.
         @param to The address that will receive the withdrawn assets
         @param deadline The timestamp of deadline in seconds
-        @return cTokenOut The estimated amount of token user will receive
-        @return cNftOut The estimated amount of nft user will receive
-        @return tokenOut The actual amount of token user received by algorithm compensation
-        @return idsOut The actual nft tokenIDs array user received by algorithm compensation
+        @return cTokenOut The estimated amount of ERC20 tokens the user is expected to receive.
+        @return cNftOut The estimated count of ERC721 tokens the user is expected to receive.
+        @return tokenOut The actual amount of ERC20 tokens received after be adjusted by algorithmic compensation.
+        @return idsOut An array of token IDs representing the actual ERC721 tokens received, after be adjusted by algorithmic compensation.
      */
     function removeLiquidity(
         address token,
@@ -203,6 +207,10 @@ contract SeacowsPositionManager is
 
     /**
         @notice Remove liquidity from the WETH Pair based on the ERC721 address and fee tier. Also convert WETH to ETH
+        @dev cTokenOut and cNftOut are calculated based on the user's actual share, 
+        representing the expected quantities the user can receive, including floating points. 
+        However, due to the indivisibility of NFTs, we must adjust through the core compensation algorithm to ensure the obtained NFT quantity is an integer, 
+        namely tokenOut and idsOut.
         @param collection The ERC721 contract address
         @param fee The fee tier. Please check TradePair for the fee tiers.
         @param liquidity The amount of liquidity wanted to remove.
@@ -210,10 +218,10 @@ contract SeacowsPositionManager is
         @param fromTokenId The position NFT that is used to burn the liquidity and redeem the assets.
         @param to The address that will receive the withdrawn assets
         @param deadline The timestamp of deadline in seconds
-        @return cTokenOut The estimated amount of eth user will receive
-        @return cNftOut The estimated amount of nft user will receive
-        @return tokenOut The actual amount of eth user received by algorithm compensation
-        @return idsOut The actual nft tokenIDs array user received by algorithm compensation
+        @return cTokenOut The estimated amount of ERC20 tokens the user is expected to receive.
+        @return cNftOut The estimated count of ERC721 tokens the user is expected to receive.
+        @return tokenOut The actual amount of ERC20 tokens received after be adjusted by algorithmic compensation.
+        @return idsOut An array of token IDs representing the actual ERC721 tokens received, after be adjusted by algorithmic compensation.
      */
     function removeLiquidityETH(
         address collection,

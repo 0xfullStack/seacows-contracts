@@ -75,14 +75,16 @@ library PricingKernel {
     }
 
     /**
-     * @notice convert from caller used digits to library used digits 
-     * @dev for example: seacows digits is 18, pricing-kernel digits is 24, this function transfer it from 18 to 24
-     * @param X0: the initial amount of token X (ERC-20)
-     * @param Y0: the initial amount of token Y (ERC-721)
-     * @param E: the amount of token X (ERC-20) to be withdrawn
-     * @param N: the amount of token Y (ERC-721) to be withdrawn
-     * @param DIGITS: caller used digits
-     * @return : converted values
+     * @notice Converts numerical values from the caller's precision to the library's precision.
+     * @dev For instance, if the library uses a precision of 24 (as in the case of pricing-kernel), 
+     * and the caller uses a precision of 18 (as in the case of seacows), this function is responsible 
+     * for converting values from 18-digit precision to 24-digit precision.
+     * @param X0: The initial amount of token X (ERC-20)
+     * @param Y0: The initial amount of token Y (ERC-721)
+     * @param E: The amount of token X (ERC-20) to be withdrawn
+     * @param N: The amount of token Y (ERC-721) to be withdrawn
+     * @param DIGITS: The precision used by the caller
+     * @return : The values converted to the library's precision
      */
     function convertFromCallerDigitsToLibDigits(
         uint256 X0,
@@ -100,12 +102,13 @@ library PricingKernel {
     }
 
     /**
-     * @notice convert from lib used digits to caller used digits
-     * @dev for example: seacows digits is 18, pricing-kernel digits is 24, this function transfer it from 24 to 18
-     * @param compensatedE: the amount of token X (ERC-20) to be withdrawn, pluse compensated part
-     * @param compensatedN: the amount of token Y (ERC-721) to be withdrawn, pluse compensated part
-     * @param DIGITS: caller used digits
-     * @return : converted values
+     * @notice Converts numerical values from the library's precision to the caller's precision.
+     * @dev For example: seacows uses a precision of 18, while pricing-kernel uses a precision of 24. 
+     * This function converts values from 24-digit precision (library's precision) to 18-digit precision (caller's precision).
+     * @param compensatedE: The amount of token X (ERC-20) to be withdrawn, including the compensated part, in library's precision.
+     * @param compensatedN: The amount of token Y (ERC-721) to be withdrawn, including the compensated part, in library's precision.
+     * @param DIGITS: The precision used by the caller (to which the conversion is targeted).
+     * @return : The values converted to the caller's precision.
      */
     function convertFromLibDigitsToCallerDigits(
         int256 compensatedE,
