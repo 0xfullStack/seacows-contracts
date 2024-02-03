@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.23.1 (2024-02-03)
+
+
+### Bug Fixes
+
+* Reduce contract size to below 24k ([#40](https://github.com/yolominds/seacows-contracts/issues/40)) ([af74e1b](https://github.com/yolominds/seacows-contracts/commit/af74e1bd4f4625ee739674bfa7bc613947622eb6))
+
 ## 1.23.0 (2024-01-29)
 
 
