@@ -32,11 +32,6 @@
   },
   {
     "inputs": [],
-    "name": "SPMD_PAUSED",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
     "type": "error"
   },
@@ -102,11 +97,6 @@
   },
   {
     "inputs": [],
-    "name": "SPM_UNAUTHORIZED",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "SSB_ETH_TRANSFER_FAILED",
     "type": "error"
   },
@@ -128,6 +118,11 @@
   {
     "inputs": [],
     "name": "STPF_PAIR_ALREADY_EXIST",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "STPF_ZERO_ADDRESS",
     "type": "error"
   },
   {

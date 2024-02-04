@@ -36,7 +36,6 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "paused()": FunctionFragment;
     "positionInfos(uint256)": FunctionFragment;
     "positionManager()": FunctionFragment;
     "slot()": FunctionFragment;
@@ -108,7 +107,6 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "positionInfos",
     values: [BigNumberish]
@@ -185,7 +183,6 @@ interface SeacowsRewarderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "positionInfos",
     data: BytesLike
@@ -333,8 +330,6 @@ export class SeacowsRewarder extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    paused(overrides?: CallOverrides): Promise<[boolean]>;
-
     positionInfos(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -421,8 +416,6 @@ export class SeacowsRewarder extends BaseContract {
   ): Promise<ContractTransaction>;
 
   ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  paused(overrides?: CallOverrides): Promise<boolean>;
 
   positionInfos(
     arg0: BigNumberish,
@@ -512,8 +505,6 @@ export class SeacowsRewarder extends BaseContract {
     ): Promise<string>;
 
     ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    paused(overrides?: CallOverrides): Promise<boolean>;
 
     positionInfos(
       arg0: BigNumberish,
@@ -632,8 +623,6 @@ export class SeacowsRewarder extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    paused(overrides?: CallOverrides): Promise<BigNumber>;
-
     positionInfos(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -730,8 +719,6 @@ export class SeacowsRewarder extends BaseContract {
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     positionInfos(
       arg0: BigNumberish,

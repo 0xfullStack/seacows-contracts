@@ -37,21 +37,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ContextUpgradeable__factory>;
     getContractFactory(
-      name: "Ownable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Ownable__factory>;
-    getContractFactory(
-      name: "Ownable2Step",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Ownable2Step__factory>;
-    getContractFactory(
       name: "IERC2981",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC2981__factory>;
-    getContractFactory(
-      name: "Pausable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Pausable__factory>;
     getContractFactory(
       name: "ERC2981",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -164,10 +152,6 @@ declare module "hardhat/types/runtime" {
       name: "SeacowsErrors",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SeacowsErrors__factory>;
-    getContractFactory(
-      name: "SeacowsLimitAccessControl",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SeacowsLimitAccessControl__factory>;
     getContractFactory(
       name: "SeacowsPairMetadata",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -300,25 +284,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ContextUpgradeable>;
     getContractAt(
-      name: "Ownable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Ownable>;
-    getContractAt(
-      name: "Ownable2Step",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Ownable2Step>;
-    getContractAt(
       name: "IERC2981",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC2981>;
-    getContractAt(
-      name: "Pausable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Pausable>;
     getContractAt(
       name: "ERC2981",
       address: string,
@@ -459,11 +428,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.SeacowsErrors>;
-    getContractAt(
-      name: "SeacowsLimitAccessControl",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SeacowsLimitAccessControl>;
     getContractAt(
       name: "SeacowsPairMetadata",
       address: string,

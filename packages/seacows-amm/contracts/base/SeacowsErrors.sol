@@ -70,7 +70,6 @@ contract SeacowsErrors {
      * SeacowsPairMetadata Errors
      */
     error SPMD_ONLY_POSITION_MANAGER();
-    error SPMD_PAUSED();
 
     /**
      * FeeManagement Errors

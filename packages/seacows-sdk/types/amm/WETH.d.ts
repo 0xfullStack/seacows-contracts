@@ -195,7 +195,13 @@ export class WETH extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    withdraw(
+    "withdraw(uint256)"(
+      wad: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "withdraw(address,uint256)"(
+      dst: string,
       wad: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -240,7 +246,13 @@ export class WETH extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  withdraw(
+  "withdraw(uint256)"(
+    wad: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "withdraw(address,uint256)"(
+    dst: string,
     wad: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -283,7 +295,16 @@ export class WETH extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    withdraw(wad: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    "withdraw(uint256)"(
+      wad: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "withdraw(address,uint256)"(
+      dst: string,
+      wad: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
@@ -384,7 +405,13 @@ export class WETH extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    withdraw(
+    "withdraw(uint256)"(
+      wad: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "withdraw(address,uint256)"(
+      dst: string,
       wad: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -433,7 +460,13 @@ export class WETH extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    withdraw(
+    "withdraw(uint256)"(
+      wad: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "withdraw(address,uint256)"(
+      dst: string,
       wad: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

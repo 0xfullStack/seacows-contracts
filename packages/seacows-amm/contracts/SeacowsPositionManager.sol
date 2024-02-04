@@ -397,8 +397,4 @@ contract SeacowsPositionManager is
         }
         return _renderTokenMetadata(tokenId);
     }
-
-    function isPaused() external view returns (bool) {
-        return paused();
-    }
 }

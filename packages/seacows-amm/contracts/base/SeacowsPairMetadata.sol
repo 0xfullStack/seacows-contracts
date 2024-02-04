@@ -35,13 +35,6 @@ contract SeacowsPairMetadata is
         _;
     }
 
-    modifier whenNotPaused() {
-        if (paused()) {
-            revert SPMD_PAUSED();
-        }
-        _;
-    }
-
     // solhint-disable-next-line func-name-mixedcase
     function __SeacowsPairMetadata_init(
         address positionManager_,
@@ -71,10 +64,6 @@ contract SeacowsPairMetadata is
 
     function totalSupply() public view override returns (uint256) {
         return positionManager().totalValueSupplyOf(slot());
-    }
-
-    function paused() public view returns (bool) {
-        return positionManager().isPaused();
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
