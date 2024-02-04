@@ -76,8 +76,8 @@ library PricingKernel {
 
     /**
      * @notice Converts numerical values from the caller's precision to the library's precision.
-     * @dev For instance, if the library uses a precision of 24 (as in the case of pricing-kernel), 
-     * and the caller uses a precision of 18 (as in the case of seacows), this function is responsible 
+     * @dev For instance, if the library uses a precision of 24 (as in the case of pricing-kernel),
+     * and the caller uses a precision of 18 (as in the case of seacows), this function is responsible
      * for converting values from 18-digit precision to 24-digit precision.
      * @param X0: The initial amount of token X (ERC-20)
      * @param Y0: The initial amount of token Y (ERC-721)
@@ -103,7 +103,7 @@ library PricingKernel {
 
     /**
      * @notice Converts numerical values from the library's precision to the caller's precision.
-     * @dev For example: seacows uses a precision of 18, while pricing-kernel uses a precision of 24. 
+     * @dev For example: seacows uses a precision of 18, while pricing-kernel uses a precision of 24.
      * This function converts values from 24-digit precision (library's precision) to 18-digit precision (caller's precision).
      * @param compensatedE: The amount of token X (ERC-20) to be withdrawn, including the compensated part, in library's precision.
      * @param compensatedN: The amount of token Y (ERC-721) to be withdrawn, including the compensated part, in library's precision.
