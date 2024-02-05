@@ -6,13 +6,18 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {IERC165} from '@openzeppelin/contracts/utils/introspection/IERC165.sol';
-import {ISeacowsSwapCallback} from '@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol';
+// import {ISeacowsSwapCallback} from '@yolominds/seacows-periphery/contracts/interfaces/ISeacowsSwapCallback.sol';
 import {ISeacowsERC721TradePair} from './interfaces/ISeacowsERC721TradePair.sol';
 import {ISeacowsPositionManager} from './interfaces/ISeacowsPositionManager.sol';
 import {SeacowsComplement} from './base/SeacowsComplement.sol';
 import {SeacowsPairMetadata} from './base/SeacowsPairMetadata.sol';
 import {SeacowsRewarder} from './base/SeacowsRewarder.sol';
 import {RoyaltyManagement} from './base/RoyaltyManagement.sol';
+
+
+interface ISeacowsSwapCallback {
+    function seacowsSwapCallback(bytes calldata data) external returns (uint256 tokenAmountIn, uint256[] memory idsIn);
+}
 
 contract SeacowsERC721TradePair is
     ReentrancyGuardUpgradeable,
