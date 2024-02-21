@@ -15,8 +15,9 @@ import {ISeacowsERC3525} from '../interfaces/ISeacowsERC3525.sol';
 import {ISeacowsERC721TradePair} from '../interfaces/ISeacowsERC721TradePair.sol';
 import {SeacowsErrors} from './SeacowsErrors.sol';
 import {NFTRenderer} from '../lib/NFTRenderer.sol';
+import {SeacowsLimitAccessControl} from './SeacowsLimitAccessControl.sol';
 
-contract SeacowsERC3525 is ISeacowsERC3525, SeacowsErrors, ERC3525, ERC721Holder {
+contract SeacowsERC3525 is ISeacowsERC3525, SeacowsErrors, ERC3525, ERC721Holder, SeacowsLimitAccessControl {
     using Counters for Counters.Counter;
     using SafeERC20 for IERC20;
 

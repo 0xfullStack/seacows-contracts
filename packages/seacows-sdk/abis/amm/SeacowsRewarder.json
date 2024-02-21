@@ -21,6 +21,11 @@
   },
   {
     "inputs": [],
+    "name": "SPMD_PAUSED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
     "type": "error"
   },
@@ -477,6 +482,19 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",

@@ -21,4 +21,6 @@ interface ISeacowsPositionManager is ISeacowsERC3525, IFeeManagement, ISeacowsER
     function mintValue(uint256 tokenId, uint256 _value) external;
 
     function burnValue(uint256 tokenId, uint256 burnValue_) external;
+
+    function isPaused() external view returns (bool);
 }

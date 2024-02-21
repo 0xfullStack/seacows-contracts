@@ -30,6 +30,7 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "paused()": FunctionFragment;
     "positionManager()": FunctionFragment;
     "slot()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -73,6 +74,7 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "positionManager",
     values?: undefined
@@ -115,6 +117,7 @@ interface SeacowsPairMetadataInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "positionManager",
     data: BytesLike
@@ -220,6 +223,8 @@ export class SeacowsPairMetadata extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
     positionManager(overrides?: CallOverrides): Promise<[string]>;
 
     slot(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -268,6 +273,8 @@ export class SeacowsPairMetadata extends BaseContract {
 
   ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
   positionManager(overrides?: CallOverrides): Promise<string>;
 
   slot(overrides?: CallOverrides): Promise<BigNumber>;
@@ -315,6 +322,8 @@ export class SeacowsPairMetadata extends BaseContract {
     ): Promise<string>;
 
     ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
 
     positionManager(overrides?: CallOverrides): Promise<string>;
 
@@ -378,6 +387,8 @@ export class SeacowsPairMetadata extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
     positionManager(overrides?: CallOverrides): Promise<BigNumber>;
 
     slot(overrides?: CallOverrides): Promise<BigNumber>;
@@ -435,6 +446,8 @@ export class SeacowsPairMetadata extends BaseContract {
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

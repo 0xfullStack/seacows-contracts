@@ -33,6 +33,7 @@ interface RoyaltyManagementInterface extends ethers.utils.Interface {
     "onERC3525Received(address,uint256,uint256,uint256,bytes)": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "paused()": FunctionFragment;
     "positionManager()": FunctionFragment;
     "royaltyFeeManager()": FunctionFragment;
     "royaltyRegistry()": FunctionFragment;
@@ -91,6 +92,7 @@ interface RoyaltyManagementInterface extends ethers.utils.Interface {
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "positionManager",
     values?: undefined
@@ -157,6 +159,7 @@ interface RoyaltyManagementInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "positionManager",
     data: BytesLike
@@ -283,6 +286,8 @@ export class RoyaltyManagement extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
     positionManager(overrides?: CallOverrides): Promise<[string]>;
 
     royaltyFeeManager(overrides?: CallOverrides): Promise<[string]>;
@@ -349,6 +354,8 @@ export class RoyaltyManagement extends BaseContract {
 
   ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
   positionManager(overrides?: CallOverrides): Promise<string>;
 
   royaltyFeeManager(overrides?: CallOverrides): Promise<string>;
@@ -414,6 +421,8 @@ export class RoyaltyManagement extends BaseContract {
     ): Promise<string>;
 
     ownerOf(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
 
     positionManager(overrides?: CallOverrides): Promise<string>;
 
@@ -495,6 +504,8 @@ export class RoyaltyManagement extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
     positionManager(overrides?: CallOverrides): Promise<BigNumber>;
 
     royaltyFeeManager(overrides?: CallOverrides): Promise<BigNumber>;
@@ -574,6 +585,8 @@ export class RoyaltyManagement extends BaseContract {
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

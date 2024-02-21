@@ -2,7 +2,7 @@
 
 echo "############################## Choose The Network ##############################"
 
-networks=("mainnet" "polygon", "goerli" "sepolia", "mumbai")
+networks=("mainnet" "polygon" "goerli" "sepolia" "mumbai")
 
 select network in "${networks[@]}"; do
   case $network in
@@ -10,7 +10,7 @@ select network in "${networks[@]}"; do
       environment="prod"
       break
       ;;
-    "sepolia"|"goerli"|"mumbai")
+    "goerli"|"sepolia"|"mumbai")
       environment="dev"
       break
       ;;
