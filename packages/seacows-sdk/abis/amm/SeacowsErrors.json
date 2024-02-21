@@ -21,6 +21,11 @@
   },
   {
     "inputs": [],
+    "name": "SPMD_PAUSED",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
     "type": "error"
   },

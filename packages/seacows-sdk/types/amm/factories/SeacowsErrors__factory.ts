@@ -29,6 +29,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "SPMD_PAUSED",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "SPM_BELOW_NFT_OUT_MIN_CONSTRAINT",
     type: "error",
   },
@@ -195,7 +200,7 @@ const _abi = [
 ];
 
 const _bytecode =
-  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220b9d53278f81270c9d4fd7254a24838a5800410ba062d916f1db9980b3895cfe964736f6c634300080d0033";
+  "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212201abef9adb74a05492ab0321ce826d8154746bc02b9c9fe0b12b0a2b850163e8864736f6c634300080d0033";
 
 export class SeacowsErrors__factory extends ContractFactory {
   constructor(

@@ -31,6 +31,7 @@ interface ISeacowsPositionManagerInterface extends ethers.utils.Interface {
     "getApproved(uint256)": FunctionFragment;
     "getPair(address,address,uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "isPaused()": FunctionFragment;
     "mintValue(uint256,uint256)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "royaltyFeeManager()": FunctionFragment;
@@ -81,6 +82,7 @@ interface ISeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
+  encodeFunctionData(functionFragment: "isPaused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "mintValue",
     values: [BigNumberish, BigNumberish]
@@ -157,6 +159,7 @@ interface ISeacowsPositionManagerInterface extends ethers.utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "isPaused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintValue", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -389,6 +392,8 @@ export class ISeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    isPaused(overrides?: CallOverrides): Promise<[boolean]>;
+
     mintValue(
       tokenId: BigNumberish,
       _value: BigNumberish,
@@ -551,6 +556,8 @@ export class ISeacowsPositionManager extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  isPaused(overrides?: CallOverrides): Promise<boolean>;
+
   mintValue(
     tokenId: BigNumberish,
     _value: BigNumberish,
@@ -702,6 +709,8 @@ export class ISeacowsPositionManager extends BaseContract {
       _operator: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    isPaused(overrides?: CallOverrides): Promise<boolean>;
 
     mintValue(
       tokenId: BigNumberish,
@@ -991,6 +1000,8 @@ export class ISeacowsPositionManager extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    isPaused(overrides?: CallOverrides): Promise<BigNumber>;
+
     mintValue(
       tokenId: BigNumberish,
       _value: BigNumberish,
@@ -1149,6 +1160,8 @@ export class ISeacowsPositionManager extends BaseContract {
       _operator: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    isPaused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mintValue(
       tokenId: BigNumberish,
